@@ -45,8 +45,7 @@ function getUser(callback){
 upvoteApp.controller('listCtrl',['$scope',function($scope) {
     $scope.suggestions = [];
 
-    buildfire.publicData.search({}, "suggestion", function (err, results) {
-
+    buildfire.publicData.search({sort: {"upVoteCount":-1}}, "suggestion", function (err, results) {
         $scope.suggestions = results;
         $scope.$apply();
     });
