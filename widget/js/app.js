@@ -2,31 +2,31 @@
  * Created by danielhindi on 8/31/17.
  */
 
-var upvoteApp = angular.module('upvote',[]);
+var upvoteApp = angular.module('upvote', []);
 
 var _currentUser = null;
 
-buildfire.auth.onLogin(function(user){
-    _currentUser=user;
+buildfire.auth.onLogin(function (user) {
+    _currentUser = user;
 });
 
-buildfire.auth.onLogout(function(){
+buildfire.auth.onLogout(function () {
     _currentUser = null;
 });
 
-function getUser(callback){
-    if(_currentUser){
+function getUser(callback) {
+    if (_currentUser) {
         callback(_currentUser);
         return;
     }
-    buildfire.auth.getCurrentUser(function(err,user){
-        if(err){
+    buildfire.auth.getCurrentUser(function (err, user) {
+        if (err) {
             debugger;
             console.error(err);
         }
-        else if(!user){
-            buildfire.auth.login({},function(err,user){
-                if(err)
+        else if (!user) {
+            buildfire.auth.login({}, function (err, user) {
+                if (err)
                     console.error(err);
                 else {
                     _currentUser = user;
@@ -34,21 +34,35 @@ function getUser(callback){
                 }
             });
         }
-        else{
+        else {
             _currentUser = user;
             callback(user);
         }
     });
 }
 
-
-upvoteApp.controller('listCtrl',['$scope',function($scope) {
+var config = {};
+upvoteApp.controller('listCtrl', ['$scope', function ($scope) {
     $scope.suggestions = [];
 
-    buildfire.publicData.search({sort: {"upVoteCount":-1}}, "suggestion", function (err, results) {
+
+    buildfire.publicData.search({sort: {"upVoteCount": -1}}, "suggestion", function (err, results) {
+        
         $scope.suggestions = results;
+        $scope.hasSocial = config.socialPlugin?true:false;
         $scope.$apply();
     });
+
+    $scope.goSocial = function (s) {
+
+        buildfire.navigation.navigateTo({
+            pluginId: config.socialPlugin.pluginTypeId
+            , instanceId: config.socialPlugin.instanceId
+            , folderName: config.socialPlugin.folderName
+            , title: s.data.title
+            , queryString: "wid=" + s.data.createdBy.userToken + "-" + s.data.createdOn + "&wTitle=" + s.data.title
+        });
+    };
 
     $scope.upVote = function (suggestionObj) {
 
@@ -64,38 +78,49 @@ upvoteApp.controller('listCtrl',['$scope',function($scope) {
                     if (err) {
                         console.error(err);
                     }
+                    else
+                        $scope.$apply();
                 });
             }
         });
     };
 }]);
 
-upvoteApp.controller('suggestionBoxCtrl',['$scope',function($scope) {
-    $scope.popupOn=false;
+upvoteApp.controller('suggestionBoxCtrl', ['$scope', function ($scope) {
+    $scope.popupOn = false;
+    $scope.text = config.text;
 
-    $scope.addSuggestion = function() {
+    buildfire.datastore.get(function (err, obj) {
+
+        if (obj)
+            config = obj.data;
+        $scope.text = config.text;
+    });
+
+    $scope.addSuggestion = function () {
         getUser(function (user) {
             _addSuggestion(user, $scope.suggestionTitle, $scope.suggestionText);
             $scope.popupOn = false;
             $scope.suggestionTitle = $scope.suggestionText = '';
+            $scope.$apply();
 
         });
     };
 
-    function _addSuggestion(user,title,text){
-        if(!user || !title || !text)return;
+    function _addSuggestion(user, title, text) {
+        if (!user || !title || !text)return;
 
-        var obj ={
-            title:title
-            ,suggestion :text
-            ,createdBy: user
-            ,createdOn:new Date()
-            ,upVoteCount:1
-            ,upVotedBy:{}
+        var obj = {
+            title: title
+            , suggestion: text
+            , createdBy: user
+            , createdOn: new Date()
+            , upVoteCount: 1
+            , upVotedBy: {}
         };
-        obj.upVotedBy[user._id]= new Date();
+        obj.upVotedBy[user._id] = new Date();
 
-        buildfire.publicData.insert(obj,"suggestion",function(err){
+        buildfire.publicData.insert(obj, "suggestion", function (err) {
 
         });
     }

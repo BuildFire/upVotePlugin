@@ -8,15 +8,12 @@
     <script src="../../../scripts/buildfire.min.js"></script>
     <script src="../../../scripts/angular/angular.min.js"></script>
     <!-- build:bundleJSFiles  -->
-
     <script src="js/app.js"></script>
-
     <!-- endbuild -->
 
 
     <!-- build:bundleCSSFiles  -->
     <link rel="stylesheet" href="css/main.css">
-
 
     <!-- endbuild -->
 
@@ -33,7 +30,7 @@
     <div ng-controller="suggestionBoxCtrl"  ng-cloak="">
         <a class="pull-right btn btn-success" ng-click="popupOn=true">+</a>
         <h1>Suggestions</h1>
-
+        <p ng-show="text" >{{text}}</p>
         <div class="overlay" ng-show="popupOn" ng-click="popupOn=false"></div>
         <div class="suggestionBox" ng-show="popupOn">
             <input class="form-control" type="text" placeholder="Title"  ng-model="suggestionTitle">
@@ -55,7 +52,7 @@
             <div class="buttonPanel" >
 
                 <a class="voteButton btn pull-right" ng-click="upVote(s)"> <img class="likeButton" src="like.png" alt="Vote"> </a>
-                <a class="voteButton btn pull-right"> <img class="likeButton" src="msg.png" alt="Msg"> </a>
+                <a class="voteButton btn pull-right" ng-show="hasSocial" ng-click="goSocial(s)"> <img class="likeButton" src="msg.png" alt="Msg"> </a>
             </div>
         </div>
     </div>

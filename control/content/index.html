@@ -17,7 +17,7 @@
 	
 	<!-- JS -->
 	<script src="../../../../scripts/buildfire.js"></script>
-   
+
  	<!--
     <script src="../../../../scripts/angular/angular.min.js"></script>
     <script src="../../../../scripts/angular/ui-bootstrap.min.js"></script>
@@ -26,6 +26,93 @@
    -->
 </head>
 <body>
-<span>Content - Hello world!</span>
+<div ng-form="frmMain">
+    <div class="item clearfix row">
+        <div class="labels col-md-3 padding-right-zero pull-left">
+            <span>Text</span>
+        </div>
+    </div>
+    <hr class="none">
+    <div class="item clearfix row">
+        <div class="main col-md-12 pull-left">
+            <textarea id="text" ui-tinymce="editorOptions" class="form-control" rows="5" width="100%" onkeypress="saveTextWithDelay()" ></textarea>
+        </div>
+    </div>
+
+
+    <hr class="none">
+    <div class="item clearfix row">
+        <div class="labels col-md-3 padding-right-zero pull-left">
+            <span>Social Plugin</span>
+        </div>
+        <div class="col-md-6 padding-right-zero">
+            <div class="input-group">
+                <input type="text" id="socialPlugin" class="form-control" placeholder="social plugin..." readonly>
+                <span class="input-group-btn">
+            <button class="btn btn-default" type="button" onclick="openPluginSearch()">...</button>
+          </span>
+            </div><!-- /input-group -->
+        </div>
+    </div>
+
+
+    <script>
+
+        var data ={};
+
+        var tmr=null;
+        function saveTextWithDelay(){
+            if(tmr)clearTimeout(tmr);
+            setTimeout(function(){
+                data.text = document.getElementById("text").value;
+                save(data);
+            },500);
+        }
+
+        function openPluginSearch(){
+            buildfire.pluginInstance.showDialog({}, function(err,results){
+                if(results && results.length) {
+                    if(results[0].pluginTypeName.toLowerCase().indexOf("social") < 0){
+                        buildfire.notifications.alert({message:"This doesnt seem to be a social plugin"});
+                    }
+                    else{
+                        data.socialPlugin = results[0];
+                        document.getElementById("socialPlugin").value = results[0].title;
+                        save(data);
+                    }
+                }
+            })
+
+        }
+
+        function save(data){
+            buildfire.datastore.save(data,function(err){
+                if(err)console.error(err);
+            });
+        }
+
+        function loadData(data){
+
+            if(data && data.socialPlugin && data.socialPlugin.title)
+                document.getElementById("socialPlugin").value = data.socialPlugin.title;
+            else
+                document.getElementById("socialPlugin").value ='';
+
+            if(data && data.text )
+                document.getElementById("text").value = data.text;
+            else
+                document.getElementById("text").value ='';
+
+        }
+
+        buildfire.datastore.get(function(err,obj){
+            if(obj) {
+                data=obj.data;
+                loadData(obj.data);
+            }
+        });
+
+    </script>
+</div>
 </body>
 </html>
