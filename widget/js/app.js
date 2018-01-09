@@ -46,12 +46,21 @@ upvoteApp.controller('listCtrl', ['$scope', function ($scope) {
     $scope.suggestions = [];
 
 
-    buildfire.publicData.search({sort: {"upVoteCount": -1}}, "suggestion", function (err, results) {
-        
-        $scope.suggestions = results;
-        $scope.hasSocial = config.socialPlugin?true:false;
+    $scope.$on('suggestionAdded', function(e,obj){
+        $scope.suggestions.unshift(obj);
+        if(!$scope.$$phase)
         $scope.$apply();
     });
+
+
+    buildfire.publicData.search({sort: {"upVoteCount": -1}}, "suggestion", function (err, results) {
+
+        $scope.suggestions = results;
+        $scope.hasSocial = config.socialPlugin?true:false;
+        if(!$scope.$$phase)$scope.$apply();
+    });
+
+
 
     $scope.goSocial = function (s) {
 
@@ -86,12 +95,11 @@ upvoteApp.controller('listCtrl', ['$scope', function ($scope) {
     };
 }]);
 
-upvoteApp.controller('suggestionBoxCtrl', ['$scope', function ($scope) {
+upvoteApp.controller('suggestionBoxCtrl', ['$scope','$rootScope', function ($scope,$rootScope) {
     $scope.popupOn = false;
     $scope.text = config.text;
 
     buildfire.datastore.get(function (err, obj) {
-
         if (obj)
             config = obj.data;
         $scope.text = config.text;
@@ -102,7 +110,7 @@ upvoteApp.controller('suggestionBoxCtrl', ['$scope', function ($scope) {
             _addSuggestion(user, $scope.suggestionTitle, $scope.suggestionText);
             $scope.popupOn = false;
             $scope.suggestionTitle = $scope.suggestionText = '';
-            $scope.$apply();
+            if(!$scope.$$phase) $scope.$apply();
 
         });
     };
@@ -120,9 +128,11 @@ upvoteApp.controller('suggestionBoxCtrl', ['$scope', function ($scope) {
         };
         obj.upVotedBy[user._id] = new Date();
 
-        buildfire.publicData.insert(obj, "suggestion", function (err) {
-
+        buildfire.publicData.insert(obj, "suggestion", function (err,obj) {
+            $rootScope.$broadcast('suggestionAdded',obj);
         });
+
+
     }
 
 
