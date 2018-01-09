@@ -28,14 +28,14 @@
 <body>
 
     <div ng-controller="suggestionBoxCtrl"  ng-cloak="">
-        <a class="pull-right btn btn-success" ng-click="popupOn=true">+</a>
+        <a class="pull-right btn btn-success btnShadow" ng-click="popupOn=true">+</a>
         <h1>Suggestions</h1>
         <p ng-show="text" >{{text}}</p>
         <div class="overlay" ng-show="popupOn" ng-click="popupOn=false"></div>
         <div class="suggestionBox" ng-show="popupOn">
             <input class="form-control" type="text" placeholder="Title"  ng-model="suggestionTitle">
             <textarea class="form-control" rows="5" placeholder="add your suggestion here" ng-model="suggestionText"></textarea>
-            <button class="btn btn-success pull-right" ng-click="addSuggestion()">Submit</button>
+            <button class="btn btn-success pull-right btnShadow" ng-click="addSuggestion()">Submit</button>
         </div>
     </div>
     <div ng-controller="listCtrl">
@@ -51,8 +51,8 @@
             </div>
             <div class="buttonPanel" >
 
-                <a class="voteButton btn pull-right" ng-click="upVote(s)"> <img class="likeButton" src="like.png" alt="Vote"> </a>
-                <a class="voteButton btn pull-right" ng-show="hasSocial" ng-click="goSocial(s)"> <img class="likeButton" src="msg.png" alt="Msg"> </a>
+                <a class="voteButton btn pull-right" ng-click="upVote(s)" ng-class="{btnShadow:!s.disableUpvote,btntransparent:s.disableUpvote} "> <img class="likeButton" src="like.png" alt="Vote"  > </a>
+                <a class="voteButton btn pull-right btnShadow" ng-show="hasSocial" ng-click="goSocial(s)"> <img class="likeButton" src="msg.png" alt="Msg"> </a>
             </div>
         </div>
     </div>

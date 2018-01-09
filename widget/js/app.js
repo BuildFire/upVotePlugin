@@ -40,6 +40,7 @@ function getUser(callback) {
         }
     });
 }
+getUser(function(){});
 
 var config = {};
 upvoteApp.controller('listCtrl', ['$scope', function ($scope) {
@@ -52,10 +53,19 @@ upvoteApp.controller('listCtrl', ['$scope', function ($scope) {
         $scope.$apply();
     });
 
-
     buildfire.publicData.search({sort: {"upVoteCount": -1}}, "suggestion", function (err, results) {
 
-        $scope.suggestions = results;
+
+        if(!_currentUser)
+            $scope.suggestions = results;
+        else
+            $scope.suggestions = results.map(function(s){
+                s.disableUpvote = !s
+                                || !s.data.upVotedBy
+                                || s.data.upVotedBy[_currentUser._id];
+                return s;
+            });
+
         $scope.hasSocial = config.socialPlugin?true:false;
         if(!$scope.$$phase)$scope.$apply();
     });
@@ -82,15 +92,24 @@ upvoteApp.controller('listCtrl', ['$scope', function ($scope) {
 
             if (!suggestionObj.data.upVotedBy[user._id]) {
                 suggestionObj.data.upVoteCount++;
+                suggestionObj.disableUpvote = true;
                 suggestionObj.data.upVotedBy[user._id] = new Date();
-                buildfire.publicData.update(suggestionObj.id, suggestionObj.data, "suggestion", function (err) {
-                    if (err) {
-                        console.error(err);
-                    }
-                    else
-                        $scope.$apply();
-                });
             }
+            else{ // unvote
+                suggestionObj.data.upVoteCount--;
+                suggestionObj.disableUpvote = false;
+                delete suggestionObj.data.upVotedBy[user._id] ;
+            }
+
+            if(suggestionObj.data.upVoteCount < 10) /// then just to a hard count just in case
+                suggestionObj.data.upVoteCount = Object.keys(suggestionObj.data.upVotedBy).length;
+
+
+            buildfire.publicData.update(suggestionObj.id, suggestionObj.data, "suggestion", function (err) {
+                if (err)
+                    console.error(err);
+            });
+
         });
     };
 }]);
