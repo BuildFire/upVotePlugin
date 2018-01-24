@@ -96,16 +96,6 @@ upvoteApp.controller('listCtrl', ['$scope', function ($scope) {
 
         getUser(function (user) {
 
-            if(suggestionObj.data.createdBy._id !=  user._id) {
-                buildfire.notifications.pushNotification.schedule({
-                    title: "You got an upvote !!!"
-                    , text: user.displayName + " upvoted your suggestion " + suggestionObj.data.title
-                    //,at: new Date()
-                    , users: [suggestionObj.data.createdBy._id]
-                }, function (err) {
-                    if (err) console.error(err);
-                });
-            }
 
             if (!suggestionObj.data.upVotedBy) suggestionObj.data.upVotedBy = {};
             if (!suggestionObj.data.upVoteCount) suggestionObj.data.upVoteCount = 1;
@@ -116,7 +106,20 @@ upvoteApp.controller('listCtrl', ['$scope', function ($scope) {
                 suggestionObj.data.upVotedBy[user._id] = {
                     votedOn:new Date()
                     ,user:user
+                };
+
+                if(suggestionObj.data.createdBy._id !=  user._id) {
+                    buildfire.notifications.pushNotification.schedule({
+                        title: "You got an upvote !!!"
+                        , text: user.displayName + " upvoted your suggestion " + suggestionObj.data.title
+                        //,at: new Date()
+                        , users: [suggestionObj.data.createdBy._id]
+                    }, function (err) {
+                        if (err) console.error(err);
+                    });
                 }
+
+
             }
             else{ // unvote
                 suggestionObj.data.upVoteCount--;
