@@ -14,16 +14,10 @@
 
     <!-- build:bundleCSSFiles  -->
     <link rel="stylesheet" href="css/main.css">
-
     <!-- endbuild -->
 
+    <script src="../../../scripts/buildfire/services/notifications/pushNotifications.js"></script>
 
-    <!--
-
-   <script src="../../../../scripts/angular/ui-bootstrap.min.js"></script>
-
-   <script src="../../../../scripts/jquery/jquery-1.11.2.min.js"></script>
-   -->
 </head>
 <body>
 
@@ -44,7 +38,7 @@
             <div  >{{s.data.createdOn | date:'MMM dd'}}</div>
             <img class="avatarMain" ng-src="{{s.data.createdBy.imageUrl}}">
             <div class="suggestion">
-                <p class="pull-right">{{s.data.upVoteCount}} Vote<span ng-show="s.data.upVoteCount>1">s</span></p>
+                <p class="pull-right" ng-click="expandVotes(s)">{{s.data.upVoteCount}} Vote<span ng-show="s.data.upVoteCount>1">s</span></p>
 
                 <h4 ng-show="s.data.title">{{s.data.title}}</h4>
                 {{s.data.suggestion}}
@@ -54,6 +48,11 @@
                 <a class="voteButton btn pull-right" ng-click="upVote(s)" ng-class="{btnShadow:!s.disableUpvote,btntransparent:s.disableUpvote} "> <img class="likeButton" src="like.png" alt="Vote"  > </a>
                 <a class="voteButton btn pull-right btnShadow" ng-show="hasSocial" ng-click="goSocial(s)"> <img class="likeButton" src="msg.png" alt="Msg"> </a>
             </div>
+
+            <ul>
+                <li ng-repeat="u in s.voters">{{u.displayName}}</li>
+            </ul>
+
         </div>
     </div>
 </body>

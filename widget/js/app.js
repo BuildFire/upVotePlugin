@@ -31,12 +31,14 @@ function getUser(callback) {
                 else {
                     _currentUser = user;
                     callback(user);
+                    buildfire.notifications.pushNotification.subscribe({groupName:"suggestions"});
                 }
             });
         }
         else {
             _currentUser = user;
             callback(user);
+            buildfire.notifications.pushNotification.subscribe({groupName:"suggestions"});
         }
     });
 }
@@ -45,7 +47,6 @@ getUser(function(){});
 var config = {};
 upvoteApp.controller('listCtrl', ['$scope', function ($scope) {
     $scope.suggestions = [];
-
 
     $scope.$on('suggestionAdded', function(e,obj){
         $scope.suggestions.unshift(obj);
@@ -70,8 +71,6 @@ upvoteApp.controller('listCtrl', ['$scope', function ($scope) {
         if(!$scope.$$phase)$scope.$apply();
     });
 
-
-
     $scope.goSocial = function (s) {
 
         buildfire.navigation.navigateTo({
@@ -83,9 +82,30 @@ upvoteApp.controller('listCtrl', ['$scope', function ($scope) {
         });
     };
 
+    $scope.expandVotes = function (s) {
+        s.voteDetails=[];
+
+        for( p in s.data.upVotedBy)
+            s.voters=[s.data.upVotedBy[p].user];
+
+
+
+    };
+
     $scope.upVote = function (suggestionObj) {
 
         getUser(function (user) {
+
+            if(suggestionObj.data.createdBy._id !=  user._id) {
+                buildfire.notifications.pushNotification.schedule({
+                    title: "You got an upvote !!!"
+                    , text: user.displayName + " upvoted your suggestion " + suggestionObj.data.title
+                    //,at: new Date()
+                    , users: [suggestionObj.data.createdBy._id]
+                }, function (err) {
+                    if (err) console.error(err);
+                });
+            }
 
             if (!suggestionObj.data.upVotedBy) suggestionObj.data.upVotedBy = {};
             if (!suggestionObj.data.upVoteCount) suggestionObj.data.upVoteCount = 1;
@@ -93,7 +113,10 @@ upvoteApp.controller('listCtrl', ['$scope', function ($scope) {
             if (!suggestionObj.data.upVotedBy[user._id]) {
                 suggestionObj.data.upVoteCount++;
                 suggestionObj.disableUpvote = true;
-                suggestionObj.data.upVotedBy[user._id] = new Date();
+                suggestionObj.data.upVotedBy[user._id] = {
+                    votedOn:new Date()
+                    ,user:user
+                }
             }
             else{ // unvote
                 suggestionObj.data.upVoteCount--;
@@ -128,6 +151,16 @@ upvoteApp.controller('suggestionBoxCtrl', ['$scope','$rootScope', function ($sco
         getUser(function (user) {
             _addSuggestion(user, $scope.suggestionTitle, $scope.suggestionText);
             $scope.popupOn = false;
+
+            buildfire.notifications.pushNotification.schedule({
+                title: "New suggestion by " + user.displayName
+                , text: $scope.suggestionTitle
+                //,at: new Date()
+                , groupName: "suggestions"
+            }, function (err) {
+                if (err) console.error(err);
+            });
+
             $scope.suggestionTitle = $scope.suggestionText = '';
             if(!$scope.$$phase) $scope.$apply();
 
