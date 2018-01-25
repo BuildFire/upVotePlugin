@@ -1,7 +1,7 @@
 {
   "author":"Daniel Hindi"
-,"pluginName":"Up Vote Plugin"
-,"pluginDescription":"Simple Up Vote Plugin"
+,"pluginName":"Up Vote"
+,"pluginDescription":"Simple up vote plugin that allows your users to post suggestions and other users to up vote them. Not only is it a great way to gather suggestions but it engages your users via push notifications when their suggestions are up voted"
 ,"supportEmail":"devSupport@buildfire.com"
 ,"control":{
   "content":{
