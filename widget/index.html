@@ -26,7 +26,7 @@
         <div class="container--responsive padded padded--x">
             <a class="btn btn-primary btn--fab btn--add" ng-click="popupOn=true"><span></span></a>
             <h3 class="padded margin--0 padded--y">Suggestions</h3>
-            <p class="margin-bottom--sm text--secondary" ng-show="text" >{{text}}</p>
+            <p class="margin-bottom--sm text--secondary word--break" ng-show="text" >{{text}}</p>
         </div>
             
         <div class="overlay" ng-show="popupOn" ng-click="popupOn=false"></div>
@@ -55,7 +55,7 @@
                     <h5 class="margin--0 ellipsis">{{s.data.createdBy.displayName}}</h5>
                     <h6 class="caption margin--0 text--secondary">{{s.data.createdOn | date:'MMM dd'}}</h6>
                 </div>
-                <p class="pill text--secondary shrink--0" ng-click="expandVotes(s)">{{s.data.upVoteCount}} Vote<span ng-show="s.data.upVoteCount>1">s</span></p>
+                <p class="pill text--secondary shrink--0" ng-click="expandVotes(s)"><span class="margin--0">{{s.data.upVoteCount}} Vote</span><span class="margin--0" ng-show="s.data.upVoteCount>1">s</span></p>
             </div>
             <div class="suggestion padded padded--m padded--x">
                 <h4 class="word--break" ng-show="s.data.title">{{s.data.title}}</h4>
@@ -64,9 +64,13 @@
             <div class="button__panel shrink--0 padded padded--sm padded--x">
                 <button class="voteButton btn btn--icon--text btn--transparent" ng-click="upVote(s)" ng-class="{btnShadow:!s.disableUpvote,btntransparent:s.disableUpvote} ">
                     <span class="icon icon-thumbs-up2"></span>
-                    <span class="text-primary margin--0">Vote</span>  
+                    <span class="text-primary margin--0">Vote</span>
                 </button>
-                <button class="voteButton btn border-primary" ng-show="hasSocial" ng-click="goSocial(s)"> <img class="likeButton" src="msg.png" alt="Msg"> <span class="text-primary margin--0"></span> VOTE </button>
+                <!-- ng-show="hasSocial" -->
+                <button class="voteButton btn btn--icon--text btn--transparent"  ng-click="goSocial(s)" >
+                    <span class="icon icon-bubble"></span>
+                    <span class="text-primary margin--0">Comment</span>  
+                </button>
             </div>
             <p class="name-list text--secondary ellipsis">
                 <span class="caption" ng-repeat="u in s.voters">{{u.displayName}}</span>
