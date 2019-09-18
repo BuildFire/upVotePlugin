@@ -31,44 +31,44 @@ function getUser(callback) {
                 else {
                     _currentUser = user;
                     callback(user);
-                    buildfire.notifications.pushNotification.subscribe({groupName:"suggestions"});
+                    buildfire.notifications.pushNotification.subscribe({ groupName: "suggestions" });
                 }
             });
         }
         else {
             _currentUser = user;
             callback(user);
-            buildfire.notifications.pushNotification.subscribe({groupName:"suggestions"});
+            buildfire.notifications.pushNotification.subscribe({ groupName: "suggestions" });
         }
     });
 }
-getUser(function(){});
+getUser(function () { });
 
 var config = {};
 upvoteApp.controller('listCtrl', ['$scope', function ($scope) {
     $scope.suggestions = [];
 
-    $scope.$on('suggestionAdded', function(e,obj){
+    $scope.$on('suggestionAdded', function (e, obj) {
         $scope.suggestions.unshift(obj);
-        if(!$scope.$$phase)
-        $scope.$apply();
+        if (!$scope.$$phase)
+            $scope.$apply();
     });
 
-    buildfire.publicData.search({sort: {"upVoteCount": -1}}, "suggestion", function (err, results) {
+    buildfire.publicData.search({ sort: { "upVoteCount": -1 } }, "suggestion", function (err, results) {
 
 
-        if(!_currentUser)
+        if (!_currentUser)
             $scope.suggestions = results;
         else
-            $scope.suggestions = results.map(function(s){
+            $scope.suggestions = results.map(function (s) {
                 s.disableUpvote = !s
-                                || !s.data.upVotedBy
-                                || s.data.upVotedBy[_currentUser._id];
+                    || !s.data.upVotedBy
+                    || s.data.upVotedBy[_currentUser._id];
                 return s;
             });
 
-        $scope.hasSocial = config.socialPlugin?true:false;
-        if(!$scope.$$phase)$scope.$apply();
+        $scope.hasSocial = config.socialPlugin ? true : false;
+        if (!$scope.$$phase) $scope.$apply();
     });
 
     $scope.goSocial = function (s) {
@@ -83,10 +83,10 @@ upvoteApp.controller('listCtrl', ['$scope', function ($scope) {
     };
 
     $scope.expandVotes = function (s) {
-        s.voteDetails=[];
+        s.voteDetails = [];
 
-        for( p in s.data.upVotedBy)
-            s.voters=[s.data.upVotedBy[p].user];
+        for (p in s.data.upVotedBy)
+            s.voters = [s.data.upVotedBy[p].user];
 
 
 
@@ -104,11 +104,11 @@ upvoteApp.controller('listCtrl', ['$scope', function ($scope) {
                 suggestionObj.data.upVoteCount++;
                 suggestionObj.disableUpvote = true;
                 suggestionObj.data.upVotedBy[user._id] = {
-                    votedOn:new Date()
-                    ,user:user
+                    votedOn: new Date()
+                    , user: user
                 };
 
-                if(suggestionObj.data.createdBy._id !=  user._id) {
+                if (suggestionObj.data.createdBy._id != user._id) {
                     buildfire.notifications.pushNotification.schedule({
                         title: "You got an upvote !!!"
                         , text: user.displayName + " upvoted your suggestion " + suggestionObj.data.title
@@ -121,13 +121,13 @@ upvoteApp.controller('listCtrl', ['$scope', function ($scope) {
 
 
             }
-            else{ // unvote
+            else { // unvote
                 suggestionObj.data.upVoteCount--;
                 suggestionObj.disableUpvote = false;
-                delete suggestionObj.data.upVotedBy[user._id] ;
+                delete suggestionObj.data.upVotedBy[user._id];
             }
 
-            if(suggestionObj.data.upVoteCount < 10) /// then just to a hard count just in case
+            if (suggestionObj.data.upVoteCount < 10) /// then just to a hard count just in case
                 suggestionObj.data.upVoteCount = Object.keys(suggestionObj.data.upVotedBy).length;
 
 
@@ -140,9 +140,10 @@ upvoteApp.controller('listCtrl', ['$scope', function ($scope) {
     };
 }]);
 
-upvoteApp.controller('suggestionBoxCtrl', ['$scope','$rootScope', function ($scope,$rootScope) {
+upvoteApp.controller('suggestionBoxCtrl', ['$scope', '$rootScope', function ($scope, $rootScope) {
     $scope.popupOn = false;
     $scope.text = config.text;
+    
 
     buildfire.datastore.get(function (err, obj) {
         if (obj)
@@ -150,10 +151,18 @@ upvoteApp.controller('suggestionBoxCtrl', ['$scope','$rootScope', function ($sco
         $scope.text = config.text;
     });
 
+    $scope.clearForm = function(){
+        $scope.text = "";
+        $scope.suggestionTitle = "";
+        $scope.suggestionText = "";
+        $scope.suggestionForm.$setUntouched();
+        $scope.popupOn = false;
+    };
+
     $scope.addSuggestion = function () {
         getUser(function (user) {
+
             _addSuggestion(user, $scope.suggestionTitle, $scope.suggestionText);
-            $scope.popupOn = false;
 
             buildfire.notifications.pushNotification.schedule({
                 title: "New suggestion by " + user.displayName
@@ -164,14 +173,15 @@ upvoteApp.controller('suggestionBoxCtrl', ['$scope','$rootScope', function ($sco
                 if (err) console.error(err);
             });
 
+            $scope.popupOn = false;
             $scope.suggestionTitle = $scope.suggestionText = '';
-            if(!$scope.$$phase) $scope.$apply();
+            if (!$scope.$$phase) $scope.$apply();
 
         });
     };
 
     function _addSuggestion(user, title, text) {
-        if (!user || !title || !text)return;
+        if (!user || !title || !text) return;
 
         var obj = {
             title: title
@@ -183,12 +193,11 @@ upvoteApp.controller('suggestionBoxCtrl', ['$scope','$rootScope', function ($sco
         };
         obj.upVotedBy[user._id] = new Date();
 
-        buildfire.publicData.insert(obj, "suggestion", function (err,obj) {
-            $rootScope.$broadcast('suggestionAdded',obj);
+        buildfire.publicData.insert(obj, "suggestion", function (err, obj) {
+            $rootScope.$broadcast('suggestionAdded', obj);
         });
-
-
     }
 
 
 }]);
+
