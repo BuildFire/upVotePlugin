@@ -150,6 +150,14 @@ upvoteApp.controller('suggestionBoxCtrl', ['$scope', '$rootScope', function ($sc
         $scope.text = config.text;
     });
 
+    $scope.clearForm = function () {
+        $scope.text = "";
+        $scope.suggestionTitle = "";
+        $scope.suggestionText = "";
+        $scope.suggestionForm.$setUntouched();
+        $scope.popupOn = false;
+    };
+
     $scope.addSuggestion = function () {
         getUser(function (user) {
             _addSuggestion(user, $scope.suggestionTitle, $scope.suggestionText);
