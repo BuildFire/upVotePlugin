@@ -11,9 +11,10 @@
 		    to keep you plugin as light weight as possible for performance and transport reasons
 	-->
 
-    <!-- You can load helper.css to use our helper classes.
+    <!-- You can load helper.css to use our helper classes. -->
     <link href="../../../../styles/helper.css" rel="stylesheet">
-    -->
+    <link rel="stylesheet" href="../assets/control.css">
+   
 	
 	<!-- JS -->
 	<script src="../../../../scripts/buildfire.min.js"></script>
@@ -27,30 +28,25 @@
 </head>
 <body>
 <div ng-form="frmMain">
-    <div class="item clearfix row">
-        <div class="labels col-md-3 padding-right-zero pull-left">
-            <span>Text</span>
-        </div>
+    <div class="item">
+        <h2 class="title">Description</h2>
     </div>
-    <hr class="none">
-    <div class="item clearfix row">
-        <div class="main col-md-12 pull-left">
-            <textarea id="text" ui-tinymce="editorOptions" class="form-control" rows="5" width="100%" onkeypress="saveTextWithDelay()" ></textarea>
-        </div>
+    <div class="item">
+        <textarea id="text" ui-tinymce="editorOptions" class="form-control" rows="5" width="100%" onkeypress="saveTextWithDelay()" ></textarea>
     </div>
 
 
     <hr class="none">
-    <div class="item clearfix row">
-        <div class="labels col-md-3 padding-right-zero pull-left">
-            <span>Social Plugin</span>
+    <div class="row">
+        <div class="col-md-3">
+            <h3 class="title">Social Plugin</span>
         </div>
-        <div class="col-md-6 padding-right-zero">
+        <div class="col-md-6">
             <div class="input-group">
                 <input type="text" id="socialPlugin" class="form-control" placeholder="social plugin..." readonly>
                 <span class="input-group-btn">
-            <button class="btn btn-default" type="button" onclick="openPluginSearch()">...</button>
-          </span>
+                    <button class="btn btn-default" type="button" onclick="openPluginSearch()">...</button>
+                </span>
             </div><!-- /input-group -->
         </div>
     </div>
