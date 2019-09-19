@@ -143,7 +143,6 @@ upvoteApp.controller('listCtrl', ['$scope', function ($scope) {
 upvoteApp.controller('suggestionBoxCtrl', ['$scope', '$rootScope', function ($scope, $rootScope) {
     $scope.popupOn = false;
     $scope.text = config.text;
-    
 
     buildfire.datastore.get(function (err, obj) {
         if (obj)
@@ -151,18 +150,10 @@ upvoteApp.controller('suggestionBoxCtrl', ['$scope', '$rootScope', function ($sc
         $scope.text = config.text;
     });
 
-    $scope.clearForm = function(){
-        $scope.text = "";
-        $scope.suggestionTitle = "";
-        $scope.suggestionText = "";
-        $scope.suggestionForm.$setUntouched();
-        $scope.popupOn = false;
-    };
-
     $scope.addSuggestion = function () {
         getUser(function (user) {
-
             _addSuggestion(user, $scope.suggestionTitle, $scope.suggestionText);
+            $scope.popupOn = false;
 
             buildfire.notifications.pushNotification.schedule({
                 title: "New suggestion by " + user.displayName
@@ -173,7 +164,6 @@ upvoteApp.controller('suggestionBoxCtrl', ['$scope', '$rootScope', function ($sc
                 if (err) console.error(err);
             });
 
-            $scope.popupOn = false;
             $scope.suggestionTitle = $scope.suggestionText = '';
             if (!$scope.$$phase) $scope.$apply();
 
@@ -196,8 +186,9 @@ upvoteApp.controller('suggestionBoxCtrl', ['$scope', '$rootScope', function ($sc
         buildfire.publicData.insert(obj, "suggestion", function (err, obj) {
             $rootScope.$broadcast('suggestionAdded', obj);
         });
+
+
     }
 
 
 }]);
-
