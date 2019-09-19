@@ -31,22 +31,32 @@
             <p class="margin-bottom--sm text--secondary word--break" ng-show="text">{{text}}</p>
         </div>
 
-        <div class="overlay" ng-show="popupOn" ng-click="popupOn=false"></div>
+        <div class="overlay" ng-show="popupOn" ng-click="clearForm()"></div>
 
         <div class="suggestionBox popup" ng-show="popupOn">
+            <form name="suggestionForm" class="form-main" novalidate>
             <div class="card backgroundColorTheme">
                 <div class="padded">
-                    <input type="text" placeholder="Title" ng-model="suggestionTitle">
+                    <input type="text" placeholder="Title" ng-model="suggestionTitle" name="suggestionTitle" required>
+                    <span style="color:red!important" name="titleErr"
+                    ng-show="suggestionForm.suggestionTitle.$touched && suggestionForm.suggestionTitle.$invalid">Please
+                    add suggestion title
+                    </span>
                     <textarea class="margin--0" rows="5" placeholder="Add your suggestion here"
-                        ng-model="suggestionText"></textarea>
+                        ng-model="suggestionText" name="suggestionText" required></textarea>
+                        <span style="color:red!important" name="textErr"
+                    ng-show="suggestionForm.suggestionText.$touched && suggestionForm.suggestionText.$invalid">Please
+                    add suggestion body
+                    </span>
                 </div>
                 <div class="button__panel padded padded--sm padded--x">
-                    <button class="btn btn--transparent" ng-click="popupOn=false"><span
+                    <button class="btn btn--transparent" ng-click="clearForm()"><span
                             class="text--secondary">Cancel</span></button>
-                    <button class="btn btn--transparent" ng-click="addSuggestion()"><span
+                    <button class="btn btn--transparent" ng-click="addSuggestion()" ng-disabled="!suggestionForm.suggestionText.$touched || suggestionForm.suggestionText.$invalid || !suggestionForm.suggestionTitle.$touched || suggestionForm.suggestionTitle.$invalid"><span
                             class="text-primary">Submit</span></button>
                 </div>
             </div>
+            </form>
         </div>
 
     </div>
