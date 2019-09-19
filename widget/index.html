@@ -38,13 +38,13 @@
             <div class="card backgroundColorTheme">
                 <div class="padded">
                     <input type="text" placeholder="Title" ng-model="suggestionTitle" name="suggestionTitle" required>
-                    <span style="color:red!important" name="titleErr"
+                    <span class="text-danger" name="titleErr"
                     ng-show="suggestionForm.suggestionTitle.$touched && suggestionForm.suggestionTitle.$invalid">Please
                     add suggestion title
                     </span>
                     <textarea class="margin--0" rows="5" placeholder="Add your suggestion here"
                         ng-model="suggestionText" name="suggestionText" required></textarea>
-                        <span style="color:red!important" name="textErr"
+                        <span class="text-danger" name="textErr"
                     ng-show="suggestionForm.suggestionText.$touched && suggestionForm.suggestionText.$invalid">Please
                     add suggestion body
                     </span>

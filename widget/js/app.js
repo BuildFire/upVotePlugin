@@ -151,7 +151,6 @@ upvoteApp.controller('suggestionBoxCtrl', ['$scope', '$rootScope', function ($sc
     });
 
     $scope.clearForm = function () {
-        $scope.text = "";
         $scope.suggestionTitle = "";
         $scope.suggestionText = "";
         $scope.suggestionForm.$setUntouched();
@@ -172,7 +171,7 @@ upvoteApp.controller('suggestionBoxCtrl', ['$scope', '$rootScope', function ($sc
                 if (err) console.error(err);
             });
 
-            $scope.suggestionTitle = $scope.suggestionText = '';
+            $scope.clearForm();
             if (!$scope.$$phase) $scope.$apply();
 
         });
