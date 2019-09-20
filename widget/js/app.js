@@ -150,6 +150,14 @@ upvoteApp.controller('suggestionBoxCtrl', ['$scope', '$rootScope', function ($sc
         $scope.text = config.text;
     });
 
+    buildfire.datastore.onUpdate(function (obj) {
+        if (obj) {
+            config = obj.data;
+            $scope.text = obj.data.text;
+        }
+        if (!$scope.$$phase) $scope.$apply();
+    });
+
     $scope.clearForm = function () {
         $scope.suggestionTitle = "";
         $scope.suggestionText = "";
