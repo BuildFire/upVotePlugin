@@ -54,8 +54,23 @@ upvoteApp.controller('listCtrl', ['$scope', function ($scope) {
             $scope.$apply();
     });
 
-    buildfire.publicData.search({ sort: { "upVoteCount": -1 } }, "suggestion", function (err, results) {
+    buildfire.pluginInstance.search({}, function(err, instances){
+        if(err){ 
+            console.error(err.message);
+        }else{
+            for(var i = 0, j = instances.result.length; i < j ; i++){
+                if(instances.result[i].data._buildfire.pluginType.result[0].name.toLowerCase().indexOf("social") >= 1){
+                    config.socialPlugin = instances.result[i].data._buildfire.pluginType.result[0];
+                    console.log(config.socialPlugin);
+                    break;
+                }else{
+                    console.log("No social was found");
+                }
+            }
+        }      
+    });
 
+    buildfire.publicData.search({ sort: { "upVoteCount": -1 } }, "suggestion", function (err, results) {
 
         if (!_currentUser)
             $scope.suggestions = results;
@@ -72,11 +87,12 @@ upvoteApp.controller('listCtrl', ['$scope', function ($scope) {
     });
 
     $scope.goSocial = function (s) {
-
-        buildfire.navigation.navigateTo({
-            pluginId: config.socialPlugin.pluginTypeId
-            , instanceId: config.socialPlugin.instanceId
-            , folderName: config.socialPlugin.folderName
+        debugger;
+        buildfire.navigation.navigateToSocialWall({
+            // pluginId: config.socialPlugin.pluginTypeId
+            //, instanceId: config.socialPlugin.instanceId
+            // , 
+            folderName: config.socialPlugin.folderName
             , title: s.data.title
             , queryString: "wid=" + s.data.createdBy.userToken + "-" + s.data.createdOn + "&wTitle=" + s.data.title
         });
@@ -151,10 +167,9 @@ upvoteApp.controller('suggestionBoxCtrl', ['$scope', '$rootScope', function ($sc
     });
 
     buildfire.datastore.onUpdate(function (obj) {
-        if (obj) {
+        if (obj) 
             config = obj.data;
-            $scope.text = obj.data.text;
-        }
+        $scope.text = config.text;
         if (!$scope.$$phase) $scope.$apply();
     });
 
