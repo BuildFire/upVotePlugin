@@ -15,6 +15,7 @@
     <!-- You can load helper.css to use our helper classes. -->
     <link href="../../../../styles/helper.css" rel="stylesheet">
     <link rel="stylesheet" href="../assets/control.css">
+    <link href="../../../../styles/siteIcons.css" rel="stylesheet">
 
 
     <!-- JS -->
@@ -26,9 +27,9 @@
 
     <script src="../../../../scripts/jquery/jquery-1.11.2.min.js"></script> 
     -->
-    <!-- WYSIWYG -->
-    <!-- <link rel="stylesheet" href="https://app.buildfire.com/scripts/lib/tinymce/skins/lightgray/skin.min.css"> -->
+    <!-- WYSIWYG -->  
     <script src="../../../../scripts/tinymce/tinymce.min.js"></script>
+    
     <script>tinymce.init({
             selector: "#text",
             setup: function (editor) {
@@ -60,7 +61,9 @@
             <h2 class="title">Description</h2>
         </div>
         <div class="item">
-            <textarea id="text" ui-tinymce="editorOptions" name="content"></textarea>
+            <textarea id="text" name="content" rows="5" width="100%" class="form-control"
+            ui-tinymce="ContentHome.descriptionWYSIWYGOptions"
+            ng-model="ContentHome.data.content.description"></textarea>
         </div>
 
         <script>
