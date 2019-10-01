@@ -54,10 +54,14 @@ upvoteApp.controller('listCtrl', ['$scope', function ($scope) {
             $scope.$apply();
     });
 
+    // added pluginInstance to show comment items when social wall is available
     buildfire.pluginInstance.search({}, function(err, instances){
         if(err){ 
             console.error(err.message);
         }else{
+            if(!instances || !instances.lenght){
+                return;
+            }
             for(var i = 0, j = instances.result.length; i < j ; i++){
                 if(instances.result[i].data._buildfire.pluginType.result[0].name.toLowerCase().indexOf("social") >= 1){
                     config.socialPlugin = instances.result[i].data._buildfire.pluginType.result[0];
@@ -87,13 +91,8 @@ upvoteApp.controller('listCtrl', ['$scope', function ($scope) {
     });
 
     $scope.goSocial = function (s) {
-        debugger;
-        buildfire.navigation.navigateToSocialWall({
-            // pluginId: config.socialPlugin.pluginTypeId
-            //, instanceId: config.socialPlugin.instanceId
-            // , 
-            folderName: config.socialPlugin.folderName
-            , title: s.data.title
+        buildfire.navigation.navigateToSocialWall({ // changed navigateTo, to navigateToSocialWall (see official docs)
+            title: s.data.title
             , queryString: "wid=" + s.data.createdBy.userToken + "-" + s.data.createdOn + "&wTitle=" + s.data.title
         });
     };
@@ -156,20 +155,20 @@ upvoteApp.controller('listCtrl', ['$scope', function ($scope) {
     };
 }]);
 
-upvoteApp.controller('suggestionBoxCtrl', ['$scope', '$rootScope', function ($scope, $rootScope) {
+upvoteApp.controller('suggestionBoxCtrl', ['$scope', '$sce', '$rootScope', function ($scope, $sce, $rootScope) {
     $scope.popupOn = false;
-    $scope.text = config.text;
+    $scope.text = $sce.trustAsHtml(config.text);
 
     buildfire.datastore.get(function (err, obj) {
         if (obj)
             config = obj.data;
-        $scope.text = config.text;
+        $scope.text = $sce.trustAsHtml(config.text);
     });
 
     buildfire.datastore.onUpdate(function (obj) {
         if (obj) 
             config = obj.data;
-        $scope.text = config.text;
+        $scope.text = $sce.trustAsHtml(config.text);
         if (!$scope.$$phase) $scope.$apply();
     });
 
