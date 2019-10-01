@@ -419,3 +419,18 @@ textarea{
         width: 80vw;
     }
   }
+
+.text-danger {
+    margin-top: 0.75rem;
+    margin-left: 0.75rem; 
+    margin-bottom: 0.75rem;
+    font-weight: lighter !important;
+}
+
+.suggestionBox .textfield {
+    margin-bottom: 1rem;
+}
+
+.no-margin-bottom {
+    margin-bottom: 0 !important;
+}
