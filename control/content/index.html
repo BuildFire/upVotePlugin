@@ -24,8 +24,34 @@
     <script src="../../../../scripts/angular/angular.min.js"></script>
     <script src="../../../../scripts/angular/ui-bootstrap.min.js"></script>
 
-   <script src="../../../../scripts/jquery/jquery-1.11.2.min.js"></script>
-   -->
+    <script src="../../../../scripts/jquery/jquery-1.11.2.min.js"></script> 
+    -->
+    <!-- WYSIWYG -->
+    <!-- <link rel="stylesheet" href="https://app.buildfire.com/scripts/lib/tinymce/skins/lightgray/skin.min.css"> -->
+    <script src="../../../../scripts/tinymce/tinymce.min.js"></script>
+    <script>tinymce.init({
+            selector: "#text",
+            setup: function (editor) {
+                var data = {};
+                var tmr = null;
+                editor.on("load", function () {
+                    buildfire.datastore.get(function (err, obj) {
+                        if (obj) {
+                            data = obj.data;
+                            tinymce.activeEditor.setContent(obj.data.text);
+                        }
+                    });
+                });
+                editor.on("keyup", function (saveWithDelay) {
+                    if (tmr) clearTimeout(tmr);
+                    setTimeout(function () {
+                        data.text = tinymce.activeEditor.getContent();
+                        save(data);
+                    }, 500);
+                });
+            }
+        });
+    </script>
 </head>
 
 <body>
@@ -34,44 +60,19 @@
             <h2 class="title">Description</h2>
         </div>
         <div class="item">
-            <textarea id="text" ui-tinymce="editorOptions" class="form-control" rows="5" width="100%"
-                onkeypress="saveTextWithDelay()"></textarea>
+            <textarea id="text" ui-tinymce="editorOptions" name="content"></textarea>
         </div>
 
         <script>
-
             var data = {};
 
             var tmr = null;
-            function saveTextWithDelay() {
-                if (tmr) clearTimeout(tmr);
-                setTimeout(function () {
-                    data.text = document.getElementById("text").value;
-                    save(data);
-                }, 500);
-            }
 
             function save(data) {
                 buildfire.datastore.save(data, function (err) {
                     if (err) console.error(err);
                 });
             }
-
-            function loadData(data) {
-
-                if (data && data.text)
-                    document.getElementById("text").value = data.text;
-                else
-                    document.getElementById("text").value = '';
-
-            }
-
-            buildfire.datastore.get(function (err, obj) {
-                if (obj) {
-                    data = obj.data;
-                    loadData(obj.data);
-                }
-            });
 
         </script>
     </div>
