@@ -25,6 +25,7 @@ console.log(">> Building to " , destinationFolder);
 
 const cssTasks=[
     {name:"widgetCSS",src:"widget/**/*.css",dest:"/widget"}
+    ,{name:"controlAssetsCSS",src:"control/assets/**/*.css",dest:"/control/assets"}
     ,{name:"controlContentCSS",src:"control/content/**/*.css",dest:"/control/content"}
     ,{name:"controlDesignCSS",src:"control/design/**/*.css",dest:"/control/design"}
     ,{name:"controlSettingsCSS",src:"control/settings/**/*.css",dest:"/control/settings"}
@@ -120,8 +121,17 @@ gulp.task('images', function(){
         .pipe(gulp.dest(destinationFolder ));
 });
 
+gulp.task('fonts', function(){
+    return gulp.src(['widget/css/fonts/**/*.{ttf,woff,eot,svg}'],{base: '.'})
+        .pipe(gulp.dest(destinationFolder));
+});
 
-var buildTasksToRun=['html','resources','images'];
+gulp.task('icons', function(){
+    return gulp.src(['widget/css/fonts/**/*.{ttf,woff,eot,svg}'])
+        .pipe(gulp.dest(destinationFolder + '/widget/fonts'));
+});
+
+var buildTasksToRun=['html','resources','images','fonts','icons'];
 
 cssTasks.forEach(function(task){  buildTasksToRun.push(task.name)});
 jsTasks.forEach(function(task){  buildTasksToRun.push(task.name)});
