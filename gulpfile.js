@@ -10,12 +10,13 @@ const eslint = require('gulp-eslint');
 const imagemin = require('gulp-imagemin');
 const gulpSequence = require('gulp-sequence');
 const babel = require('gulp-babel');
+const zip = require('gulp-zip');
 
 const destinationFolder= releaseFolder();
-
+var fldr; // moved outside to be able to use it in zip function (191002 - Marcela)
 function releaseFolder() {
     var arr = __dirname.split("/");
-    var fldr = arr.pop();
+    fldr = arr.pop();
     arr.push(fldr + "_release");
     return arr.join("/");
 }
@@ -131,9 +132,17 @@ gulp.task('icons', function(){
         .pipe(gulp.dest(destinationFolder + '/widget/fonts'));
 });
 
+// added task to be able to zip by running gulp zipit (191001 - Marcela)
+gulp.task('zip', function () {
+    return gulp.src(destinationFolder + '/**/*')
+        .pipe(zip(fldr + 'release.zip'))
+        .pipe(gulp.dest('..'));
+});
+
 var buildTasksToRun=['html','resources','images','fonts','icons'];
 
 cssTasks.forEach(function(task){  buildTasksToRun.push(task.name)});
 jsTasks.forEach(function(task){  buildTasksToRun.push(task.name)});
 
 gulp.task('build', gulpSequence('clean',buildTasksToRun) );
+gulp.task('zipit', gulpSequence('zip'));// run by 'gulp zipit' (191001 - Marcela)

@@ -55,23 +55,21 @@ upvoteApp.controller('listCtrl', ['$scope', function ($scope) {
     });
 
     // added pluginInstance to show comment items when social wall is available
-    buildfire.pluginInstance.search({}, function(err, instances){
-        if(err){ 
+    buildfire.pluginInstance.search({}, function (err, instances) {
+        if (err) {
             console.error(err.message);
-        }else{
-            if(!instances || !instances.lenght){
+        } else {
+            if (!instances || !instances.lenght) {
                 return;
             }
-            for(var i = 0, j = instances.result.length; i < j ; i++){
-                if(instances.result[i].data._buildfire.pluginType.result[0].name.toLowerCase().indexOf("social") >= 1){
+            for (var i = 0, j = instances.result.length; i < j; i++) {
+                if (instances.result[i].data._buildfire.pluginType.result[0].name.toLowerCase().indexOf("social") >= 1) {
                     config.socialPlugin = instances.result[i].data._buildfire.pluginType.result[0];
-                    console.log(config.socialPlugin);
+                    console.log("TEST " + config.socialPlugin);
                     break;
-                }else{
-                    console.log("No social was found");
                 }
             }
-        }      
+        }
     });
 
     buildfire.publicData.search({ sort: { "upVoteCount": -1 } }, "suggestion", function (err, results) {
@@ -102,9 +100,6 @@ upvoteApp.controller('listCtrl', ['$scope', function ($scope) {
 
         for (p in s.data.upVotedBy)
             s.voters = [s.data.upVotedBy[p].user];
-
-
-
     };
 
     $scope.upVote = function (suggestionObj) {
@@ -166,7 +161,7 @@ upvoteApp.controller('suggestionBoxCtrl', ['$scope', '$sce', '$rootScope', funct
     });
 
     buildfire.datastore.onUpdate(function (obj) {
-        if (obj) 
+        if (obj)
             config = obj.data;
         $scope.text = $sce.trustAsHtml(config.text);
         if (!$scope.$$phase) $scope.$apply();

@@ -34,7 +34,6 @@
             selector: "#text",
             setup: function (editor) {
                 var data = {};
-                var tmr = null;
                 editor.on("load", function () {
                     buildfire.datastore.get(function (err, obj) {
                         if (obj) {
@@ -44,7 +43,6 @@
                     });
                 });
                 editor.on("keyup", function (saveWithDelay) {
-                    if (tmr) clearTimeout(tmr);
                     setTimeout(function () {
                         data.text = tinymce.activeEditor.getContent();
                         save(data);
@@ -61,22 +59,15 @@
             <h2 class="title">Description</h2>
         </div>
         <div class="item">
-            <textarea id="text" name="content" rows="5" width="100%" class="form-control"
-            ui-tinymce="ContentHome.descriptionWYSIWYGOptions"
-            ng-model="ContentHome.data.content.description"></textarea>
+            <textarea id="text"></textarea>
         </div>
 
         <script>
-            var data = {};
-
-            var tmr = null;
-
             function save(data) {
                 buildfire.datastore.save(data, function (err) {
                     if (err) console.error(err);
                 });
             }
-
         </script>
     </div>
 </body>
