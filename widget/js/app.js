@@ -99,7 +99,6 @@ upvoteApp.controller('listCtrl', ['$scope', function ($scope) {
 
     $scope.expandVotes = function (s) {
         s.voteDetails = [];
-        debugger;
         s.voters = [];
         s.voters.push(s.data.createdBy);
         for (p in s.data.upVotedBy) {
