@@ -48,6 +48,12 @@
                         save(data);
                     }, 500);
                 });
+                editor.on("change", function (saveWithDelay) {
+                    setTimeout(function () {
+                        data.text = tinymce.activeEditor.getContent();
+                        save(data);
+                    }, 500);
+                });
             }
         });
     </script>
@@ -59,7 +65,7 @@
             <h2 class="title">Description</h2>
         </div>
         <div class="item">
-            <textarea id="text"></textarea>
+            <textarea id="text" ui-tinymce="editorOptions" class="form-control" rows="5" width="100%"></textarea>
         </div>
 
         <script>

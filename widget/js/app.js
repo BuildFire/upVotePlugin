@@ -21,7 +21,6 @@ function getUser(callback) {
     }
     buildfire.auth.getCurrentUser(function (err, user) {
         if (err) {
-            debugger;
             console.error(err);
         }
         else if (!user) {
@@ -54,25 +53,29 @@ upvoteApp.controller('listCtrl', ['$scope', function ($scope) {
             $scope.$apply();
     });
 
-    // added pluginInstance to show comment items when social wall is available
-    buildfire.pluginInstance.search({}, function (err, instances) {
-        if (err) {
-            console.error(err.message);
-        } else {
-            if (!instances || !instances.lenght) {
-                return;
-            }
-            for (var i = 0, j = instances.result.length; i < j; i++) {
-                if (instances.result[i].data._buildfire.pluginType.result[0].name.toLowerCase().indexOf("social") >= 1) {
-                    config.socialPlugin = instances.result[i].data._buildfire.pluginType.result[0];
-                    console.log("TEST " + config.socialPlugin);
-                    break;
+    // added pluginInstance search to find out if social wall is available
+    var social = function () {
+        buildfire.pluginInstance.search({}, function (err, instances) {
+            if (err) {
+                console.error(err.message);
+            } else {
+                if (!instances || !instances.result || !instances.result.length) {
+                    return;
+                }
+                for (var i = 0, j = instances.result.length; i < j; i++) {
+                    if (instances.result[i].data._buildfire.pluginType.result[0].name.toLowerCase().indexOf("social") >= 1) {
+                        config.socialPlugin = instances.result[i].data._buildfire.pluginType.result[0];
+                        break;
+                    }
                 }
             }
-        }
-    });
+            $scope.hasSocial = config.socialPlugin ? true : false;
+            if (!$scope.$$phase) $scope.$apply();
+        })
+    };
 
     buildfire.publicData.search({ sort: { "upVoteCount": -1 } }, "suggestion", function (err, results) {
+        social();
 
         if (!_currentUser)
             $scope.suggestions = results;
@@ -83,8 +86,7 @@ upvoteApp.controller('listCtrl', ['$scope', function ($scope) {
                     || s.data.upVotedBy[_currentUser._id];
                 return s;
             });
-
-        $scope.hasSocial = config.socialPlugin ? true : false;
+        // $scope.hasSocial = config.socialPlugin ? true : false;
         if (!$scope.$$phase) $scope.$apply();
     });
 
@@ -97,15 +99,18 @@ upvoteApp.controller('listCtrl', ['$scope', function ($scope) {
 
     $scope.expandVotes = function (s) {
         s.voteDetails = [];
-
-        for (p in s.data.upVotedBy)
-            s.voters = [s.data.upVotedBy[p].user];
+        debugger;
+        s.voters = [];
+        s.voters.push(s.data.createdBy);
+        for (p in s.data.upVotedBy) {
+            if(p != s.data.createdBy)
+                s.voters.push(s.data.upVotedBy[p].user);
+        }
     };
 
     $scope.upVote = function (suggestionObj) {
 
         getUser(function (user) {
-
 
             if (!suggestionObj.data.upVotedBy) suggestionObj.data.upVotedBy = {};
             if (!suggestionObj.data.upVoteCount) suggestionObj.data.upVoteCount = 1;
