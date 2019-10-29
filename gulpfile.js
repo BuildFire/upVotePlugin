@@ -145,4 +145,4 @@ cssTasks.forEach(function(task){  buildTasksToRun.push(task.name)});
 jsTasks.forEach(function(task){  buildTasksToRun.push(task.name)});
 
 gulp.task('build', gulpSequence('clean',buildTasksToRun) );
-gulp.task('zipit', gulpSequence('zip'));// run by 'gulp zipit' (191001 - Marcela)
+gulp.task('zip', gulpSequence('zip'));// run by 'gulp zip' (191001 - Marcela)
