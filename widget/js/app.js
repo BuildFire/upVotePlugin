@@ -101,7 +101,7 @@ upvoteApp.controller('listCtrl', ['$scope', function ($scope) {
         s.voteDetails = [];
         s.voters = [];
         s.voters.push(s.data.createdBy);
-        for (p in s.data.upVotedBy) {
+        for (var p in s.data.upVotedBy) {
             if(p != s.data.createdBy._id)
                 s.voters.push(s.data.upVotedBy[p].user);
         }
