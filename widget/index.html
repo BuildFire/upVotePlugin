@@ -41,18 +41,19 @@
                     <div class="padded">
                         <div class="textfield">
                             <input class="no-margin-bottom" type="text" placeholder="Title" ng-model="suggestionTitle"
+                                maxlength="64"
                                 name="suggestionTitle" required>
                             <span class="text-danger caption" name="titleErr"
                                 ng-show="suggestionForm.suggestionTitle.$touched && suggestionForm.suggestionTitle.$invalid">Title
-                                is mandatory
+                                is required
                             </span>
                         </div>
                         <div class="textfield">
                             <textarea class="margin--0 no-margin-bottom" rows="5" placeholder="Add your suggestion here"
-                                ng-model="suggestionText" name="suggestionText" required></textarea>
+                                ng-model="suggestionText" maxlength="200" name="suggestionText" required></textarea>
                             <span class="text-danger caption" name="textErr"
                                 ng-show="suggestionForm.suggestionText.$touched && suggestionForm.suggestionText.$invalid">Text
-                                is mandatory
+                                is required
                             </span>
                         </div>
                     </div>
