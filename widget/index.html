@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html ng-app="upvote">
+
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -18,32 +19,55 @@
     <!-- endbuild -->
 
     <script src="../../../scripts/buildfire/services/notifications/pushNotifications.js"></script>
+    <script src="../../../scripts/tinymce/tinymce.min.js"></script>
+    <script src="../../../scripts/tinymce/ui-tinymce.js"></script>
 
 </head>
+
 <body>
 
-    <div ng-controller="suggestionBoxCtrl"  ng-cloak="">
+    <div ng-controller="suggestionBoxCtrl" ng-cloak="">
         <div class="container--responsive padded padded--x">
             <a class="btn btn-primary btn--fab btn--add" ng-click="popupOn=true"><span></span></a>
             <h3 class="padded margin--0 padded--y">Suggestions</h3>
-            <p class="margin-bottom--sm text--secondary word--break" ng-show="text" >{{text}}</p>
+            <p class="margin-bottom--sm text--secondary word--break" ng-bind-html="text">{{text}}</p>
         </div>
-            
-        <div class="overlay" ng-show="popupOn" ng-click="popupOn=false"></div>
+
+        <div class="overlay" ng-show="popupOn" ng-click="clearForm()"></div>
 
         <div class="suggestionBox popup" ng-show="popupOn">
-            <div class="card backgroundColorTheme">
-                <div class="padded">
-                    <input type="text" placeholder="Title"  ng-model="suggestionTitle">
-                    <textarea class="margin--0" rows="5" placeholder="Add your suggestion here" ng-model="suggestionText"></textarea>
+            <form name="suggestionForm" class="form-main" novalidate>
+                <div class="card backgroundColorTheme">
+                    <div class="padded">
+                        <div class="textfield">
+                            <input class="no-margin-bottom" type="text" placeholder="Title" ng-model="suggestionTitle"
+                                maxlength="64"
+                                name="suggestionTitle" required>
+                            <span class="text-danger caption" name="titleErr"
+                                ng-show="suggestionForm.suggestionTitle.$touched && suggestionForm.suggestionTitle.$invalid">Title
+                                is required
+                            </span>
+                        </div>
+                        <div class="textfield">
+                            <textarea class="margin--0 no-margin-bottom" rows="5" placeholder="Add your suggestion here"
+                                ng-model="suggestionText" maxlength="200" name="suggestionText" required></textarea>
+                            <span class="text-danger caption" name="textErr"
+                                ng-show="suggestionForm.suggestionText.$touched && suggestionForm.suggestionText.$invalid">Text
+                                is required
+                            </span>
+                        </div>
+                    </div>
+                    <div class="button__panel padded padded--sm padded--x">
+                        <button class="btn btn--transparent" ng-click="clearForm()"><span
+                                class="text--secondary">Cancel</span></button>
+                        <button class="btn btn--transparent" ng-click="addSuggestion()"
+                            ng-disabled="!suggestionForm.suggestionText.$touched || suggestionForm.suggestionText.$invalid || !suggestionForm.suggestionTitle.$touched || suggestionForm.suggestionTitle.$invalid"><span
+                                class="text-primary">Submit</span></button>
+                    </div>
                 </div>
-                <div class="button__panel padded padded--sm padded--x">
-                    <button class="btn btn--transparent" ng-click="popupOn=false"><span class="text--secondary">Cancel</span></button>
-                    <button class="btn btn--transparent" ng-click="addSuggestion()"><span class="text-primary">Submit</span></button>
-                </div>
-            </div>
+            </form>
         </div>
-        
+
     </div>
 
     <div ng-controller="listCtrl" class="padded padded--x container--responsive">
@@ -55,27 +79,32 @@
                     <h5 class="margin--0 ellipsis">{{s.data.createdBy.displayName}}</h5>
                     <h6 class="caption margin--0 text--secondary">{{s.data.createdOn | date:'MMM dd'}}</h6>
                 </div>
-                <p class="pill text--secondary shrink--0" ng-click="expandVotes(s)"><span class="margin--0">{{s.data.upVoteCount}} Vote</span><span class="margin--0" ng-show="s.data.upVoteCount>1">s</span></p>
+                <p class="pill text--secondary shrink--0" ng-click="expandVotes(s)">
+                    <span class="margin--0">{{s.data.upVoteCount}} Vote</span>
+                    <span class="margin--0" ng-show="s.data.upVoteCount>1">s</span>
+                </p>
             </div>
             <div class="suggestion padded padded--m padded--x">
                 <h4 class="word--break" ng-show="s.data.title">{{s.data.title}}</h4>
                 <p class="word--break margin-bottom--m">{{s.data.suggestion}}</p>
             </div>
             <div class="button__panel shrink--0 padded padded--sm padded--x">
-                <button class="voteButton btn btn--icon--text btn--transparent" ng-click="upVote(s)" ng-class="{btnShadow:!s.disableUpvote,btntransparent:s.disableUpvote} ">
+                <button class="voteButton btn btn--icon--text btn--transparent" ng-click="upVote(s)"
+                    ng-class="{btnShadow:!s.disableUpvote,btntransparent:s.disableUpvote}">
                     <span class="icon icon-thumbs-up2"></span>
                     <span class="text-primary margin--0">Vote</span>
                 </button>
-                <!-- ng-show="hasSocial" -->
-                <button class="voteButton btn btn--icon--text btn--transparent"  ng-click="goSocial(s)" >
+                <button class="voteButton btn btn--icon--text btn--transparent" ng-click="goSocial(s)"
+                    ng-show="hasSocial">
                     <span class="icon icon-bubble"></span>
-                    <span class="text-primary margin--0">Comment</span>  
+                    <span class="text-primary margin--0">Comment</span>
                 </button>
             </div>
             <p class="name-list text--secondary ellipsis">
-                <span class="caption" ng-repeat="u in s.voters">{{u.displayName}}</span>
+                <span class="text--secondary" ng-repeat="u in s.voters">{{u.displayName}}</span>
             </p>
         </div>
     </div>
 </body>
+
 </html>

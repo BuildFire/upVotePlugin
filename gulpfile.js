@@ -10,12 +10,13 @@ const eslint = require('gulp-eslint');
 const imagemin = require('gulp-imagemin');
 const gulpSequence = require('gulp-sequence');
 const babel = require('gulp-babel');
+const zip = require('gulp-zip');
 
 const destinationFolder= releaseFolder();
-
+var fldr; // moved outside to be able to use it in zip function (191002 - Marcela)
 function releaseFolder() {
     var arr = __dirname.split("/");
-    var fldr = arr.pop();
+    fldr = arr.pop();
     arr.push(fldr + "_release");
     return arr.join("/");
 }
@@ -25,6 +26,7 @@ console.log(">> Building to " , destinationFolder);
 
 const cssTasks=[
     {name:"widgetCSS",src:"widget/**/*.css",dest:"/widget"}
+    ,{name:"controlAssetsCSS",src:"control/assets/**/*.css",dest:"/control/assets"}
     ,{name:"controlContentCSS",src:"control/content/**/*.css",dest:"/control/content"}
     ,{name:"controlDesignCSS",src:"control/design/**/*.css",dest:"/control/design"}
     ,{name:"controlSettingsCSS",src:"control/settings/**/*.css",dest:"/control/settings"}
@@ -120,10 +122,27 @@ gulp.task('images', function(){
         .pipe(gulp.dest(destinationFolder ));
 });
 
+gulp.task('fonts', function(){
+    return gulp.src(['widget/css/fonts/**/*.{ttf,woff,eot,svg}'],{base: '.'})
+        .pipe(gulp.dest(destinationFolder));
+});
 
-var buildTasksToRun=['html','resources','images'];
+gulp.task('icons', function(){
+    return gulp.src(['widget/css/fonts/**/*.{ttf,woff,eot,svg}'])
+        .pipe(gulp.dest(destinationFolder + '/widget/fonts'));
+});
+
+// added task to be able to zip by running gulp zipit (191001 - Marcela)
+gulp.task('zip', function () {
+    return gulp.src(destinationFolder + '/**/*')
+        .pipe(zip(fldr + 'release.zip'))
+        .pipe(gulp.dest('..'));
+});
+
+var buildTasksToRun=['html','resources','images','fonts','icons'];
 
 cssTasks.forEach(function(task){  buildTasksToRun.push(task.name)});
 jsTasks.forEach(function(task){  buildTasksToRun.push(task.name)});
 
 gulp.task('build', gulpSequence('clean',buildTasksToRun) );
+gulp.task('zipit', gulpSequence('zip'));// run by 'gulp zip' (191001 - Marcela)

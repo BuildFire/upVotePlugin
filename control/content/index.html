@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -14,101 +15,67 @@
     <!-- You can load helper.css to use our helper classes. -->
     <link href="../../../../styles/helper.css" rel="stylesheet">
     <link rel="stylesheet" href="../assets/control.css">
-   
-	
-	<!-- JS -->
-	<script src="../../../../scripts/buildfire.min.js"></script>
+    <link href="../../../../styles/siteIcons.css" rel="stylesheet">
 
- 	<!--
+
+    <!-- JS -->
+    <script src="../../../../scripts/buildfire.min.js"></script>
+
+    <!--
     <script src="../../../../scripts/angular/angular.min.js"></script>
     <script src="../../../../scripts/angular/ui-bootstrap.min.js"></script>
 
-   <script src="../../../../scripts/jquery/jquery-1.11.2.min.js"></script>
-   -->
-</head>
-<body>
-<div ng-form="frmMain">
-    <div class="item">
-        <h2 class="title">Description</h2>
-    </div>
-    <div class="item">
-        <textarea id="text" ui-tinymce="editorOptions" class="form-control" rows="5" width="100%" onkeypress="saveTextWithDelay()" ></textarea>
-    </div>
-
-
-    <hr class="none">
-    <div class="row">
-        <div class="col-md-3">
-            <h3 class="title">Social Plugin</span>
-        </div>
-        <div class="col-md-6">
-            <div class="input-group">
-                <input type="text" id="socialPlugin" class="form-control" placeholder="social plugin..." readonly>
-                <span class="input-group-btn">
-                    <button class="btn btn-default" type="button" onclick="openPluginSearch()">...</button>
-                </span>
-            </div><!-- /input-group -->
-        </div>
-    </div>
-
-
-    <script>
-
-        var data ={};
-
-        var tmr=null;
-        function saveTextWithDelay(){
-            if(tmr)clearTimeout(tmr);
-            setTimeout(function(){
-                data.text = document.getElementById("text").value;
-                save(data);
-            },500);
-        }
-
-        function openPluginSearch(){
-            buildfire.pluginInstance.showDialog({}, function(err,results){
-                if(results && results.length) {
-                    if(results[0].pluginTypeName.toLowerCase().indexOf("social") < 0){
-                        buildfire.notifications.alert({message:"This doesnt seem to be a social plugin"});
-                    }
-                    else{
-                        data.socialPlugin = results[0];
-                        document.getElementById("socialPlugin").value = results[0].title;
+    <script src="../../../../scripts/jquery/jquery-1.11.2.min.js"></script> 
+    -->
+    <!-- WYSIWYG -->  
+    <script src="../../../../scripts/tinymce/tinymce.min.js"></script>
+    
+    <script>tinymce.init({
+            selector: "#text",
+            setup: function (editor) {
+                var data = {};
+                editor.on("load", function () {
+                    buildfire.datastore.get(function (err, obj) {
+                        if (obj) {
+                            data = obj.data;
+                            tinymce.activeEditor.setContent(obj.data.text);
+                        }
+                    });
+                });
+                editor.on("keyup", function (saveWithDelay) {
+                    setTimeout(function () {
+                        data.text = tinymce.activeEditor.getContent();
                         save(data);
-                    }
-                }
-            })
-
-        }
-
-        function save(data){
-            buildfire.datastore.save(data,function(err){
-                if(err)console.error(err);
-            });
-        }
-
-        function loadData(data){
-
-            if(data && data.socialPlugin && data.socialPlugin.title)
-                document.getElementById("socialPlugin").value = data.socialPlugin.title;
-            else
-                document.getElementById("socialPlugin").value ='';
-
-            if(data && data.text )
-                document.getElementById("text").value = data.text;
-            else
-                document.getElementById("text").value ='';
-
-        }
-
-        buildfire.datastore.get(function(err,obj){
-            if(obj) {
-                data=obj.data;
-                loadData(obj.data);
+                    }, 500);
+                });
+                editor.on("change", function (saveWithDelay) {
+                    setTimeout(function () {
+                        data.text = tinymce.activeEditor.getContent();
+                        save(data);
+                    }, 500);
+                });
             }
         });
-
     </script>
-</div>
+</head>
+
+<body>
+    <div ng-form="frmMain">
+        <div class="item">
+            <h2 class="title">Description</h2>
+        </div>
+        <div class="item">
+            <textarea id="text" ui-tinymce="editorOptions" class="form-control" rows="5" width="100%"></textarea>
+        </div>
+
+        <script>
+            function save(data) {
+                buildfire.datastore.save(data, function (err) {
+                    if (err) console.error(err);
+                });
+            }
+        </script>
+    </div>
 </body>
+
 </html>
