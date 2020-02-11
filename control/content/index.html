@@ -32,6 +32,7 @@
     
     <script>tinymce.init({
             selector: "#text",
+            max_chars: 800,
             setup: function (editor) {
                 var data = {};
                 editor.on("load", function () {
@@ -48,12 +49,25 @@
                         save(data);
                     }, 500);
                 });
+                editor.on("keydown", function (e) {
+                    var whitelistedKeys = [8, 37, 38, 39, 40, 46];
+                    if (whitelistedKeys.indexOf(e.keyCode) > -1) return true;
+                    if (tinymce_getContentLength() + 1 > this.settings.max_chars) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        return false;
+                    }
+                    return true;
+                })
                 editor.on("change", function (saveWithDelay) {
                     setTimeout(function () {
                         data.text = tinymce.activeEditor.getContent();
                         save(data);
                     }, 500);
                 });
+                function tinymce_getContentLength() {
+                    return tinymce.get(tinymce.activeEditor.id).contentDocument.body.innerText.length;
+                }
             }
         });
     </script>

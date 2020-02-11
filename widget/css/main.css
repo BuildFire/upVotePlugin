@@ -14,7 +14,8 @@ hgroup,menu,nav,section {
 body {
     line-height: 1;
 }
-ol,ul {
+ol:not(#text_container *),
+ul:not(#text_container *) {
     list-style: none;
 }
 blockquote,q {
@@ -30,6 +31,10 @@ q:after {
 table {
     border-collapse: collapse;
     border-spacing: 0;
+}
+/* Reset em style */
+#text_container em {
+    font-style: italic !important;
 }
 
 /* Global Styling */
@@ -75,7 +80,12 @@ html {
     font-family: Helvetica, sans-serif;
 }
 body {
+    overflow: hidden !important;
     font-family: sans-serif;
+}
+.main--container {
+    max-height: 100%;
+    overflow: auto;
 }
 /*Headings & Subheadings*/
 h1,h2,h3,h4,h5,h6 {
@@ -225,12 +235,17 @@ button.btn--lg,
     width: 2.5rem;
     height: 2.5rem;
 }
+#btn--add__container {
+    position: absolute;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    width: 3.5rem;
+    height: 3.5rem;
+    z-index: 999999;
+}
 .btn.btn--fab{
     width: 3.5rem;
     height: 3.5rem;
-    position: fixed;
-    bottom: 1.5rem;
-    right: 1.5rem;
     box-shadow: 0 .125rem .5rem rgba(50, 50, 50, 0.3);
 }
 .btn.btn--fab .icon{
@@ -385,16 +400,20 @@ textarea{
 }
 
 .name-list {
-    margin-left:3rem;
-    margin-right: 1rem;
+    margin-left:1rem;
+    margin-right: calc(54px + 1.5rem);
+    padding-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
 }
 .name-list span{
-    padding: .5rem 0;
+    padding: 0;
+    margin: 0;
     display: inline-block;
 }
-.name-list span:not(:first-of-type)::before{
- content: ', ';
- margin-left: -.125rem;
+.name-list span:not(:last-of-type)::after{
+    content: ', ';
+    margin-right: -.125rem;
 }
 
 /* Utilities */
