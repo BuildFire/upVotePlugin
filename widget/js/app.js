@@ -6,6 +6,8 @@ var upvoteApp = angular.module('upvote', []);
 
 var _currentUser = null;
 
+buildfire.appearance.titlebar.show();
+
 buildfire.auth.onLogin(function (user) {
     _currentUser = user;
 });
@@ -48,6 +50,8 @@ upvoteApp.controller('listCtrl', ['$scope', function ($scope) {
     $scope.suggestions = [];
 
     $scope.$on('suggestionAdded', function (e, obj) {
+        obj.voters = [];
+        obj.disableUpvote = true;
         $scope.suggestions.unshift(obj);
         if (!$scope.$$phase)
             $scope.$apply();
@@ -86,7 +90,7 @@ upvoteApp.controller('listCtrl', ['$scope', function ($scope) {
                     || s.data.upVotedBy[_currentUser._id];
                 return s;
             });
-        // $scope.hasSocial = config.socialPlugin ? true : false;
+
         if (!$scope.$$phase) $scope.$apply();
     });
 
@@ -97,14 +101,23 @@ upvoteApp.controller('listCtrl', ['$scope', function ($scope) {
         });
     };
 
-    $scope.expandVotes = function (s) {
+    $scope.toggleVotes = function (s) {
         s.voteDetails = [];
         s.voters = [];
-        s.voters.push(s.data.createdBy);
+
+        if (s.isExpanded) {
+            s.isExpanded = false;
+            if (!$scope.$$phase) $scope.$apply();
+            return;
+        };
+
+        s.isExpanded = true;
+        // s.voters.push(s.data.createdBy);
         for (var p in s.data.upVotedBy) {
-            if(p != s.data.createdBy._id)
+            // if(p != s.data.createdBy._id)
                 s.voters.push(s.data.upVotedBy[p].user);
         }
+
         if (!$scope.$$phase) $scope.$apply();
     };
 
@@ -122,6 +135,9 @@ upvoteApp.controller('listCtrl', ['$scope', function ($scope) {
                     votedOn: new Date()
                     , user: user
                 };
+                if (suggestionObj.isExpanded) {
+                    suggestionObj.voters.push(user);
+                }
 
                 if (suggestionObj.data.createdBy._id != user._id) {
                     buildfire.notifications.pushNotification.schedule({
@@ -140,6 +156,9 @@ upvoteApp.controller('listCtrl', ['$scope', function ($scope) {
                 suggestionObj.data.upVoteCount--;
                 suggestionObj.disableUpvote = false;
                 delete suggestionObj.data.upVotedBy[user._id];
+                suggestionObj.voters = (suggestionObj.voters || []).filter(function (voter) {
+                    return voter._id != user._id;
+                });
             }
 
             if (suggestionObj.data.upVoteCount < 10) /// then just to a hard count just in case
@@ -153,11 +172,26 @@ upvoteApp.controller('listCtrl', ['$scope', function ($scope) {
 
         });
     };
-}]);
+}])
+.filter('getUserImage', function () {
+    return function (user) {
+        var url = './avatar.png';
+        if (user) {
+            url = buildfire.auth.getUserPictureUrl(user);
+            return url;
+        }
+        return url;
+    }
+});
 
 upvoteApp.controller('suggestionBoxCtrl', ['$scope', '$sce', '$rootScope', function ($scope, $sce, $rootScope) {
     $scope.popupOn = false;
     $scope.text = $sce.trustAsHtml(config.text);
+
+    window.openPopup = function () {
+        $scope.popupOn = true;
+        if (!$scope.$$phase) $scope.$apply();
+    }
 
     buildfire.datastore.get(function (err, obj) {
         if (obj)
@@ -179,7 +213,18 @@ upvoteApp.controller('suggestionBoxCtrl', ['$scope', '$sce', '$rootScope', funct
         $scope.popupOn = false;
     };
 
+    $scope.closeForm = function () {
+        $scope.popupOn = false;
+    }
+
     $scope.addSuggestion = function () {
+
+        if ($scope.suggestionForm.$invalid) {
+            $scope.suggestionForm.suggestionTitle.$setTouched();
+            $scope.suggestionForm.suggestionText.$setTouched();
+            return;
+        }
+
         getUser(function (user) {
             _addSuggestion(user, $scope.suggestionTitle, $scope.suggestionText);
             $scope.popupOn = false;
@@ -210,14 +255,13 @@ upvoteApp.controller('suggestionBoxCtrl', ['$scope', '$sce', '$rootScope', funct
             , upVoteCount: 1
             , upVotedBy: {}
         };
-        obj.upVotedBy[user._id] = new Date();
+        obj.upVotedBy[user._id] = {
+            votedOn: new Date(),
+            user: user
+        };
 
         buildfire.publicData.insert(obj, "suggestion", function (err, obj) {
             $rootScope.$broadcast('suggestionAdded', obj);
         });
-
-
     }
-
-
 }]);

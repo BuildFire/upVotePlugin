@@ -4,7 +4,8 @@
   "description": "template for a buildfire plugin using gulp",
   "main": "index.js",
   "scripts": {
-    "start": "gulp build"
+    "start": "gulp build",
+    "build": "gulp build && cd .. && rm -rf upVotePlugin.zip && zip -r upVotePlugin.zip upVotePlugin/ -x *node_modules* *.git*"
   },
   "author": "Daniel Hindi",
   "license": "ISC",
