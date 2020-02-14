@@ -85,6 +85,10 @@ upvoteApp.controller('listCtrl', ['$scope', function ($scope) {
             $scope.suggestions = results;
         else
             $scope.suggestions = results.map(function (s) {
+                var creationYear = new Date(s.data.createdOn).getFullYear();
+                var currentYear = new Date().getFullYear();
+
+                s.isCurrentYear = creationYear === currentYear;
                 s.disableUpvote = !s
                     || !s.data.upVotedBy
                     || s.data.upVotedBy[_currentUser._id];
@@ -115,7 +119,7 @@ upvoteApp.controller('listCtrl', ['$scope', function ($scope) {
         // s.voters.push(s.data.createdBy);
         for (var p in s.data.upVotedBy) {
             // if(p != s.data.createdBy._id)
-                s.voters.push(s.data.upVotedBy[p].user);
+            s.voters.push(s.data.upVotedBy[p].user);
         }
 
         if (!$scope.$$phase) $scope.$apply();
