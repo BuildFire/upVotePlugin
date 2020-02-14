@@ -85,6 +85,10 @@ upvoteApp.controller('listCtrl', ['$scope', function ($scope) {
             $scope.suggestions = results;
         else
             $scope.suggestions = results.map(function (s) {
+							var creationYear = new Date(s.data.createdOn).getFullYear();
+							var currentYear = new Date().getFullYear();
+
+							s.isCurrentYear = creationYear === currentYear;
                 s.disableUpvote = !s
                     || !s.data.upVotedBy
                     || s.data.upVotedBy[_currentUser._id];
