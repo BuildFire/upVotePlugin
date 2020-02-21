@@ -113,24 +113,37 @@ function listCtrl($scope) {
 			})
 		).then(users => {
 			var richContent = `
-				<div class="container">
+				<div class="user-container">
 					${users.map(user => {
 						const { email } = user;
 						return `
-							<img src=${buildfire.auth.getUserPictureUrl({ email })} class="avatar" onerror="this.src=window._appRoot+'media/avatar.png'"/>
-							<h5 class="text--secondary ellipsis">${user.displayName}</h5>
+							<div class="user-item">
+								<img src=${buildfire.auth.getUserPictureUrl({ email })} class="avatar" onerror="this.src=window._appRoot+'media/avatar.png'"/>
+								<p class="ellipsis margin-bottom-zero">${user.displayName}</p>
+							</div>
 						`;
 					}).join('')}
 				</div>
 				<style>
+					.user-container{
+						max-height: 60vh;
+						overflow-y: auto; 
+					}
+					.user-item{
+						display: flex;
+						align-items: center;
+						padding: 16px 0;
+						font-size: 14px;
+					}
 					.avatar {
 						border-radius: 50%;
 						overflow: hidden;
-						width: 2rem;
-						height: 2rem;
+						width: 24px;
+						height: 24px;
 						object-fit: cover;
 						background-color: rgba(128, 128, 128, 0.1);
 						flex-shrink: 0;
+						margin-right: 12px;
 					}
 				</style>
 			`;
