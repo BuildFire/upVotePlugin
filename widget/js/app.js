@@ -49,7 +49,6 @@ function listCtrl($scope) {
 	$scope.suggestions = [];
 
 	$scope.$on('suggestionAdded', function(e, obj) {
-		obj.voters = [];
 		obj.disableUpvote = true;
 		$scope.suggestions.unshift(obj);
 		if (!$scope.$$phase) $scope.$apply();
@@ -155,16 +154,12 @@ function listCtrl($scope) {
 					votedOn: new Date(),
 					user: user
 				};
-				if (suggestionObj.isExpanded) {
-					suggestionObj.voters.push(user);
-				}
 
 				if (suggestionObj.data.createdBy._id != user._id) {
 					buildfire.notifications.pushNotification.schedule(
 						{
-							title: 'You got an upvote !!!',
+							title: 'You got an upvote!',
 							text: user.displayName + ' upvoted your suggestion ' + suggestionObj.data.title,
-							//,at: new Date()
 							users: [suggestionObj.data.createdBy._id]
 						},
 						function(err) {
@@ -177,9 +172,6 @@ function listCtrl($scope) {
 				suggestionObj.data.upVoteCount--;
 				suggestionObj.disableUpvote = false;
 				delete suggestionObj.data.upVotedBy[user._id];
-				suggestionObj.voters = (suggestionObj.voters || []).filter(function(voter) {
-					return voter._id != user._id;
-				});
 			}
 
 			if (suggestionObj.data.upVoteCount < 10)
