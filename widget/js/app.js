@@ -119,15 +119,10 @@ function listCtrl($scope) {
 						const { email } = user;
 						return `
 							<img src=${buildfire.auth.getUserPictureUrl({ email })} class="avatar" onerror="this.src=window._appRoot+'media/avatar.png'"/>
-							<h5 text--secondary ellipsis >${user.displayName}</h5>
+							<h5 class="text--secondary ellipsis">${user.displayName}</h5>
 						`;
-					})}
+					}).join('')}
 				</div>
-				<script>
-					function handleError (img) {
-						img.src=window._appRoot+'media/avatar.png'
-					}
-				</script>
 				<style>
 					.avatar {
 						border-radius: 50%;
