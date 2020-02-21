@@ -101,24 +101,51 @@ function listCtrl($scope) {
 		});
 	};
 
-	$scope.toggleVotes = function(s) {
-		s.voteDetails = [];
-		s.voters = [];
+	$scope.showVoterModal = function(s) {
+		var voterIds = Object.keys(s.data.upVotedBy);
+		Promise.all(
+			voterIds.map(userId => {
+				return new Promise((resolve, reject) => {
+					buildfire.auth.getUserProfile({ userId }, (error, user) => {
+						if (error) return reject(error);
+						resolve(user);
+					});
+				});
+			})
+		).then(users => {
+			var richContent = `
+				<div class="container">
+					${users.map(user => {
+						const { email } = user;
+						return `
+							<img src=${buildfire.auth.getUserPictureUrl({ email })} class="avatar" onerror="this.src=window._appRoot+'media/avatar.png'"/>
+							<h5 text--secondary ellipsis >${user.displayName}</h5>
+						`;
+					})}
+				</div>
+				<script>
+					function handleError (img) {
+						img.src=window._appRoot+'media/avatar.png'
+					}
+				</script>
+				<style>
+					.avatar {
+						border-radius: 50%;
+						overflow: hidden;
+						width: 2rem;
+						height: 2rem;
+						object-fit: cover;
+						background-color: rgba(128, 128, 128, 0.1);
+						flex-shrink: 0;
+					}
+				</style>
+			`;
 
-		if (s.isExpanded) {
-			s.isExpanded = false;
-			if (!$scope.$$phase) $scope.$apply();
-			return;
-		}
-
-		s.isExpanded = true;
-		// s.voters.push(s.data.createdBy);
-		for (var p in s.data.upVotedBy) {
-			// if(p != s.data.createdBy._id)
-			s.voters.push(s.data.upVotedBy[p].user);
-		}
-
-		if (!$scope.$$phase) $scope.$apply();
+			var options = { richContent };
+			buildfire.components.popup.display(options, (err, result) => {
+				console.log(':: err, result', err, result);
+			});
+		});
 	};
 
 	$scope.upVote = function(suggestionObj) {
