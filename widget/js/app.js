@@ -102,6 +102,14 @@ function listCtrl($scope) {
 
 	$scope.showVoterModal = function(s) {
 		var voterIds = Object.keys(s.data.upVotedBy);
+		if (!voterIds.length) {
+			var richContent = '<p style="padding-top: 10px; text-align: center">No votes yet!<p>';
+			var options = { richContent };
+			return buildfire.components.popup.display(options, err => {
+				if (err) return console.log(err);
+			});
+		}
+
 		Promise.all(
 			voterIds.map(userId => {
 				return new Promise((resolve, reject) => {
@@ -149,8 +157,8 @@ function listCtrl($scope) {
 			`;
 
 			var options = { richContent };
-			buildfire.components.popup.display(options, (err, result) => {
-				console.log(':: err, result', err, result);
+			buildfire.components.popup.display(options, err => {
+				if (err) return console.log(err);
 			});
 		});
 	};
