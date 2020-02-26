@@ -450,3 +450,9 @@ textarea{
 .no-margin-bottom {
     margin-bottom: 0 !important;
 }
+
+.empty-state-holder {
+    position: absolute;
+    right: 25%;
+    top: 25%;
+}

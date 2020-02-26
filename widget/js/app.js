@@ -8,14 +8,6 @@ var _currentUser = null;
 
 buildfire.appearance.titlebar.show();
 
-buildfire.auth.onLogin(function(user) {
-	_currentUser = user;
-});
-
-buildfire.auth.onLogout(function() {
-	_currentUser = null;
-});
-
 function getUser(callback) {
 	if (_currentUser) {
 		callback(_currentUser);
@@ -23,21 +15,24 @@ function getUser(callback) {
 	}
 	buildfire.auth.getCurrentUser(function(err, user) {
 		if (err) {
-			console.error(err);
-		} else if (!user) {
-			buildfire.auth.login({}, function(err, user) {
-				if (err) console.error(err);
-				else {
-					_currentUser = user;
-					callback(user);
-					buildfire.notifications.pushNotification.subscribe({ groupName: 'suggestions' });
-				}
-			});
-		} else {
-			_currentUser = user;
-			callback(user);
-			buildfire.notifications.pushNotification.subscribe({ groupName: 'suggestions' });
+			callback(null);
+			return console.error(err);
 		}
+		if (!user) {
+			return buildfire.auth.login({}, function(err, user) {
+				if (err) {
+					callback();
+					return console.error(err);
+				}
+				_currentUser = user;
+				callback(user);
+				buildfire.notifications.pushNotification.subscribe({ groupName: 'suggestions' });
+			});
+		}
+
+		_currentUser = user;
+		callback(user);
+		buildfire.notifications.pushNotification.subscribe({ groupName: 'suggestions' });
 	});
 }
 getUser(function() {});
@@ -47,6 +42,7 @@ var config = {};
 upvoteApp.controller('listCtrl', ['$scope', listCtrl]);
 function listCtrl($scope) {
 	$scope.suggestions = [];
+	$scope.isInitalized = false;
 
 	$scope.$on('suggestionAdded', function(e, obj) {
 		obj.disableUpvote = true;
@@ -57,47 +53,102 @@ function listCtrl($scope) {
 	// added pluginInstance search to find out if social wall is available
 	var social = function() {
 		buildfire.pluginInstance.search({}, function(err, instances) {
-			if (err) {
-				console.error(err.message);
-			} else {
-				if (!instances || !instances.result || !instances.result.length) {
-					return;
-				}
-				for (var i = 0, j = instances.result.length; i < j; i++) {
-					if (instances.result[i].data._buildfire.pluginType.result[0].name.toLowerCase().indexOf('social') >= 1) {
-						config.socialPlugin = instances.result[i].data._buildfire.pluginType.result[0];
-						break;
+			if (err) return console.error(err);
+			if (typeof instances !== 'object') return;
+
+			let { result } = instances;
+
+			result = (result || [])
+				.filter(i => i.data._buildfire)
+				.some(r => {
+					if (r.data._buildfire.pluginType.result[0].name.toLowerCase().indexOf('social') >= 1) {
+						$scope.hasSocial = true;
+						if (!$scope.$$phase) $scope.$apply();
+						return true;
 					}
-				}
-			}
-			$scope.hasSocial = config.socialPlugin ? true : false;
-			if (!$scope.$$phase) $scope.$apply();
+				});
 		});
 	};
 
-	buildfire.publicData.search({ sort: { upVoteCount: -1 } }, 'suggestion', function(err, results) {
-		social();
+	function init() {
+		buildfire.spinner.show();
+		$scope.suggestions = [];
+		$scope.isInitalized = false;
 
-		if (!_currentUser) $scope.suggestions = results;
-		else
-			$scope.suggestions = results.map(function(s) {
-				var creationYear = new Date(s.data.createdOn).getFullYear();
-				var currentYear = new Date().getFullYear();
+		buildfire.publicData.search({ sort: { upVoteCount: -1 } }, 'suggestion', function(err, results) {
+			social();
 
-				s.isCurrentYear = creationYear === currentYear;
-				s.disableUpvote = !s || !s.data.upVotedBy || s.data.upVotedBy[_currentUser._id];
-				return s;
+			if (err) return console.error(err);
+			if (!results || !results.length) return update([]);
+
+			results = results.map(checkYear);
+
+			// quickly display the out of date suggestions,
+			// they will update after promises resolve
+			update(results);
+
+			const promises = results.map(s => {
+				return new Promise(resolve => {
+					buildfire.auth.getUserProfile({ userId: s.data.createdBy._id }, (error, updatedUser) => {
+						if (error || !updatedUser._id) {
+							console.warn('failed to update user profile:', s.data.createdBy);
+							return resolve(s);
+						}
+
+						const hasUpdate = s.data.createdBy.displayName !== updatedUser.displayName;
+
+						s.data.createdBy = updatedUser;
+						resolve(s);
+
+						if (!hasUpdate) return;
+						// update suggestion out of sync for next time
+						buildfire.publicData.update(s.id, s.data, 'suggestion', e => {
+							if (e) console.error(e);
+						});
+					});
+				});
 			});
 
-		if (!$scope.$$phase) $scope.$apply();
+			Promise.all(promises)
+				.then(update)
+				.catch(console.error);
+
+			function update(data) {
+				$scope.isInitalized = true;
+				$scope.suggestions = data;
+				buildfire.spinner.hide();
+				if (!$scope.$$phase) $scope.$apply();
+			}
+
+			function checkYear(item) {
+				var creationYear = new Date(item.data.createdOn).getFullYear();
+				var currentYear = new Date().getFullYear();
+
+				item.isCurrentYear = creationYear === currentYear;
+				item.disableUpvote = _currentUser ? !item || !item.data.upVotedBy || item.data.upVotedBy[_currentUser._id] : false;
+
+				return item;
+			}
+		});
+	}
+
+	getUser(init);
+
+	buildfire.auth.onLogin(user => {
+		_currentUser = user;
+		init();
 	});
 
-	$scope.goSocial = function(s) {
-		buildfire.navigation.navigateToSocialWall({
-			// changed navigateTo, to navigateToSocialWall (see official docs)
-			title: s.data.title,
-			queryString: 'wid=' + s.data.createdBy.userToken + '-' + s.data.createdOn + '&wTitle=' + s.data.title
-		});
+	buildfire.auth.onLogout(() => {
+		_currentUser = null;
+		init();
+	});
+
+	$scope.goSocial = (s = {}) => {
+		if (!s.data) return;
+		const { title, createdOn, createdBy } = s.data;
+		const queryString = `wid=${createdBy.displayName}-${createdOn}&wTitle=${title}`;
+		buildfire.navigation.navigateToSocialWall({ title, queryString }, () => {});
 	};
 
 	$scope.showVoterModal = function(s) {
@@ -122,15 +173,16 @@ function listCtrl($scope) {
 		).then(users => {
 			var richContent = `
 				<div class="user-container">
-					${users.map(user => {
-						const { email } = user;
-						return `
+					${users
+						.map(user => {
+							return `
 							<div class="user-item">
-								<img src=${buildfire.auth.getUserPictureUrl({ email })} class="avatar" onerror="this.src=window._appRoot+'media/avatar.png'"/>
+								<img src=${buildfire.auth.getUserPictureUrl({ userId: user._id })} class="avatar" onerror="this.src=window._appRoot+'media/avatar.png'"/>
 								<p class="ellipsis margin-bottom-zero">${user.displayName}</p>
 							</div>
 						`;
-					}).join('')}
+						})
+						.join('')}
 				</div>
 				<style>
 					.user-container{
@@ -143,7 +195,7 @@ function listCtrl($scope) {
 						padding: 16px 0;
 						font-size: 14px;
 					}
-					.avatar {
+					.avatar{
 						border-radius: 50%;
 						overflow: hidden;
 						width: 24px;
@@ -195,9 +247,10 @@ function listCtrl($scope) {
 				delete suggestionObj.data.upVotedBy[user._id];
 			}
 
-			if (suggestionObj.data.upVoteCount < 10)
+			if (suggestionObj.data.upVoteCount < 10) {
 				/// then just to a hard count just in case
 				suggestionObj.data.upVoteCount = Object.keys(suggestionObj.data.upVotedBy).length;
+			}
 
 			buildfire.publicData.update(suggestionObj.id, suggestionObj.data, 'suggestion', function(err) {
 				if (err) console.error(err);
@@ -209,7 +262,7 @@ upvoteApp.filter('getUserImage', function() {
 	return function(user) {
 		var url = './avatar.png';
 		if (user) {
-			url = buildfire.auth.getUserPictureUrl(user);
+			url = buildfire.auth.getUserPictureUrl({ userId: user._id });
 			return url;
 		}
 		return url;
