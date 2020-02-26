@@ -4,29 +4,13 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!--
-		NOTE:
-		1. You can reference the file in SDK via relative path
-		2. The Control and Widget Should NOT share resources. They will be separated in production.
-		3. You may include any JS framework you want with your Widget and Control folders. However, keep in mind
-		    to keep you plugin as light weight as possible for performance and transport reasons
-	-->
-
-    <!-- You can load helper.css to use our helper classes. -->
     <link href="../../../../styles/helper.css" rel="stylesheet">
-    <link rel="stylesheet" href="../assets/control.css">
     <link href="../../../../styles/siteIcons.css" rel="stylesheet">
-
+    <link rel="stylesheet" href="../assets/control.css">
 
     <!-- JS -->
     <script src="../../../../scripts/buildfire.min.js"></script>
 
-    <!--
-    <script src="../../../../scripts/angular/angular.min.js"></script>
-    <script src="../../../../scripts/angular/ui-bootstrap.min.js"></script>
-
-    <script src="../../../../scripts/jquery/jquery-1.11.2.min.js"></script> 
-    -->
     <!-- WYSIWYG -->  
     <script src="../../../../scripts/tinymce/tinymce.min.js"></script>
     
@@ -37,10 +21,11 @@
                 var data = {};
                 editor.on("load", function () {
                     buildfire.datastore.get(function (err, obj) {
-                        if (obj) {
-                            data = obj.data;
-                            tinymce.activeEditor.setContent(obj.data.text);
-                        }
+                        if (!obj || !obj.data) return;
+                        if (!obj.data.text) obj.data.text = '';
+
+                        data = obj.data;
+                        tinymce.activeEditor.setContent(obj.data.text);
                     });
                 });
                 editor.on("keyup", function (saveWithDelay) {

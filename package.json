@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "gulp build",
-    "build": "gulp build && cd .. && rm -rf upVotePlugin.zip && zip -r upVotePlugin.zip upVotePlugin/ -x *node_modules* *.git*"
+		"build": "gulp build && cd .. && rm -rf upVotePlugin.zip && zip -r upVotePlugin.zip upVotePlugin/ -x *node_modules* *.git*",
+		"publish": "cd ../../ && buildfire plugin publish plugins/UpVotePlugin --prod --update"
   },
   "author": "Daniel Hindi",
   "license": "ISC",
