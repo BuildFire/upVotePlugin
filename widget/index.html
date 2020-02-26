@@ -101,6 +101,9 @@
                     </button>
                 </div>
             </div>
+            <div class="empty-state-holder">
+                <img ng-if="isInitalized && !suggestions.length" src="empty.svg"></img>
+            </div>
         </div>
     </div>
 </body>
