@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "gulp build",
-		"build": "gulp build && cd .. && rm -rf upVotePlugin.zip && zip -r upVotePlugin.zip upVotePlugin/ -x *node_modules* *.git*",
-		"publish": "cd ../../ && buildfire plugin publish plugins/UpVotePlugin --prod --update"
+    "build": "gulp build && cd .. && rm -rf upVotePlugin.zip && zip -r upVotePlugin.zip upVotePlugin/ -x *node_modules* *.git*",
+    "publish": "cd ../../ && buildfire plugin publish plugins/UpVotePlugin --prod --update",
+    "preinstall": "npx npm-force-resolutions"
   },
   "author": "Daniel Hindi",
   "license": "ISC",
@@ -26,5 +27,8 @@
     "gulp-strip-comments": "^2.5.1",
     "gulp-uglify": "^3.0.2",
     "gulp-zip": "^3.2.0"
+  },
+  "resolutions": {
+    "graceful-fs": "4.2.3"
   }
 }
