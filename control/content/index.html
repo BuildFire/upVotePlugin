@@ -11,8 +11,24 @@
     <!-- JS -->
     <script src="../../../../scripts/buildfire.min.js"></script>
 
-    <!-- WYSIWYG -->  
+    <!-- WYSIWYG -->
     <script src="../../../../scripts/tinymce/tinymce.min.js"></script>
+
+    <script>
+        const debounce = (func, wait) => {
+            let timeout;
+            function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+            executedFunction();
+        };
+    </script>
     
     <script>tinymce.init({
             selector: "#text",
@@ -31,7 +47,7 @@
                     });
                 });
                 editor.on("keyup", function (saveWithDelay) {
-                    setTimeout(function () {
+                    debounce(function () {
                         data.text = tinymce.activeEditor.getContent();
                         save(data);
                     }, 500);
@@ -47,7 +63,7 @@
                     return true;
                 })
                 editor.on("change", function (saveWithDelay) {
-                    setTimeout(function () {
+                    debounce(function () {
                         data.text = tinymce.activeEditor.getContent();
                         save(data);
                     }, 500);
