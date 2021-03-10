@@ -147,8 +147,23 @@ function listCtrl($scope) {
 	$scope.goSocial = (s = {}) => {
 		if (!s.data) return;
 		const { title, createdOn, createdBy } = s.data;
+    const navigateToCwByDefault = (
+      config && !Object.keys(config).length 
+      ? 
+        true 
+      :
+        config && config.navigateToCwByDefault 
+        ? 
+          config.navigateToCwByDefault 
+        : 
+          false
+    );
 		const queryString = `wid=${createdBy.displayName}-${createdOn}&wTitle=${title}`;
-		buildfire.navigation.navigateToSocialWall({ title, queryString }, () => {});
+		buildfire.navigation.navigateToSocialWall({ 
+      title, 
+      queryString,
+      pluginTypeOrder: navigateToCwByDefault ? ['community', 'premium_social', 'social'] : ['premium_social', 'social', 'community']
+    }, () => {});
 	};
 
 	$scope.showVoterModal = function(s) {
