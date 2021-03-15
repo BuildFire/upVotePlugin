@@ -40,6 +40,8 @@
                 editor.on("load", function () {
                     buildfire.datastore.get(function (err, obj) {
                         if (!obj || !obj.data) return;
+                        // This way, we will keep old instances to use PSW navigate by default (so we don't break backward compatibility) and new instances to navigate to CW by default.
+                        if (!Object.keys(obj.data).length) obj.data.navigateToCwByDefault = true;
                         if (!obj.data.text) obj.data.text = '';
 
                         data = obj.data;
