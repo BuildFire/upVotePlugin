@@ -180,7 +180,7 @@ function listCtrl($scope) {
 			voterIds.map(userId => {
 				return new Promise((resolve, reject) => {
 					buildfire.auth.getUserProfile({ userId }, (error, user) => {
-						if (error) return reject(error);
+						if (error || !user) return reject(error);
 						resolve(user);
 					});
 				});
