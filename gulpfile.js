@@ -95,11 +95,27 @@ gulp.task('clean',function(){
  a processes copy in the 'build' folder
  */
 gulp.task('html', function(){
-    return gulp.src(['widget/**/*.html','widget/**/*.htm','control/**/*.html','control/**/*.htm'],{base: '.'})
+    return gulp.src(['widget/**/*.html','widget/**/*.htm'],{base: '.'})
     /// replace all the <!-- build:bundleJSFiles  --> comment bodies
     /// with scripts.min.js with cache buster
         .pipe(htmlReplace({
             bundleJSFiles:"scripts.min.js?v=" + (new Date().getTime())
+            ,bundleCSSFiles:"styles.min.css?v=" + (new Date().getTime())
+        }))
+
+        /// then strip the html from any comments
+        .pipe(minHTML({removeComments:true,collapseWhitespace:true}))
+
+        /// write results to the 'build' folder
+        .pipe(gulp.dest(destinationFolder));
+});
+
+gulp.task('Controlhtml', function(){
+    return gulp.src(['control/**/*.html','control/**/*.htm'],{base: '.'})
+    /// replace all the <!-- build:bundleJSFiles  --> comment bodies
+    /// with scripts.min.js with cache buster
+        .pipe(htmlReplace({
+            bundleJSFiles:"../../widget/scripts.min.js?v=" + (new Date().getTime())
             ,bundleCSSFiles:"styles.min.css?v=" + (new Date().getTime())
         }))
 
@@ -139,7 +155,7 @@ gulp.task('zip', function () {
         .pipe(gulp.dest('..'));
 });
 
-var buildTasksToRun=['html','resources','images','fonts','icons'];
+var buildTasksToRun=['html', 'Controlhtml','resources','images','fonts','icons'];
 
 cssTasks.forEach(function(task){  buildTasksToRun.push(task.name)});
 jsTasks.forEach(function(task){  buildTasksToRun.push(task.name)});

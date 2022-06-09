@@ -10,10 +10,17 @@
 
     <!-- JS -->
     <script src="../../../../scripts/buildfire.min.js"></script>
+    <!-- build:bundleJSFiles  -->
+    <script src="../../widget/js/Analytics.js"></script>
+    <script src="../../widget/js/analyticsKeys.js"></script>
+    <!-- endbuild -->
 
     <!-- WYSIWYG -->
     <script src="../../../../scripts/tinymce/tinymce.min.js"></script>
 
+    <script>
+		Analytics.init();
+    </script>
     <script>
         const debounce = (func, wait) => {
             let timeout;
