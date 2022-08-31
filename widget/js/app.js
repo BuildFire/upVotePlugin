@@ -14,28 +14,27 @@ function getUser(callback) {
 		return;
 	}
 	buildfire.auth.getCurrentUser(function(err, user) {
-		if (err) {
+		if (err || !user) {
 			callback(null);
 			return console.error(err);
 		}
-		if (!user) {
-			return buildfire.auth.login({}, function(err, user) {
-				if (err) {
-					callback();
-					return console.error(err);
-				}
-				_currentUser = user;
-				callback(user);
-				buildfire.notifications.pushNotification.subscribe({ groupName: 'suggestions' });
-			});
+		if(user){
+			_currentUser = user;
+			callback(user)
 		}
+	});
+}
 
+function enforceLogin() {
+	buildfire.auth.login({}, function(err, user) {
+		if (err) {
+			callback();
+			return console.error(err);
+		}
 		_currentUser = user;
-		callback(user);
 		buildfire.notifications.pushNotification.subscribe({ groupName: 'suggestions' });
 	});
 }
-getUser(function() {});
 
 var config = {};
 
@@ -232,6 +231,7 @@ function listCtrl($scope) {
 
 	$scope.upVote = function(suggestionObj) {
 		getUser(function(user) {
+			if(!user) enforceLogin()
 			if (!suggestionObj.data.upVotedBy) suggestionObj.data.upVotedBy = {};
 			if (!suggestionObj.data.upVoteCount) suggestionObj.data.upVoteCount = 1;
 
@@ -290,8 +290,12 @@ function suggestionBoxCtrl($scope, $sce, $rootScope) {
 	$scope.text = $sce.trustAsHtml(config.text);
 
 	window.openPopup = function() {
-		$scope.popupOn = true;
-		if (!$scope.$$phase) $scope.$apply();
+		if(_currentUser){
+			$scope.popupOn = true;
+			if (!$scope.$$phase) $scope.$apply();
+		} else {
+			enforceLogin();
+		}
 	};
 
 	buildfire.datastore.get(function(err, obj) {
