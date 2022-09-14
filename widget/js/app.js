@@ -13,13 +13,13 @@ function getUser(callback) {
 		callback(_currentUser);
 		return;
 	}
-	buildfire.auth.getCurrentUser(function(err, user) {
+	buildfire.auth.getCurrentUser(function (err, user) {
 		if (err) {
 			callback(null);
 			return console.error(err);
 		}
 		if (!user) {
-			return buildfire.auth.login({}, function(err, user) {
+			return buildfire.auth.login({}, function (err, user) {
 				if (err) {
 					callback();
 					return console.error(err);
@@ -35,7 +35,7 @@ function getUser(callback) {
 		buildfire.notifications.pushNotification.subscribe({ groupName: 'suggestions' });
 	});
 }
-getUser(function() {});
+getUser(function () { });
 
 var config = {};
 
@@ -44,15 +44,15 @@ function listCtrl($scope) {
 	$scope.suggestions = [];
 	$scope.isInitalized = false;
 
-	$scope.$on('suggestionAdded', function(e, obj) {
+	$scope.$on('suggestionAdded', function (e, obj) {
 		obj.disableUpvote = true;
 		$scope.suggestions.unshift(obj);
 		if (!$scope.$$phase) $scope.$apply();
 	});
 
 	// added pluginInstance search to find out if social wall is available
-	var social = function() {
-		buildfire.pluginInstance.search({}, function(err, instances) {
+	var social = function () {
+		buildfire.pluginInstance.search({}, function (err, instances) {
 			if (err) return console.error(err);
 			if (typeof instances !== 'object') return;
 
@@ -71,11 +71,12 @@ function listCtrl($scope) {
 	};
 
 	function init() {
+
 		buildfire.spinner.show();
 		$scope.suggestions = [];
 		$scope.isInitalized = false;
 
-		buildfire.publicData.search({ sort: { upVoteCount: -1 } }, 'suggestion', function(err, results) {
+		buildfire.publicData.search({ sort: { upVoteCount: -1 } }, 'suggestion', function (err, results) {
 			social();
 
 			if (err) return console.error(err);
@@ -147,26 +148,26 @@ function listCtrl($scope) {
 	$scope.goSocial = (s = {}) => {
 		if (!s.data) return;
 		const { title, createdOn, createdBy } = s.data;
-    const navigateToCwByDefault = (
-      config && !Object.keys(config).length 
-      ? 
-        true 
-      :
-        config && config.navigateToCwByDefault 
-        ? 
-          config.navigateToCwByDefault 
-        : 
-          false
-    );
+		const navigateToCwByDefault = (
+			config && !Object.keys(config).length
+				?
+				true
+				:
+				config && config.navigateToCwByDefault
+					?
+					config.navigateToCwByDefault
+					:
+					false
+		);
 		const queryString = `wid=${createdBy.displayName}-${createdOn}&wTitle=${title}`;
-		buildfire.navigation.navigateToSocialWall({ 
-      title, 
-      queryString,
-      pluginTypeOrder: navigateToCwByDefault ? ['community', 'premium_social', 'social'] : ['premium_social', 'social', 'community']
-    }, () => {});
+		buildfire.navigation.navigateToSocialWall({
+			title,
+			queryString,
+			pluginTypeOrder: navigateToCwByDefault ? ['community', 'premium_social', 'social'] : ['premium_social', 'social', 'community']
+		}, () => { });
 	};
 
-	$scope.showVoterModal = function(s) {
+	$scope.showVoterModal = function (s) {
 		var voterIds = Object.keys(s.data.upVotedBy);
 		if (!voterIds.length) {
 			var richContent = '<p style="padding-top: 10px; text-align: center">No votes yet!<p>';
@@ -189,15 +190,15 @@ function listCtrl($scope) {
 			var richContent = `
 				<div class="user-container">
 					${users
-						.map(user => {
-							return `
+					.map(user => {
+						return `
 							<div class="user-item">
-								<img src=${buildfire.auth.getUserPictureUrl({ userId: user._id })} class="avatar" onerror="this.src=window._appRoot+'media/avatar.png'"/>
+								<img alt="${user.displayName}" src=${buildfire.auth.getUserPictureUrl({ userId: user._id })} class="avatar" onerror="this.src=window._appRoot+'media/avatar.png'"/>
 								<p class="ellipsis margin-bottom-zero">${user.displayName}</p>
 							</div>
 						`;
-						})
-						.join('')}
+					})
+					.join('')}
 				</div>
 				<style>
 					.user-container{
@@ -230,12 +231,15 @@ function listCtrl($scope) {
 		});
 	};
 
-	$scope.upVote = function(suggestionObj) {
-		getUser(function(user) {
+	$scope.upVote = function (suggestionObj) {
+		getUser(function (user) {
 			if (!suggestionObj.data.upVotedBy) suggestionObj.data.upVotedBy = {};
 			if (!suggestionObj.data.upVoteCount) suggestionObj.data.upVoteCount = 1;
 
 			if (!suggestionObj.data.upVotedBy[user._id]) {
+				// vote
+				Analytics.trackAction(analyticKeys.VOTE_NUMBER.key, { votes: 1, _buildfire: { aggregationValue: 1 } });
+
 				suggestionObj.data.upVoteCount++;
 				suggestionObj.disableUpvote = true;
 				suggestionObj.data.upVotedBy[user._id] = {
@@ -250,13 +254,15 @@ function listCtrl($scope) {
 							text: user.displayName + ' upvoted your suggestion ' + suggestionObj.data.title,
 							users: [suggestionObj.data.createdBy._id]
 						},
-						function(err) {
+						function (err) {
 							if (err) console.error(err);
 						}
 					);
 				}
 			} else {
 				// unvote
+				Analytics.trackAction(analyticKeys.VOTE_NUMBER.key, { votes: -1, _buildfire: { aggregationValue: -1 } });
+
 				suggestionObj.data.upVoteCount--;
 				suggestionObj.disableUpvote = false;
 				delete suggestionObj.data.upVotedBy[user._id];
@@ -267,14 +273,14 @@ function listCtrl($scope) {
 				suggestionObj.data.upVoteCount = Object.keys(suggestionObj.data.upVotedBy).length;
 			}
 
-			buildfire.publicData.update(suggestionObj.id, suggestionObj.data, 'suggestion', function(err) {
+			buildfire.publicData.update(suggestionObj.id, suggestionObj.data, 'suggestion', function (err) {
 				if (err) console.error(err);
 			});
 		});
 	};
 }
-upvoteApp.filter('getUserImage', function() {
-	return function(user) {
+upvoteApp.filter('getUserImage', function () {
+	return function (user) {
 		var url = './avatar.png';
 		if (user) {
 			url = buildfire.auth.getUserPictureUrl({ userId: user._id });
@@ -289,44 +295,46 @@ function suggestionBoxCtrl($scope, $sce, $rootScope) {
 	$scope.popupOn = false;
 	$scope.text = $sce.trustAsHtml(config.text);
 
-	window.openPopup = function() {
+	window.openPopup = function () {
 		$scope.popupOn = true;
 		if (!$scope.$$phase) $scope.$apply();
 	};
 
-	buildfire.datastore.get(function(err, obj) {
+	buildfire.datastore.get(function (err, obj) {
 		if (obj) config = obj.data;
 		$scope.text = $sce.trustAsHtml(config.text);
 	});
 
-	buildfire.datastore.onUpdate(function(obj) {
+	buildfire.datastore.onUpdate(function (obj) {
 		if (obj) config = obj.data;
 		$scope.text = $sce.trustAsHtml(config.text);
 		if (!$scope.$$phase) $scope.$apply();
 	});
 
-	$scope.clearForm = function() {
+	$scope.clearForm = function () {
 		$scope.suggestionTitle = '';
 		$scope.suggestionText = '';
 		$scope.suggestionForm.$setUntouched();
 		$scope.popupOn = false;
 	};
 
-	$scope.closeForm = function() {
+	$scope.closeForm = function () {
 		$scope.popupOn = false;
 	};
 
-	$scope.addSuggestion = function() {
+	$scope.addSuggestion = function () {
+
 		if ($scope.suggestionForm.$invalid) {
 			$scope.suggestionForm.suggestionTitle.$setTouched();
 			$scope.suggestionForm.suggestionText.$setTouched();
 			return;
 		}
 
-		getUser(function(user) {
+		getUser(function (user) {
 			_addSuggestion(user, $scope.suggestionTitle, $scope.suggestionText);
 			$scope.popupOn = false;
 
+			Analytics.trackAction(analyticKeys.SUGGESTIONS_NUMBER.key, { _buildfire: { aggregationValue: 1 } });
 			buildfire.notifications.pushNotification.schedule(
 				{
 					title: 'New suggestion by ' + user.displayName,
@@ -334,7 +342,7 @@ function suggestionBoxCtrl($scope, $sce, $rootScope) {
 					//,at: new Date()
 					groupName: 'suggestions'
 				},
-				function(err) {
+				function (err) {
 					if (err) console.error(err);
 				}
 			);
@@ -360,7 +368,7 @@ function suggestionBoxCtrl($scope, $sce, $rootScope) {
 			user: user
 		};
 
-		buildfire.publicData.insert(obj, 'suggestion', function(err, obj) {
+		buildfire.publicData.insert(obj, 'suggestion', function (err, obj) {
 			$rootScope.$broadcast('suggestionAdded', obj);
 		});
 	}
