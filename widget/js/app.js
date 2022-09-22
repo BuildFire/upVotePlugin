@@ -13,29 +13,30 @@ function getUser(callback) {
 		callback(_currentUser);
 		return;
 	}
-	buildfire.auth.getCurrentUser(function (err, user) {
-		if (err) {
+	buildfire.auth.getCurrentUser(function(err, user) {
+		if (err || !user) {
 			callback(null);
 			return console.error(err);
 		}
-		if (!user) {
-			return buildfire.auth.login({}, function (err, user) {
-				if (err) {
-					callback();
-					return console.error(err);
-				}
-				_currentUser = user;
-				callback(user);
-				buildfire.notifications.pushNotification.subscribe({ groupName: 'suggestions' });
-			});
+		if(user){
+			_currentUser = user;
+			callback(user)
 		}
-
-		_currentUser = user;
-		callback(user);
-		buildfire.notifications.pushNotification.subscribe({ groupName: 'suggestions' });
 	});
 }
-getUser(function () { });
+
+function enforceLogin() {
+	buildfire.auth.login({}, function(err, user) {
+		if (err) {
+			callback();
+			return console.error(err);
+		}
+		_currentUser = user;
+		if(user){
+			buildfire.notifications.pushNotification.subscribe({ groupName: 'suggestions' });
+		}
+	});
+}
 
 var config = {};
 
@@ -231,8 +232,9 @@ function listCtrl($scope) {
 		});
 	};
 
-	$scope.upVote = function (suggestionObj) {
-		getUser(function (user) {
+	$scope.upVote = function(suggestionObj) {
+		getUser(function(user) {
+			if(!user) enforceLogin()
 			if (!suggestionObj.data.upVotedBy) suggestionObj.data.upVotedBy = {};
 			if (!suggestionObj.data.upVoteCount) suggestionObj.data.upVoteCount = 1;
 
@@ -295,9 +297,13 @@ function suggestionBoxCtrl($scope, $sce, $rootScope) {
 	$scope.popupOn = false;
 	$scope.text = $sce.trustAsHtml(config.text);
 
-	window.openPopup = function () {
-		$scope.popupOn = true;
-		if (!$scope.$$phase) $scope.$apply();
+	window.openPopup = function() {
+		if(_currentUser){
+			$scope.popupOn = true;
+			if (!$scope.$$phase) $scope.$apply();
+		} else {
+			enforceLogin();
+		}
 	};
 
 	buildfire.datastore.get(function (err, obj) {
