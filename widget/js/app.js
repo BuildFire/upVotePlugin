@@ -60,7 +60,7 @@ function listCtrl($scope) {
 
 		buildfire.publicData.search({ sort: { upVoteCount: -1 } }, 'suggestion', function (err, results) {
 
-
+			buildfire.spinner.hide();
 			if (err) return console.error(err);
 			if (!results || !results.length) return update([]);
 
