@@ -51,25 +51,6 @@ function listCtrl($scope) {
 		if (!$scope.$$phase) $scope.$apply();
 	});
 
-	// added pluginInstance search to find out if social wall is available
-	var social = function () {
-		buildfire.pluginInstance.search({}, function (err, instances) {
-			if (err) return console.error(err);
-			if (typeof instances !== 'object') return;
-
-			let { result } = instances;
-
-			result = (result || [])
-				.filter(i => i.data._buildfire)
-				.some(r => {
-					if (r.data._buildfire.pluginType.result[0].name.toLowerCase().indexOf('social') >= 1) {
-						$scope.hasSocial = true;
-						if (!$scope.$$phase) $scope.$apply();
-						return true;
-					}
-				});
-		});
-	};
 
 	function init() {
 
@@ -78,7 +59,7 @@ function listCtrl($scope) {
 		$scope.isInitalized = false;
 
 		buildfire.publicData.search({ sort: { upVoteCount: -1 } }, 'suggestion', function (err, results) {
-			social();
+
 
 			if (err) return console.error(err);
 			if (!results || !results.length) return update([]);
@@ -204,7 +185,7 @@ function listCtrl($scope) {
 				<style>
 					.user-container{
 						max-height: 60vh;
-						overflow-y: auto; 
+						overflow-y: auto;
 					}
 					.user-item{
 						display: flex;
@@ -286,6 +267,7 @@ upvoteApp.filter('getUserImage', function () {
 		var url = './avatar.png';
 		if (user) {
 			url = buildfire.auth.getUserPictureUrl({ userId: user._id });
+			url = buildfire.imageLib.cropImage(url,{ size: "xs", aspect: "1:1" });
 			return url;
 		}
 		return url;

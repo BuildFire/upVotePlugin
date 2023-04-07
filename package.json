@@ -9,7 +9,7 @@
     "publish": "cd ../../ && buildfire plugin publish plugins/UpVotePlugin --prod --update",
     "preinstall": "npx npm-force-resolutions"
   },
-  "author": "Daniel Hindi",
+  "author": "BuildFire",
   "license": "ISC",
   "devDependencies": {
     "babel-cli": "^6.26.0",

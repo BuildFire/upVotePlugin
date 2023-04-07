@@ -8,8 +8,7 @@
     <script src="../../../scripts/angular/angular.min.js"></script>
     <script src="../../../scripts/buildfire/services/notifications/pushNotifications.js"></script>
     <script src="../../../scripts/buildfire/components/popup/popup.js"></script>
-    <script src="../../../scripts/tinymce/tinymce.min.js"></script>
-    <script src="../../../scripts/tinymce/ui-tinymce.js"></script>
+
     <!-- build:bundleJSFiles  -->
     <script src="js/analyticsKeys.js"></script>
     <script src="js/Analytics.js"></script>
@@ -29,7 +28,6 @@
     <div class="main--container">
         <div ng-controller="suggestionBoxCtrl" ng-cloak="">
             <div class="container--responsive padded padded--x">
-                <h3 class="padded margin--0 padded--y">Suggestions</h3>
                 <p id="text_container" class="margin-bottom--sm text--secondary word--break" ng-bind-html="text">{{text}}</p>
             </div>
 
@@ -96,8 +94,7 @@
                         <span class="icon icon-thumbs-up2"></span>
                         <span class="text-primary margin--0">Vote</span>
                     </button>
-                    <button class="voteButton btn btn--icon--text btn--transparent" ng-click="goSocial(s)"
-                        ng-show="hasSocial">
+                    <button class="voteButton btn btn--icon--text " ng-click="goSocial(s)">
                         <span class="icon icon-bubble"></span>
                         <span class="text-primary margin--0">Comment</span>
                     </button>
