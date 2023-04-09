@@ -3,7 +3,7 @@
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+	<meta name="buildfire" content="enablePluginJsonLoad">
     <script src="../../../scripts/buildfire.min.js"></script>
     <script src="../../../scripts/angular/angular.min.js"></script>
     <script src="../../../scripts/buildfire/services/notifications/pushNotifications.js"></script>
@@ -16,7 +16,6 @@
     <!-- endbuild -->
 
     <!-- build:bundleCSSFiles  -->
-    <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/pluginIcons.css">
     <!-- endbuild -->
 </head>
@@ -80,8 +79,8 @@
                         <h6 ng-if="!s.isCurrentYear" class="pull-left caption margin--0 text--secondary">{{s.data.createdOn | date:'MMM dd, y'}}</h6>
                     </div>
                     <p class="pill text--secondary shrink--0" ng-click="showVoterModal(s)">
-                        <span class="margin--0">{{s.data.upVoteCount}} Vote</span>
-                        <span class="margin--0" ng-show="s.data.upVoteCount>1">s</span>
+                        <span class="margin--0">{{s.data.upVoteCount}}</span>
+						<span class="margin--0" bfString="mainScreen.voteBadge"></span>
                     </p>
                 </div>
                 <div class="suggestion padded padded--m padded--x">
@@ -92,11 +91,11 @@
                     <button class="voteButton btn btn--icon--text btn--transparent" ng-click="upVote(s)"
                         ng-class="{btnShadow:!s.disableUpvote,btntransparent:s.disableUpvote}">
                         <span class="icon icon-thumbs-up2"></span>
-                        <span class="text-primary margin--0">Vote</span>
+                        <span class="text-primary margin--0" bfString="mainScreen.voteButton"></span>
                     </button>
                     <button class="voteButton btn btn--icon--text " ng-click="goSocial(s)">
                         <span class="icon icon-bubble"></span>
-                        <span class="text-primary margin--0">Comment</span>
+                        <span class="text-primary margin--0"  bfString="mainScreen.commentButton"></span>
                     </button>
                 </div>
             </div>
