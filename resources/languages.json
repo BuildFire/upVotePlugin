@@ -1,9 +1,8 @@
 {
-	"mainInfo": "language Settings",
 	"sections": {
 		"mainScreen": {
-			"title": "Main Screen",
-			"info": "This is the main screen of this feature",
+			"title": "General",
+			"info": "",
 			"labels": {
 				"voteBadge": {
 					"title": "Vote Badge",
@@ -25,6 +24,24 @@
 					"required": true,
 					"inputType": "text",
 					"toolTip": "The word Comment in the comment button"
+				},
+				"backlog": {
+					"title": "Backlog",
+					"defaultValue": "Backlog",
+					"inputType": "text",
+					"toolTip": ""
+				},
+				"inProgress": {
+					"title": "In Progress",
+					"defaultValue": "In Progress",
+					"inputType": "text",
+					"toolTip": ""
+				},
+				"completed": {
+					"title": "Completed",
+					"defaultValue": "Completed",
+					"inputType": "text",
+					"toolTip": ""
 				}
 			}
 		}

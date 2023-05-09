@@ -1,0 +1,82 @@
+html {
+    padding: 0 !important;
+}
+body {
+    padding-top: 20px !important;
+}
+.row {
+    padding: 0px 8px !important
+}
+
+#userTagsContainer {
+    display: none;
+    margin: 0 10px !important
+}
+
+.button-switch {
+    display: flex;
+    justify-content: right;
+}
+
+.radios-row {
+    display: flex;
+    justify-content: space-around;
+}
+.user-tag-container {
+    display:flex;
+    justify-content: space-between;
+    margin: 0;
+    padding: 0 !important;
+}
+
+.user-tag-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 80px;
+    background-color: #F2F2F2;
+    border: 1px solid #DDD;
+    border-radius: 4px 0px 0px 4px;
+}
+#user-tags-fields {
+    width:100%;
+    border-bottom: 1px solid #DDD;
+    border-top: 1px solid #DDD;
+    margin: 0;
+}
+.user-tag-field {
+    background-color: #05ACF0;
+    border-radius: 2px;
+    color: white;
+    padding: 6px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+label {
+    margin: 0 !important
+}
+.col-md-4 {
+    padding: 5px 2px !important
+}
+.icon-cross2 {
+    cursor: pointer;
+}
+
+.btn-add-user-tag {
+    border: 1px solid #05ACF0;
+    padding: 7px 32px;
+    border-radius: 0px 4px 4px 0px;
+}
+.btn-plus {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    font-size: 20;
+    background-color: transparent;
+    border: none;
+    color: #05ACF0;
+}

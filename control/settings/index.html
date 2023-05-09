@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="../../../../styles/helper.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../assets/control.css" />
+    <link href="../../../../styles/control/bf-base.css" rel="stylesheet" />
+    <link href="./styles.css" rel="stylesheet" />
+    <link href="../../../../styles/control/siteIcons-control.css" rel="stylesheet" />
+    <script src="../../../../scripts/buildfire.min.js"></script>
+    <script src="../../shared/js/settings.js"></script>
+  </head>
+
+  <body>
+    <div class="row">
+      <div class="row margin-bottom-twenty">
+        <div class="labels col-md-4 pull-left">
+          <span>Comments</span>
+        </div>
+        <div class="button-switch col-md-8">
+          <input id="comments" type="checkbox" onchange="updateCommentsProperty()"/>
+          <label for="comments" class="label-success"></label>
+        </div>
+      </div>
+      <div class="row margin-bottom-twenty">
+        <div class="labels col-md-4 pull-left">
+          <span>Allow Status Update</span>
+        </div>
+        <div class="main col-md-8 pull-right">
+          <span class="radios-row">
+            <div class="radio radio-primary radio-inline">
+              <input
+                id="allUsers"
+                type="radio"
+                name="allowStatusUpdate"
+                value="allUsers"
+                onchange="changeStatus(1)"
+              />
+              <label class="subtitles-labels" for="allUsers">All Users</label>
+            </div>
+            <div class="radio radio-primary radio-inline">
+              <input
+                id="noUsers"
+                type="radio"
+                name="allowStatusUpdate"
+                value="REMOVE_VIA_APP"
+                onchange="changeStatus(2)"
+              />
+              <label class="subtitles-labels" for="noUsers">No Users</label>
+            </div>
+            <div class="radio radio-primary radio-inline">
+              <input
+                id="usersWith"
+                type="radio"
+                name="allowStatusUpdate"
+                value="REMOVE_VIA_APP"
+                onchange="changeStatus(3)"
+              />
+              <label class="subtitles-labels" for="usersWith">Users With</label>
+            </div>
+          </span>
+        </div>
+      </div>
+      <div class="row margin-bottom-twenty" id="userTagsContainer">
+        <div class="col-md-4"></div>
+        <div class="user-tag-container col-md-8">
+            <div style="display:flex;width:100%">
+                <label class="user-tag-title" >User Tags</label>
+                <div class="row" id="user-tags-fields">
+                </div>
+            </div>
+           <div class="btn-add-user-tag">
+            <button class="btn-plus icon-plus" onclick="openUserTagsDialog()"></button>
+
+           </div>
+        </div>
+      </div>
+    </div>
+  </body>
+
+  <script src="./app.js"></script>
+</html>
