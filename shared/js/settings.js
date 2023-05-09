@@ -17,7 +17,7 @@
     constructor(data = {}){
       this.enableComments = data.enableComments || false;
       this.statusUpdateUsersSegment = data.statusUpdateUsersSegment || STATUS_UPDATE_SEGMENT.NO_USERS;
-      this.statusUpdateTags = [{tagName:"Test1", id:1},{tagName:"Test2", id:2}];
+      this.statusUpdateTags = data.statusUpdateTags || [];
       this.pushNotificationUsersSegment = data.pushNotificationUsersSegment || PUSH_NOTIFICATIONS_SEGMENT.NO_USERS;
       this.pushNotificationTags = data.pushNotificationTags || [];
       this.createdOn = data.createdOn || new Date();
@@ -37,7 +37,7 @@
             reject(e);
             if (callback) callback(e);
           } else {
-            let settings = new Settings(obj);
+            let settings = new Settings(obj.data);
             resolve(settings);
             if (callback) callback(null, settings);
           }

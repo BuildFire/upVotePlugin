@@ -30,33 +30,30 @@
           <span class="radios-row">
             <div class="radio radio-primary radio-inline">
               <input
-                id="allUsers"
+                id="statusUpdateAllUsers"
                 type="radio"
                 name="allowStatusUpdate"
-                value="allUsers"
-                onchange="changeStatus(1)"
+                onchange="changeStatusUpdate(1)"
               />
-              <label class="subtitles-labels" for="allUsers">All Users</label>
+              <label class="subtitles-labels" for="statusUpdateAllUsers">All Users</label>
             </div>
             <div class="radio radio-primary radio-inline">
               <input
-                id="noUsers"
+                id="statusUpdateNoUsers"
                 type="radio"
                 name="allowStatusUpdate"
-                value="REMOVE_VIA_APP"
-                onchange="changeStatus(2)"
+                onchange="changeStatusUpdate(2)"
               />
-              <label class="subtitles-labels" for="noUsers">No Users</label>
+              <label class="subtitles-labels" for="statusUpdateNoUsers">No Users</label>
             </div>
             <div class="radio radio-primary radio-inline">
               <input
-                id="usersWith"
+                id="statusUpdateUsersWith"
                 type="radio"
                 name="allowStatusUpdate"
-                value="REMOVE_VIA_APP"
-                onchange="changeStatus(3)"
+                onchange="changeStatusUpdate(3)"
               />
-              <label class="subtitles-labels" for="usersWith">Users With</label>
+              <label class="subtitles-labels" for="statusUpdateUsersWith">Users With</label>
             </div>
           </span>
         </div>
@@ -66,11 +63,63 @@
         <div class="user-tag-container col-md-8">
             <div style="display:flex;width:100%">
                 <label class="user-tag-title" >User Tags</label>
-                <div class="row" id="user-tags-fields">
+                <div class="row" id="status_update_tags">
                 </div>
             </div>
            <div class="btn-add-user-tag">
-            <button class="btn-plus icon-plus" onclick="openUserTagsDialog()"></button>
+            <button class="btn-plus icon-plus" onclick="openStatusUpdateUserTagsDialog()"></button>
+
+           </div>
+        </div>
+      </div>
+
+
+      <div class="row margin-bottom-twenty">
+        <div class="labels col-md-4 pull-left">
+          <span>Allow new item Push notification</span>
+        </div>
+        <div class="main col-md-8 pull-right">
+          <span class="radios-row">
+            <div class="radio radio-primary radio-inline">
+              <input
+                id="pushNotificationAllUsers"
+                type="radio"
+                name="pushNotificationTags"
+                onchange="changeItemPushNotification(1)"
+              />
+              <label class="subtitles-labels" for="pushNotificationAllUsers">All Users</label>
+            </div>
+            <div class="radio radio-primary radio-inline">
+              <input
+                id="pushNotificationNoUsers"
+                type="radio"
+                name="pushNotificationTags"
+                onchange="changeItemPushNotification(2)"
+              />
+              <label class="subtitles-labels" for="pushNotificationNoUsers">No Users</label>
+            </div>
+            <div class="radio radio-primary radio-inline">
+              <input
+                id="pushNotificationUsersWith"
+                type="radio"
+                name="pushNotificationTags"
+                onchange="changeItemPushNotification(3)"
+              />
+              <label class="subtitles-labels" for="pushNotificationUsersWith">Users With</label>
+            </div>
+          </span>
+        </div>
+      </div>
+      <div class="row margin-bottom-twenty" id="itemPushNotificationTagsContainer">
+        <div class="col-md-4"></div>
+        <div class="user-tag-container col-md-8">
+            <div style="display:flex;width:100%">
+                <label class="user-tag-title" >User Tags</label>
+                <div class="row" id="push_notification_tags">
+                </div>
+            </div>
+           <div class="btn-add-user-tag">
+            <button class="btn-plus icon-plus" onclick="openItemPushNotificationUserTags()"></button>
 
            </div>
         </div>
