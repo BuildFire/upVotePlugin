@@ -69,12 +69,14 @@ function listCtrl($scope) {
 		buildfire.spinner.show();
 		$scope.suggestions = [];
 		$scope.isInitalized = false;
+		const options = {
+			sort: { upVoteCount: -1 }
+		}
 
-		buildfire.publicData.search({ sort: { upVoteCount: -1 } }, 'suggestion', function (err, results) {
+		Suggestion.search(options).then(results => {
 			document.getElementById("btn--add__container").classList.remove("hidden")
 			buildfire.spinner.hide();
 			hideSkeleton();
-			if (err) return console.error(err);
 			if (!results || !results.length) return update([]);
 
 			results = results.map(checkYear);
@@ -83,24 +85,22 @@ function listCtrl($scope) {
 			// they will update after promises resolve
 			update(results);
 
-			const promises = results.map(s => {
+			const promises = results.map(suggestion => {
 				return new Promise(resolve => {
-					buildfire.auth.getUserProfile({ userId: s.data.createdBy._id }, (error, updatedUser) => {
+					buildfire.auth.getUserProfile({ userId: suggestion.createdBy._id }, (error, updatedUser) => {
 						if (error || !updatedUser._id) {
-							console.warn('failed to update user profile:', s.data.createdBy);
-							return resolve(s);
+							console.warn('failed to update user profile:', suggestion.createdBy);
+							return resolve(suggestion);
 						}
 
-						const hasUpdate = s.data.createdBy.displayName !== updatedUser.displayName;
+						const hasUpdate = suggestion.createdBy.displayName !== updatedUser.displayName;
 
-						s.data.createdBy = updatedUser;
-						resolve(s);
+						suggestion.createdBy = updatedUser;
+						resolve(suggestion);
 
 						if (!hasUpdate) return;
 						// update suggestion out of sync for next time
-						buildfire.publicData.update(s.id, s.data, 'suggestion', e => {
-							if (e) console.error(e);
-						});
+						Suggestion.update(suggestion,()=>{})
 					});
 				});
 			});
@@ -117,15 +117,15 @@ function listCtrl($scope) {
 			}
 
 			function checkYear(item) {
-				var creationYear = new Date(item.data.createdOn).getFullYear();
+				var creationYear = new Date(item.createdOn).getFullYear();
 				var currentYear = new Date().getFullYear();
 
 				item.isCurrentYear = creationYear === currentYear;
-				item.disableUpvote = _currentUser ? !item || !item.data.upVotedBy || item.data.upVotedBy[_currentUser._id] : false;
+				item.disableUpvote = _currentUser ? !item || !item.upVotedBy || item.upVotedBy[_currentUser._id] : false;
 
 				return item;
 			}
-		});
+		}).catch(err => console.log(err))
 	}
 
 	getUser(init);
@@ -140,9 +140,9 @@ function listCtrl($scope) {
 		init();
 	});
 
-	$scope.goSocial = (s = {}) => {
-		if (!s.data) return;
-		const { title, createdOn, createdBy } = s.data;
+	$scope.goSocial = (suggestion = {}) => {
+		if (!suggestion) return;
+		const { title, createdOn, createdBy } = suggestion;
 		const navigateToCwByDefault = (
 			config && !Object.keys(config).length
 				?
@@ -162,8 +162,8 @@ function listCtrl($scope) {
 		}, () => { });
 	};
 
-	$scope.showVoterModal = function (s) {
-		var voterIds = Object.keys(s.data.upVotedBy);
+	$scope.showVoterModal = function (suggestion) {
+		var voterIds = Object.keys(suggestion.upVotedBy);
 		Promise.all(
 			voterIds.map(userId => {
 				return new Promise((resolve, reject) => {
@@ -196,26 +196,26 @@ function listCtrl($scope) {
 	$scope.upVote = function(suggestionObj) {
 		getUser(function(user) {
 			if(!user) enforceLogin()
-			if (!suggestionObj.data.upVotedBy) suggestionObj.data.upVotedBy = {};
-			if (!suggestionObj.data.upVoteCount) suggestionObj.data.upVoteCount = 1;
+			if (!suggestionObj.upVotedBy) suggestionObj.upVotedBy = {};
+			if (!suggestionObj.upVoteCount) suggestionObj.upVoteCount = 1;
 
-			if (!suggestionObj.data.upVotedBy[user._id]) {
+			if (!suggestionObj.upVotedBy[user._id]) {
 				// vote
 				Analytics.trackAction(analyticKeys.VOTE_NUMBER.key, { votes: 1, _buildfire: { aggregationValue: 1 } });
 
-				suggestionObj.data.upVoteCount++;
+				suggestionObj.upVoteCount++;
 				suggestionObj.disableUpvote = true;
-				suggestionObj.data.upVotedBy[user._id] = {
+				suggestionObj.upVotedBy[user._id] = {
 					votedOn: new Date(),
 					user: user
 				};
 
-				if (suggestionObj.data.createdBy._id != user._id) {
+				if (suggestionObj.createdBy._id != user._id) {
 					buildfire.notifications.pushNotification.schedule(
 						{
 							title: 'You got an upvote!',
-							text: user.displayName + ' upvoted your suggestion ' + suggestionObj.data.title,
-							users: [suggestionObj.data.createdBy._id]
+							text: user.displayName + ' upvoted your suggestion ' + suggestionObj.title,
+							users: [suggestionObj.createdBy._id]
 						},
 						function (err) {
 							if (err) console.error(err);
@@ -226,19 +226,16 @@ function listCtrl($scope) {
 				// unvote
 				Analytics.trackAction(analyticKeys.VOTE_NUMBER.key, { votes: -1, _buildfire: { aggregationValue: -1 } });
 
-				suggestionObj.data.upVoteCount--;
+				suggestionObj.upVoteCount--;
 				suggestionObj.disableUpvote = false;
-				delete suggestionObj.data.upVotedBy[user._id];
+				delete suggestionObj.upVotedBy[user._id];
 			}
 
-			if (suggestionObj.data.upVoteCount < 10) {
+			if (suggestionObj.upVoteCount < 10) {
 				/// then just to a hard count just in case
-				suggestionObj.data.upVoteCount = Object.keys(suggestionObj.data.upVotedBy).length;
+				suggestionObj.upVoteCount = Object.keys(suggestionObj.upVotedBy).length;
 			}
-
-			buildfire.publicData.update(suggestionObj.id, suggestionObj.data, 'suggestion', function (err) {
-				if (err) console.error(err);
-			});
+			Suggestion.update(suggestionObj,()=>{})
 		});
 	};
 }
@@ -269,12 +266,12 @@ function suggestionBoxCtrl($scope, $sce, $rootScope) {
 	};
 
 	buildfire.datastore.get(function (err, obj) {
-		if (obj) config = obj.data;
+		if (obj) config = obj;
 		$scope.text = $sce.trustAsHtml(config.text);
 	});
 
 	buildfire.datastore.onUpdate(function (obj) {
-		if (obj) config = obj.data;
+		if (obj) config = obj;
 		$scope.text = $sce.trustAsHtml(config.text);
 		if (!$scope.$$phase) $scope.$apply();
 	});
@@ -329,15 +326,17 @@ function suggestionBoxCtrl($scope, $sce, $rootScope) {
 			createdBy: user,
 			createdOn: new Date(),
 			upVoteCount: 1,
-			upVotedBy: {}
+			upVotedBy: {},
+			status: SUGGESTION_STATUS.BACKLOG
 		};
 		obj.upVotedBy[user._id] = {
 			votedOn: new Date(),
 			user: user
 		};
 
-		buildfire.publicData.insert(obj, 'suggestion', function (err, obj) {
-			$rootScope.$broadcast('suggestionAdded', obj);
-		});
+		Suggestion.insert(obj, (err, result) => {
+			const suggestion = new Suggestion(result)
+			$rootScope.$broadcast('suggestionAdded', suggestion);
+		})
 	}
 }
