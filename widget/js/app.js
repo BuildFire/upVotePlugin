@@ -43,12 +43,6 @@ function listCtrl($scope) {
 	$scope.suggestions = [];
 	$scope.isInitalized = false;
 
-	$scope.$on('suggestionAdded', function (e, obj) {
-		obj.disableUpvote = true;
-		$scope.suggestions.unshift(obj);
-		if (!$scope.$$phase) $scope.$apply();
-	});
-
 	function showSkeleton() {
 		let skeleton = document.getElementById("skeleton")
 		for(let i=0;i<=2;i++){
@@ -238,72 +232,44 @@ function listCtrl($scope) {
 			Suggestion.update(suggestionObj,()=>{})
 		});
 	};
-}
-upvoteApp.filter('getUserImage', function () {
-	return function (user) {
-		var url = './avatar.png';
-		if (user) {
-			url = buildfire.auth.getUserPictureUrl({ userId: user._id });
-			url = buildfire.imageLib.cropImage(url,{ size: "xs", aspect: "1:1" });
-			return url;
-		}
-		return url;
-	};
-});
-
-upvoteApp.controller('suggestionBoxCtrl', ['$scope', '$sce', '$rootScope', suggestionBoxCtrl]);
-function suggestionBoxCtrl($scope, $sce, $rootScope) {
-	$scope.popupOn = false;
-	$scope.text = $sce.trustAsHtml(config.text);
 
 	window.openPopup = function() {
 		if(_currentUser){
-			$scope.popupOn = true;
-			if (!$scope.$$phase) $scope.$apply();
+			const step1 = {
+				placeholder: "Enter short title*",
+				saveText: "Next",
+				defaultValue: "",
+				required: true
+			  }
+			const step2 = {
+				placeholder: "Add more details*",
+				saveText: "Submit",
+				defaultValue: "",
+				required: true
+			  }
+			const steps = [step1, step2];
+
+			buildfire.input.showTextDialog(steps, (err, response)=>{
+				const title = response.results[0].textValue
+				const description = response.results[1].textValue
+				addSuggestion(title, description)
+			})
 		} else {
 			enforceLogin();
 		}
 	};
 
-	buildfire.datastore.get(function (err, obj) {
-		if (obj) config = obj;
-		$scope.text = $sce.trustAsHtml(config.text);
-	});
-
-	buildfire.datastore.onUpdate(function (obj) {
-		if (obj) config = obj;
-		$scope.text = $sce.trustAsHtml(config.text);
-		if (!$scope.$$phase) $scope.$apply();
-	});
-
-	$scope.clearForm = function () {
-		$scope.suggestionTitle = '';
-		$scope.suggestionText = '';
-		$scope.suggestionForm.$setUntouched();
-		$scope.popupOn = false;
-	};
-
-	$scope.closeForm = function () {
-		$scope.popupOn = false;
-	};
-
-	$scope.addSuggestion = function () {
-
-		if ($scope.suggestionForm.$invalid) {
-			$scope.suggestionForm.suggestionTitle.$setTouched();
-			$scope.suggestionForm.suggestionText.$setTouched();
-			return;
-		}
+	function addSuggestion(title, description) {
 
 		getUser(function (user) {
-			_addSuggestion(user, $scope.suggestionTitle, $scope.suggestionText);
+			_addSuggestion(user, title, description);
 			$scope.popupOn = false;
 
 			Analytics.trackAction(analyticKeys.SUGGESTIONS_NUMBER.key, { _buildfire: { aggregationValue: 1 } });
 			buildfire.notifications.pushNotification.schedule(
 				{
 					title: 'New suggestion by ' + user.displayName,
-					text: $scope.suggestionTitle,
+					text: title,
 					//,at: new Date()
 					groupName: 'suggestions'
 				},
@@ -335,8 +301,26 @@ function suggestionBoxCtrl($scope, $sce, $rootScope) {
 		};
 
 		Suggestion.insert(obj, (err, result) => {
+			buildfire.dialog.toast({
+				message: "Your suggestion has been successfully added.",
+				type: "info"
+			  });
 			const suggestion = new Suggestion(result)
-			$rootScope.$broadcast('suggestionAdded', suggestion);
+			suggestion.disableUpvote = true;
+			$scope.suggestions.unshift(suggestion);
+			if (!$scope.$$phase) $scope.$apply();
 		})
 	}
 }
+upvoteApp.filter('getUserImage', function () {
+	return function (user) {
+		var url = './avatar.png';
+		if (user) {
+			url = buildfire.auth.getUserPictureUrl({ userId: user._id });
+			url = buildfire.imageLib.cropImage(url,{ size: "xs", aspect: "1:1" });
+			return url;
+		}
+		return url;
+	};
+});
+

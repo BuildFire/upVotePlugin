@@ -33,48 +33,6 @@
         <a class="btn btn-primary btn--fab btn--add"><span></span></a>
     </div>
     <div class="main--container">
-        <div ng-controller="suggestionBoxCtrl" ng-cloak="">
-            <div class="container--responsive padded padded--x">
-                <p id="text_container" class="margin-bottom--sm text--secondary word--break" ng-bind-html="text">{{text}}</p>
-            </div>
-            <div class="overlay" ng-show="popupOn" ng-click="closeForm()"></div>
-
-            <div class="suggestionBox popup" ng-show="popupOn">
-                <form name="suggestionForm" class="form-main" novalidate>
-                    <div class="card backgroundColorTheme">
-                        <div class="padded">
-                            <div class="textfield">
-                                <input class="no-margin-bottom" type="text" placeholder="Title" ng-model="suggestionTitle"
-                                    maxlength="64"
-                                    name="suggestionTitle" required>
-                                <span class="text-danger caption" name="titleErr"
-                                    ng-show="suggestionForm.suggestionTitle.$touched && suggestionForm.suggestionTitle.$invalid">Title
-                                    is required
-                                </span>
-                            </div>
-                            <div class="textfield">
-                                <textarea class="margin--0 no-margin-bottom" rows="5" placeholder="Add your suggestion here"
-                                    ng-model="suggestionText" maxlength="200" name="suggestionText" required></textarea>
-                                <span class="text-danger caption" name="textErr"
-                                    ng-show="suggestionForm.suggestionText.$touched && suggestionForm.suggestionText.$invalid">Text
-                                    is required
-                                </span>
-                            </div>
-                        </div>
-                        <div class="button__panel padded padded--sm padded--x">
-                            <button class="btn btn--transparent" ng-click="clearForm()">
-                                <span class="text--secondary">Cancel</span>
-                            </button>
-                            <button class="btn btn--transparent" ng-click="addSuggestion()">
-                                <span class="text-primary">Submit</span>
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-
-        </div>
-
         <div ng-controller="listCtrl" class="padded padded--x container--responsive">
 
             <div class="card suggestionCard" ng-cloak ng-repeat="s in suggestions track by $index">
