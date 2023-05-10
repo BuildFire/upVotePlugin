@@ -71,7 +71,7 @@ function listCtrl($scope) {
 		$scope.isInitalized = false;
 
 		buildfire.publicData.search({ sort: { upVoteCount: -1 } }, 'suggestion', function (err, results) {
-
+			document.getElementById("btn--add__container").classList.remove("hidden")
 			buildfire.spinner.hide();
 			hideSkeleton();
 			if (err) return console.error(err);
@@ -164,14 +164,6 @@ function listCtrl($scope) {
 
 	$scope.showVoterModal = function (s) {
 		var voterIds = Object.keys(s.data.upVotedBy);
-		if (!voterIds.length) {
-			var richContent = '<p style="padding-top: 10px; text-align: center">No votes yet!<p>';
-			var options = { richContent };
-			return buildfire.components.popup.display(options, err => {
-				if (err) return console.log(err);
-			});
-		}
-
 		Promise.all(
 			voterIds.map(userId => {
 				return new Promise((resolve, reject) => {
@@ -182,47 +174,22 @@ function listCtrl($scope) {
 				});
 			})
 		).then(users => {
-			var richContent = `
-				<div class="user-container">
-					${users
-					.map(user => {
-						return `
-							<div class="user-item">
-								<img alt="${user.displayName}" src=${buildfire.auth.getUserPictureUrl({ userId: user._id })} class="avatar" onerror="this.src=window._appRoot+'media/avatar.png'"/>
-								<p class="ellipsis margin-bottom-zero">${user.displayName}</p>
-							</div>
-						`;
-					})
-					.join('')}
-				</div>
-				<style>
-					.user-container{
-						max-height: 60vh;
-						overflow-y: auto;
-					}
-					.user-item{
-						display: flex;
-						align-items: center;
-						padding: 16px 0;
-						font-size: 14px;
-					}
-					.avatar{
-						border-radius: 50%;
-						overflow: hidden;
-						width: 24px;
-						height: 24px;
-						object-fit: cover;
-						background-color: rgba(128, 128, 128, 0.1);
-						flex-shrink: 0;
-						margin-right: 12px;
-					}
-				</style>
-			`;
-
-			var options = { richContent };
-			buildfire.components.popup.display(options, err => {
-				if (err) return console.log(err);
-			});
+		    const listItems = [];
+			for(let i=0;i<users.length;i++){
+				listItems.push({
+					text: users[i].firstName + " " + users[i].lastName , imageUrl:buildfire.auth.getUserPictureUrl({ userId: users[i]._id }) 
+				})
+			}
+			buildfire.components.drawer.open(
+				{
+				  content: '<b>Upvotes</b>',
+				  isHTML: true,
+				  triggerCallbackOnUIDismiss: false,   
+				  autoUseImageCdn: true,
+				  listItems: listItems
+				},
+				() => {}
+			  );
 		});
 	};
 

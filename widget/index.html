@@ -8,7 +8,7 @@
     <script src="../../../scripts/buildfire.min.js"></script>
     <script src="../../../scripts/angular/angular.min.js"></script>
     <script src="../../../scripts/buildfire/services/notifications/pushNotifications.js"></script>
-    <script src="../../../scripts/buildfire/components/popup/popup.js"></script>
+    <script src="../../../scripts/buildfire/components/drawer/drawer.js"></script>
     <!-- build:bundleJSFiles  -->
     <script src="js/analyticsKeys.js"></script>
     <script src="js/Analytics.js"></script>
@@ -28,7 +28,7 @@
 </style>
 <body style="position: initial !important;">
     <div id="skeleton"></div>
-    <div id="btn--add__container"  onclick="openPopup()">
+    <div id="btn--add__container" class="hidden" onclick="openPopup()">
         <a class="btn btn-primary btn--fab btn--add"><span></span></a>
     </div>
     <div class="main--container">
@@ -36,7 +36,6 @@
             <div class="container--responsive padded padded--x">
                 <p id="text_container" class="margin-bottom--sm text--secondary word--break" ng-bind-html="text">{{text}}</p>
             </div>
-
             <div class="overlay" ng-show="popupOn" ng-click="closeForm()"></div>
 
             <div class="suggestionBox popup" ng-show="popupOn">
@@ -106,7 +105,7 @@
                     </button>
                 </div>
             </div>
-            <div id="empty-state" ng-show="isInitalized" class="empty-state-holder hidden"  >
+            <div class="empty-state-holder" ng-if="isInitalized && !suggestions.length" >
                 <img alt="empty state holder" src="./empty.svg"></img>
             </div> 
             
