@@ -49,9 +49,23 @@ function listCtrl($scope) {
 		if (!$scope.$$phase) $scope.$apply();
 	});
 
+	function showSkeleton() {
+		let skeleton = document.getElementById("skeleton")
+		for(let i=0;i<=2;i++){
+			let div = document.createElement("div")
+			div.classList.add("bf-skeleton-loader")
+			div.classList.add("grid-block")
+			skeleton.append(div);
+		}
+	}
+
+	function hideSkeleton() {
+		let skeleton = document.getElementById("skeleton")
+		skeleton.style.display = "none";
+	}
 
 	function init() {
-
+		showSkeleton()
 		buildfire.spinner.show();
 		$scope.suggestions = [];
 		$scope.isInitalized = false;
@@ -59,6 +73,7 @@ function listCtrl($scope) {
 		buildfire.publicData.search({ sort: { upVoteCount: -1 } }, 'suggestion', function (err, results) {
 
 			buildfire.spinner.hide();
+			hideSkeleton();
 			if (err) return console.error(err);
 			if (!results || !results.length) return update([]);
 
