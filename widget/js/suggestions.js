@@ -50,14 +50,15 @@ class Suggestion {
   }
 
   static update(suggestion) {
+    const suggestionId = suggestion.id;
+    let suggestionData = {...suggestion};
+    delete suggestionData.id;
     return new Promise((resolve, reject) => {
-        buildfire.publicData.update(suggestion.id, suggestion.data, DBTAG, (e, r) => {
+        buildfire.publicData.update(suggestionId, suggestionData, DBTAG, (e, r) => {
           if (e) {
             reject(e);
-            if (callback) callback(e);
           } else {
             resolve(r);
-            if (callback) callback(null, r);
           }
         });
       });

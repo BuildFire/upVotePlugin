@@ -3,8 +3,20 @@
 var upvoteApp = angular.module('upvote', []);
 
 var _currentUser = null;
+var appThemeColors = null;
 
 buildfire.appearance.titlebar.show();
+
+function getLanguageValue(stringkey) {
+	return new Promise((resolve, reject) => {
+		buildfire.language.get({stringKey: stringkey}, (err, result) => {
+		  if (err) reject({
+			err
+		  });
+		  resolve(result);
+		});
+	  });
+}
 
 function getUser(callback) {
 	if (_currentUser) {
@@ -63,6 +75,12 @@ function listCtrl($scope) {
 		buildfire.spinner.show();
 		$scope.suggestions = [];
 		$scope.isInitalized = false;
+
+		buildfire.appearance.getAppTheme((err, result) => {
+			if (err) return console.error(err);
+			appThemeColors = result.colors
+		  });
+
 		const options = {
 			sort: { upVoteCount: -1 }
 		}
@@ -116,7 +134,7 @@ function listCtrl($scope) {
 
 				item.isCurrentYear = creationYear === currentYear;
 				item.disableUpvote = _currentUser ? !item || !item.upVotedBy || item.upVotedBy[_currentUser._id] : false;
-
+				item.upvoteByYou = item.upVotedBy && _currentUser && item.upVotedBy[_currentUser._id] != null
 				return item;
 			}
 		}).catch(err => console.log(err))
@@ -187,6 +205,76 @@ function listCtrl($scope) {
 		});
 	};
 
+	function renderStatusItem(text, index){
+		const element = `
+		<div style='display:flex;color:#000;font-weight:500;font-size:16px;line-height:24px'>
+				<span style='width: 24px;height: 24px;border-radius: 50%;margin-right: 16px;background-color:
+				   ${getStatusColor(index)}'></span> ${text} </div>`
+
+		return element;
+	}
+
+	function getStatusColor(index){
+		switch (index) {
+			case 1:
+				return "rgba(150, 150, 150, 0.1)";
+			case 2:
+				return appThemeColors.warningTheme
+			case 3:
+				return appThemeColors.successTheme
+		}
+	}
+
+	$scope.openChangeStatusModal = function (suggestion) {
+
+		const callBacklogText = getLanguageValue("mainScreen.backlog") 
+		const callInProgressText = getLanguageValue("mainScreen.inProgress") 
+		const callCompletedText = getLanguageValue("mainScreen.completed") 
+
+		Promise.all([callBacklogText, callInProgressText,callCompletedText]).then(result => {
+			const listItems = [];
+			for(let i=1;i<=result.length;i++){
+				listItems.push({
+					id: i,
+					text: renderStatusItem(result[i-1], i)
+				})
+			}
+			buildfire.components.drawer.open(
+				{
+					content: '<b>Update Status</b>',
+					isHTML: true,
+					triggerCallbackOnUIDismiss: false,   
+					listItems: listItems
+				},
+				(err, result) => {
+					if(suggestion.status != result.id){
+						suggestion.status = parseInt(result.id) 
+						Suggestion.update(suggestion).then(()=>{
+							if(suggestion.status == SUGGESTION_STATUS.COMPLETED){
+								buildfire.input.showTextDialog({
+									placeholder: `"${suggestion.title}" has been marked as completed`,
+									saveText: "Post",
+									defaultValue: `"${suggestion.title}" has been marked as completed`,
+									required: true
+								}, (err, response)=>{
+									const voterIds = Object.keys(suggestion.upVotedBy);
+									PushNotification.sendToCustomUsers("Task Completed", response.results[0].textValue, voterIds);
+								})
+							} else if(suggestion.status == SUGGESTION_STATUS.INPROGRESS){
+								const voterIds = Object.keys(suggestion.upVotedBy);
+								PushNotification.sendToCustomUsers("Task in Progress", `"${suggestion.title}" has been marked as in progress`, voterIds);
+							}
+							if (!$scope.$$phase) $scope.$apply();
+						})
+					}
+					buildfire.components.drawer.closeDrawer();
+				}
+			);
+		})
+
+	
+	}
+
 	$scope.upVote = function(suggestionObj) {
 		getUser(function(user) {
 			if(!user) enforceLogin()
@@ -229,7 +317,10 @@ function listCtrl($scope) {
 				/// then just to a hard count just in case
 				suggestionObj.upVoteCount = Object.keys(suggestionObj.upVotedBy).length;
 			}
-			Suggestion.update(suggestionObj,()=>{})
+			Suggestion.update(suggestionObj).then(()=>{
+				suggestionObj.upvoteByYou = suggestionObj.upVotedBy[user._id] != null
+				if (!$scope.$$phase) $scope.$apply();
+			})
 		});
 	};
 

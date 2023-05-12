@@ -3,7 +3,8 @@
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta name="buildfire" content="enablePluginJsonLoad">
+    <meta name="buildfire" content="enablePluginJsonLoad">
+
     <link rel="stylesheet" href="../../../styles/components/skeleton.css" />
     <script src="../../../scripts/buildfire.min.js"></script>
     <script src="../../../scripts/angular/angular.min.js"></script>
@@ -13,12 +14,12 @@
     <script src="js/suggestions.js"></script>
     <script src="js/analyticsKeys.js"></script>
     <script src="js/Analytics.js"></script>
+    <script src="js/PushNotifications.js"></script>
     <script src="js/app.js"></script>
-    <!-- endbuild -->
 
-    <!-- build:bundleCSSFiles  -->
-    <link rel="stylesheet" href="css/pluginIcons.css">
     <!-- endbuild -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
 </head>
 <style>
     .grid-block {
@@ -43,9 +44,15 @@
                         <h6 ng-if="s.isCurrentYear" class="pull-left caption margin--0 text--secondary">{{s.createdOn | date:'MMM dd'}}</h6>
                         <h6 ng-if="!s.isCurrentYear" class="pull-left caption margin--0 text--secondary">{{s.createdOn | date:'MMM dd, y'}}</h6>
                     </div>
-                    <p class="pill text--secondary shrink--0" ng-click="showVoterModal(s)">
-                        <span class="margin--0">{{s.upVoteCount}}</span>
-						<span class="margin--0" bfString="mainScreen.voteBadge"></span>
+
+                    <p ng-if="s.status == 1" class="pill shrink--0 pill-body-theme"  ng-click="openChangeStatusModal(s)">
+						<span class="margin--0" bfString="mainScreen.backlog"></span>
+                    </p>
+                    <p ng-if="s.status == 2" class="pill shrink--0 pill-warning-theme" ng-click="openChangeStatusModal(s)">
+						<span class="margin--0" bfString="mainScreen.inProgress"></span>
+                    </p>
+                    <p ng-if="s.status == 3" class="pill shrink--0 pill-success-theme" ng-click="openChangeStatusModal(s)">
+						<span class="margin--0" bfString="mainScreen.completed"></span>
                     </p>
                 </div>
                 <div class="suggestion padded padded--m padded--x">
@@ -53,15 +60,16 @@
                     <p class="word--break margin-bottom--m">{{s.suggestion}}</p>
                 </div>
                 <div class="button__panel shrink--0 padded padded--sm padded--x">
-                    <button class="voteButton btn btn--icon--text btn--transparent" ng-click="upVote(s)"
-                        ng-class="{btnShadow:!s.disableUpvote,btntransparent:s.disableUpvote}">
-                        <span class="icon icon-thumbs-up2"></span>
-                        <span class="text-primary margin--0" bfString="mainScreen.voteButton"></span>
-                    </button>
                     <button class="voteButton btn btn--icon--text " ng-click="goSocial(s)">
-                        <span class="icon icon-bubble"></span>
-                        <span class="text-primary margin--0"  bfString="mainScreen.commentButton"></span>
+                        <span class="material-icons body-theme">comment</span>
+                        <span class="text-body margin--0"  bfString="mainScreen.commentButton"></span>
                     </button>
+                    <button class="voteButton btn btn--icon--text ml-8" ng-click="upVote(s)"
+                    ng-class="{bodyTheme:!s.upvoteByYou,iconsTheme:s.upvoteByYou}">
+                        <span class="material-icons"
+                        >arrow_upward</span>
+                    </button>
+                    
                 </div>
             </div>
             <div class="empty-state-holder" ng-if="isInitalized && !suggestions.length" >
