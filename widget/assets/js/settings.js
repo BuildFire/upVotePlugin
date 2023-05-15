@@ -1,4 +1,4 @@
-  const DBTAG = 'settings';
+  const TAG = 'settings';
 
   STATUS_UPDATE_SEGMENT = Object.freeze({
     ALL_USERS: 1,
@@ -32,7 +32,7 @@
 
     static get(callback) {
       return new Promise((resolve, reject) => {
-        buildfire.datastore.get(DBTAG, (e, obj) => {
+        buildfire.datastore.get(TAG, (e, obj) => {
           if (e) {
             reject(e);
             if (callback) callback(e);
@@ -49,7 +49,7 @@
 
     static save(settings, callback) {
       return new Promise((resolve, reject) => {
-        buildfire.datastore.save(settings, DBTAG, (e, r) => {
+        buildfire.datastore.save(settings, TAG, (e, r) => {
           if (e) {
             reject(e);
             if (callback) callback(e);

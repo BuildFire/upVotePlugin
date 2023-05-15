@@ -6,17 +6,31 @@
     <meta name="buildfire" content="enablePluginJsonLoad">
 
     <link rel="stylesheet" href="../../../styles/components/skeleton.css" />
+
+    <script src="../../../scripts/jquery/jquery-1.11.2.min.js"></script>
+
     <script src="../../../scripts/buildfire.min.js"></script>
-    <script src="../../../scripts/angular/angular.min.js"></script>
+    
+  <script src="../../../scripts/angular/angular.min.js"></script>
+  <script src="../../../scripts/angular/angular-route.min.js"></script>
+  <script src="../../../scripts/angular/angular-animate.min.js"></script>
     <script src="../../../scripts/buildfire/services/notifications/pushNotifications.js"></script>
     <script src="../../../scripts/buildfire/components/drawer/drawer.js"></script>
     <!-- build:bundleJSFiles  -->
-    <script src="js/suggestions.js"></script>
-    <script src="js/analyticsKeys.js"></script>
-    <script src="js/Analytics.js"></script>
-    <script src="js/PushNotifications.js"></script>
-    <script src="js/app.js"></script>
 
+    <script src="app.js"></script>
+    <script src="app.services.js"></script>
+
+    <script src="assets/js/settings.js"></script>
+
+    <script src="assets/js/suggestions.js"></script>
+    <script src="assets/js/analyticsKeys.js"></script>
+    <script src="assets/js/Analytics.js"></script>
+    <script src="assets/js/PushNotifications.js"></script>
+    <script src="controllers/widget.home.controller.js"></script>
+    <script src="controllers/widget.item.controller.js"></script>
+
+  <link rel="stylesheet" href="../../../styles/transitionAnimation.css">
     <!-- endbuild -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 
@@ -28,56 +42,61 @@
         border-radius: 5px;
     }
 </style>
-<body style="position: initial !important;">
-    <div id="skeleton"></div>
-    <div id="btn--add__container" class="hidden" onclick="openPopup()">
-        <a class="btn btn-primary btn--fab btn--add"><span></span></a>
-    </div>
-    <div class="main--container">
-        <div ng-controller="listCtrl" class="padded padded--x container--responsive">
-
-            <div class="card suggestionCard" ng-cloak ng-repeat="s in suggestions track by $index">
-                <div class="card__header padded padded--sm margin-bottom--sm">
-                    <img alt="{{s.createdBy.displayName}} profile image"  class="avatar" onerror="this.src='avatar.png'" ng-src="{{ s.createdBy | getUserImage }}">
-                    <div class="ellipsis padded padded--x padded--sm suggestion__name">
-                        <h5 class="margin--0 ellipsis">{{s.createdBy.displayName}}</h5>
-                        <h6 ng-if="s.isCurrentYear" class="pull-left caption margin--0 text--secondary">{{s.createdOn | date:'MMM dd'}}</h6>
-                        <h6 ng-if="!s.isCurrentYear" class="pull-left caption margin--0 text--secondary">{{s.createdOn | date:'MMM dd, y'}}</h6>
+    <body>
+        <div style="position: initial !important;height:100%"  ng-controller="listCtrl as _listCtrl">
+            <div id="skeleton"></div>
+            <div id="btn--add__container" class="hidden"  onclick="openPopup()">
+                <a class="btn btn-primary btn--fab btn--add"><span></span></a>
+            </div>
+            <div class="main--container">
+                <div  class="padded padded--x container--responsive">
+                    <div class="container--responsive padded padded--x">
+                        <p id="text_container" class="margin-bottom--sm text--secondary word--break" ng-bind-html="_listCtrl.safeHtml(text)">{{_listCtrl.text}}</p>
                     </div>
-
-                    <p ng-if="s.status == 1" class="pill shrink--0 pill-body-theme"  ng-click="openChangeStatusModal(s)">
-						<span class="margin--0" bfString="mainScreen.backlog"></span>
-                    </p>
-                    <p ng-if="s.status == 2" class="pill shrink--0 pill-warning-theme" ng-click="openChangeStatusModal(s)">
-						<span class="margin--0" bfString="mainScreen.inProgress"></span>
-                    </p>
-                    <p ng-if="s.status == 3" class="pill shrink--0 pill-success-theme" ng-click="openChangeStatusModal(s)">
-						<span class="margin--0" bfString="mainScreen.completed"></span>
-                    </p>
-                </div>
-                <div class="suggestion padded padded--m padded--x">
-                    <h4 class="word--break" ng-show="s.title">{{s.title}}</h4>
-                    <p class="word--break margin-bottom--m">{{s.suggestion}}</p>
-                </div>
-                <div class="button__panel shrink--0 padded padded--sm padded--x">
-                    <button class="voteButton btn btn--icon--text " ng-click="goSocial(s)">
-                        <span class="material-icons body-theme">comment</span>
-                        <span class="text-body margin--0"  bfString="mainScreen.commentButton"></span>
-                    </button>
-                    <button class="voteButton btn btn--icon--text ml-8" ng-click="upVote(s)"
-                    ng-class="{bodyTheme:!s.upvoteByYou,iconsTheme:s.upvoteByYou}">
-                        <span class="material-icons"
-                        >arrow_upward</span>
-                    </button>
+                    <div class="card suggestionCard" ng-cloak ng-repeat="s in _listCtrl.suggestions track by $index" ng-click="_listCtrl.goToItemDetails(s)">
+                        <div class="card__header padded padded--sm margin-bottom--sm" >
+                            <img alt="{{s.createdBy.displayName}} profile image"  class="avatar" onerror="this.src='assets/images/avatar.png'" ng-src="{{ s.createdBy | getUserImage }}">
+                            <div class="ellipsis padded padded--x padded--sm suggestion__name">
+                                <h5 class="margin--0 ellipsis">{{s.createdBy.displayName}}</h5>
+                                <h6 ng-if="s.isCurrentYear" class="pull-left caption margin--0 text--secondary">{{s.createdOn | date:'MMM dd'}}</h6>
+                                <h6 ng-if="!s.isCurrentYear" class="pull-left caption margin--0 text--secondary">{{s.createdOn | date:'MMM dd, y'}}</h6>
+                            </div>
+        
+                            <p ng-if="s.status == 1" class="pill shrink--0 pill-body-theme"  ng-click="_listCtrl.openChangeStatusModal(s)">
+                                <span class="margin--0" bfString="mainScreen.backlog"></span>
+                            </p>
+                            <p ng-if="s.status == 2" class="pill shrink--0 pill-warning-theme" ng-click="_listCtrl.openChangeStatusModal(s)">
+                                <span class="margin--0" bfString="mainScreen.inProgress"></span>
+                            </p>
+                            <p ng-if="s.status == 3" class="pill shrink--0 pill-success-theme" ng-click="_listCtrl.openChangeStatusModal(s)">
+                                <span class="margin--0" bfString="mainScreen.completed"></span>
+                            </p>
+                        </div>
+                        <div class="suggestion padded padded--m padded--x">
+                            <h4 class="word--break" ng-show="s.title">{{s.title}}</h4>
+                            <p class="word--break margin-bottom--m">{{s.suggestion}}</p>
+                        </div>
+                        <div class="button__panel shrink--0 padded padded--sm padded--x">
+                            <button class="voteButton btn btn--icon--text " ng-click="_listCtrl.goSocial(s)">
+                                <span class="material-icons body-theme">comment</span>
+                                <span class="text-body margin--0"  bfString="mainScreen.commentButton"></span>
+                            </button>
+                            <button class="voteButton btn btn--icon--text ml-8" ng-click="_listCtrl.upVote(s)"
+                            ng-class="{bodyTheme:!s.upvoteByYou,iconsTheme:s.upvoteByYou}">
+                                <span class="material-icons"
+                                >arrow_upward</span>
+                            </button>
+                            
+                        </div>
+                    </div>
+                    <div class="empty-state-holder" ng-if="_listCtrl.isInitalized && !_listCtrl.suggestions.length" >
+                        <img alt="empty state holder" src="./assets/images/empty.svg"></img>
+                    </div> 
                     
                 </div>
             </div>
-            <div class="empty-state-holder" ng-if="isInitalized && !suggestions.length" >
-                <img alt="empty state holder" src="./empty.svg"></img>
-            </div> 
-            
+        
         </div>
-    </div>
-</body>
-
+        <div view-switcher=""></div>
+        </body>
 </html>

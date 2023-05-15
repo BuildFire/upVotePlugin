@@ -14,6 +14,7 @@ class Suggestion {
     this.suggestion = records.data.suggestion || null;
     this.createdBy = records.data.createdBy || null;
     this.createdOn = records.data.createdOn || null;
+    this.modifiedOn = records.lastUpdated|| null;
     this.pushNotificationTags = records.data.pushNotificationTags || [];
     this.upVoteCount = records.data.upVoteCount || 0;
     this.upVotedBy = records.data.upVotedBy || {};
