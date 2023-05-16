@@ -4,13 +4,6 @@
 			"title": "General",
 			"info": "",
 			"labels": {
-				"introduction": {
-					"title": "Introduction",
-					"defaultValue": "{{defaultIntroduction}}",
-					"required": true,
-					"inputType": "wysiwyg",
-					"toolTip": ""
-				},
 				"voteBadge": {
 					"title": "Vote Badge",
 					"defaultValue": "Vote",

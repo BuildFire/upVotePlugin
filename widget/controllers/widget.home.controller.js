@@ -111,17 +111,28 @@ var config = {};
 					sort: { upVoteCount: -1 }
 				}
 				
+				// buildfire.datastore.get(function (err, obj) {
+				// 	if (obj) config = obj.data;
+				// 	getLanguageValue("mainScreen.introduction").then(result => {
+				// 		if(result == "{{defaultIntroduction}}"){
+				// 			UpVoteHome.text = config.text;
+				// 		} else if(config.text != ""){
+				// 			UpVoteHome.text = result;
+
+				// 		}
+				// 		if (!$scope.$$phase) $scope.$apply();
+				// 	})
+				// });
+
+				buildfire.datastore.onUpdate(function (obj) {
+					if (obj) config = obj.data;
+					UpVoteHome.text = config.text;
+					if (!$scope.$$phase) $scope.$apply();
+				});
 				buildfire.datastore.get(function (err, obj) {
 					if (obj) config = obj.data;
-					getLanguageValue("mainScreen.introduction").then(result => {
-						if(result == "{{defaultIntroduction}}"){
-							UpVoteHome.text = config.text;
-						} else if(config.text != ""){
-							UpVoteHome.text = result;
-
-						}
-						if (!$scope.$$phase) $scope.$apply();
-					})
+					UpVoteHome.text = config.text;
+					if (!$scope.$$phase) $scope.$apply();
 				});
 				const callBacklogText = getLanguageValue("mainScreen.backlog") 
 				const callInProgressText = getLanguageValue("mainScreen.inProgress") 
