@@ -3,7 +3,6 @@
 
 var _currentUser = null;
 var appThemeColors = null;
-var settings = {};
 var isCardClicked = false;
 buildfire.appearance.titlebar.show();
 
@@ -51,8 +50,8 @@ var config = {};
 (function (angular, buildfire) {
 	angular
 	  .module('upvote')
-	  .controller('listCtrl', ['$scope', 'ViewStack', '$sce',
-		function ($scope, ViewStack, $sce) {
+	  .controller('listCtrl', ['$scope', 'ViewStack', '$sce', '$rootScope',
+		function ($scope, ViewStack, $sce, $rootScope) {
 			var UpVoteHome = this;
 			UpVoteHome.listeners = {};
 			UpVoteHome.suggestions = [];
@@ -99,7 +98,7 @@ var config = {};
 		
 			function getSettings() {
 				Settings.get((err, result)=>{
-					settings = result;
+					$rootScope.settings = result;
 				})
 			}
 		
@@ -115,63 +114,74 @@ var config = {};
 				buildfire.datastore.get(function (err, obj) {
 					if (obj) config = obj.data;
 					getLanguageValue("mainScreen.introduction").then(result => {
-						if(result != ""){
-							UpVoteHome.text = result;
-						} else if(config.text != ""){
+						if(result == "{{defaultIntroduction}}"){
 							UpVoteHome.text = config.text;
+						} else if(config.text != ""){
+							UpVoteHome.text = result;
+
 						}
 						if (!$scope.$$phase) $scope.$apply();
 					})
 				});
+				const callBacklogText = getLanguageValue("mainScreen.backlog") 
+				const callInProgressText = getLanguageValue("mainScreen.inProgress") 
+				const callCompletedText = getLanguageValue("mainScreen.completed") 
+
+				Promise.all([callBacklogText, callInProgressText,callCompletedText]).then(result => {
+					$rootScope.TextStatuses = result;
+					Suggestion.search(options).then(results => {
+						results = results.filter(x => x.status != 3 || new Date(x.createdOn) >= date)
+						document.getElementById("btn--add__container").classList.remove("hidden")
+						if (!results || !results.length) return update([]);
 			
-				Suggestion.search(options).then(results => {
-					results = results.filter(x => x.status != 3 || new Date(x.createdOn) >= date)
-					document.getElementById("btn--add__container").classList.remove("hidden")
-					if (!results || !results.length) return update([]);
-		
-					results = results.map(checkYear);
-					const promises = results.map(suggestion => {
-						return new Promise(resolve => {
-							buildfire.auth.getUserProfile({ userId: suggestion.createdBy._id }, (error, updatedUser) => {
-								if (error || !updatedUser._id) {
-									console.warn('failed to update user profile:', suggestion.createdBy);
-									return resolve(suggestion);
-								}
-		
-								const hasUpdate = suggestion.createdBy.displayName !== updatedUser.displayName;
-		
-								suggestion.createdBy = updatedUser;
-								resolve(suggestion);
-		
-								if (!hasUpdate) return;
-								// update suggestion out of sync for next time
-								Suggestion.update(suggestion,()=>{})
+						results = results.map(checkYear);
+						const promises = results.map(suggestion => {
+							return new Promise(resolve => {
+								buildfire.auth.getUserProfile({ userId: suggestion.createdBy._id }, (error, updatedUser) => {
+									if (error || !updatedUser._id) {
+										console.warn('failed to update user profile:', suggestion.createdBy);
+										return resolve(suggestion);
+									}
+			
+									const hasUpdate = suggestion.createdBy.displayName !== updatedUser.displayName;
+			
+									suggestion.createdBy = updatedUser;
+									resolve(suggestion);
+			
+									if (!hasUpdate) return;
+									// update suggestion out of sync for next time
+									Suggestion.update(suggestion,()=>{})
+								});
 							});
 						});
-					});
-		
-					Promise.all(promises)
-						.then(update)
-						.catch(console.error);
-		
-					function update(data) {
-						hideSkeleton();
-						UpVoteHome.isInitalized = true;
-						$scope.suggestions = data;
-						buildfire.spinner.hide();
-						if (!$scope.$$phase) $scope.$apply();
-					}
-		
-					function checkYear(item) {
-						var creationYear = new Date(item.createdOn).getFullYear();
-						var currentYear = new Date().getFullYear();
-		
-						item.isCurrentYear = creationYear === currentYear;
-						item.disableUpvote = _currentUser ? !item || !item.upVotedBy || item.upVotedBy[_currentUser._id] : false;
-						item.upvoteByYou = item.upVotedBy && _currentUser && item.upVotedBy[_currentUser._id] != null
-						return item;
-					}
-				}).catch(err => console.log(err))
+			
+						Promise.all(promises)
+							.then(update)
+							.catch(console.error);
+			
+						function update(data) {
+							hideSkeleton();
+							UpVoteHome.isInitalized = true;
+							$scope.suggestions = data;
+							buildfire.spinner.hide();
+							if (!$scope.$$phase) $scope.$apply();
+						}
+			
+						function checkYear(item) {
+							var creationYear = new Date(item.createdOn).getFullYear();
+							var currentYear = new Date().getFullYear();
+			
+							item.isCurrentYear = creationYear === currentYear;
+							item.disableUpvote = _currentUser ? !item || !item.upVotedBy || item.upVotedBy[_currentUser._id] : false;
+							item.upvoteByYou = item.upVotedBy && _currentUser && item.upVotedBy[_currentUser._id] != null;
+							item.statusName = $rootScope.TextStatuses[item.status - 1]
+
+							console.log("Trace", item)
+							return item;
+						}
+					}).catch(err => console.log(err))
+				})
+				
 			}
 		
 			getUser(init);
@@ -210,7 +220,7 @@ var config = {};
 		
 			UpVoteHome.goSocial = (suggestion = {}) => {
 				isCardClicked = true;
-				if (!suggestion || !settings.enableComments) return;
+				if (!suggestion || !$rootScope.settings.enableComments) return;
 		
 				const { title, createdOn, createdBy } = suggestion;
 				const navigateToCwByDefault = (
@@ -264,18 +274,13 @@ var config = {};
 				});
 			};
 
-			UpVoteHome.openChangeStatusModal = function (suggestion) {
-				isCardClicked = true;
-				const callBacklogText = getLanguageValue("mainScreen.backlog") 
-				const callInProgressText = getLanguageValue("mainScreen.inProgress") 
-				const callCompletedText = getLanguageValue("mainScreen.completed") 
-		
-				Promise.all([callBacklogText, callInProgressText,callCompletedText]).then(result => {
-					const listItems = [];
-					for(let i=1;i<=result.length;i++){
+			$rootScope.openChangeStatusModal = function (suggestion) {
+					isCardClicked = true;
+					listItems = []
+					for(let i=1;i<=$rootScope.TextStatuses.length;i++){
 						listItems.push({
 							id: i,
-							text: renderStatusItem(result[i-1], i)
+							text: renderStatusItem($rootScope.TextStatuses[i-1], i)
 						})
 					}
 					buildfire.components.drawer.open(
@@ -289,6 +294,7 @@ var config = {};
 							if(suggestion.status != result.id){
 								suggestion.status = parseInt(result.id) 
 								Suggestion.update(suggestion).then(()=>{
+									suggestion.statusName = $rootScope.TextStatuses[suggestion.status-1]
 									if(suggestion.status == SUGGESTION_STATUS.COMPLETED){
 										buildfire.input.showTextDialog({
 											placeholder: `"${suggestion.title}" has been marked as completed`,
@@ -309,8 +315,6 @@ var config = {};
 							buildfire.components.drawer.closeDrawer();
 						}
 					);
-				})
-		
 			
 			}
 		
@@ -358,6 +362,7 @@ var config = {};
 					}
 					Suggestion.update(suggestionObj).then(()=>{
 						suggestionObj.upvoteByYou = suggestionObj.upVotedBy[user._id] != null
+						
 						if (!$scope.$$phase) $scope.$apply();
 					})
 				});
@@ -423,13 +428,13 @@ var config = {};
 					const suggestion = new Suggestion(result)
 					suggestion.disableUpvote = true;
 					UpVoteHome.suggestions.unshift(suggestion);
-					if(settings){
+					if($rootScope.settings){
 						const title = "A new item has been created";
 						const message = `A "${suggestion.title}" has been created`;
-						if(settings.pushNotificationUsersSegment === PUSH_NOTIFICATIONS_SEGMENT.ALL_USERS){
+						if($rootScope.settings.pushNotificationUsersSegment === PUSH_NOTIFICATIONS_SEGMENT.ALL_USERS){
 							PushNotification.sendToAll(title, message);
-						} else if(settings.pushNotificationUsersSegment === PUSH_NOTIFICATIONS_SEGMENT.TAGS){
-							PushNotification.sendToUserSegment(title, message, settings.pushNotificationTags)
+						} else if($rootScope.settings.pushNotificationUsersSegment === PUSH_NOTIFICATIONS_SEGMENT.TAGS){
+							PushNotification.sendToUserSegment(title, message, $rootScope.settings.pushNotificationTags)
 						}
 					}
 					
@@ -448,6 +453,11 @@ var config = {};
 					return $sce.trustAsHtml($html.html());
 				}
 			};
+
+
+			UpVoteHome.listeners['SETTINGS_UPDATED'] = $rootScope.$on('SETTINGS_UPDATED', function (e, item) {
+				$rootScope.settings = item;
+			});
 		}
 	]
 	  )}

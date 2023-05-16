@@ -6,7 +6,7 @@
 			"labels": {
 				"introduction": {
 					"title": "Introduction",
-					"defaultValue": "",
+					"defaultValue": "{{defaultIntroduction}}",
 					"required": true,
 					"inputType": "wysiwyg",
 					"toolTip": ""

@@ -10,13 +10,13 @@
             </div>
     
             <p ng-if="selectedSuggestion.status == 1" class="pill shrink--0 pill-body-theme"  ng-click="openChangeStatusModal(selectedSuggestion)">
-                <span class="margin--0" bfString="mainScreen.backlog"></span>
+                <span class="margin--0">{{selectedSuggestion.statusName}}</span>
             </p>
             <p ng-if="selectedSuggestion.status == 2" class="pill shrink--0 pill-warning-theme" ng-click="openChangeStatusModal(selectedSuggestion)">
-                <span class="margin--0" bfString="mainScreen.inProgress"></span>
+                <span class="margin--0">{{selectedSuggestion.statusName}}</span>
             </p>
-            <p ng-if="selectedSuggestion.status == 3" class="pill shrink--0 pill-success-theme" ng-click="openChangeStatusModal(selectedSuggestion)">
-                <span class="margin--0" bfString="mainScreen.completed"></span>
+            <p ng-if="selectedSuggestion.status == 3" class="pill shrink--0 pillSuccessTheme" ng-click="openChangeStatusModal(selectedSuggestion)">
+                <span class="margin--0">{{selectedSuggestion.statusName}}</span>
             </p>
         </div>
         <div class="padded padded--m padded--x">

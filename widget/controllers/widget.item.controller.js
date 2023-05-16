@@ -8,7 +8,12 @@
         var WidgetItem = this;
         WidgetItem.listeners = {}
         $scope.selectedSuggestion = ViewStack.getCurrentView().item
+
+       
+
       }
+
+
     ]
     )
 })(window.angular, window);

@@ -57,14 +57,14 @@
                                 <h6 ng-if="!s.isCurrentYear" class="pull-left caption margin--0 text--secondary">{{s.createdOn | date:'MMM dd, y'}}</h6>
                             </div>
         
-                            <p ng-if="s.status == 1" class="pill shrink--0 pill-body-theme"  ng-click="_listCtrl.openChangeStatusModal(s)">
-                                <span class="margin--0" bfString="mainScreen.backlog"></span>
+                            <p ng-if="s.status == 1" class="pill shrink--0 pill-body-theme"  ng-click="openChangeStatusModal(s)">
+                                <span class="margin--0" >{{s.statusName}}</span>
                             </p>
-                            <p ng-if="s.status == 2" class="pill shrink--0 pill-warning-theme" ng-click="_listCtrl.openChangeStatusModal(s)">
-                                <span class="margin--0" bfString="mainScreen.inProgress"></span>
+                            <p ng-if="s.status == 2" class="pill shrink--0 pill-warning-theme" ng-click="openChangeStatusModal(s)">
+                                <span class="margin--0">{{s.statusName}}</span>
                             </p>
-                            <p ng-if="s.status == 3" class="pill shrink--0 pill-success-theme" ng-click="_listCtrl.openChangeStatusModal(s)">
-                                <span class="margin--0" bfString="mainScreen.completed"></span>
+                            <p ng-if="s.status == 3" class="pill shrink--0 pill-success-theme" ng-click="openChangeStatusModal(s)">
+                                <span class="margin--0">{{s.statusName}}</span>
                             </p>
                         </div>
                         <div class="suggestion">

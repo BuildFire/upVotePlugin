@@ -32,6 +32,10 @@ table {
 	border-collapse: collapse;
 	border-spacing: 0;
 }
+#text_container {
+	display: block;
+}
+
 /* Reset em style */
 #text_container em {
 	font-style: italic !important;

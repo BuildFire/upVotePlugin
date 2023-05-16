@@ -142,6 +142,11 @@ const openStatusUpdateUserTagsDialog = () => {
 
 const save = () => {
     Settings.save(settings,()=>{})
+
+    buildfire.messaging.sendMessageToWidget({
+        type: 'UpdateSettings',
+        data: settings
+      });
 }
 
 init();

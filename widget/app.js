@@ -111,8 +111,16 @@
       },
     ])
     .run([
-      "ViewStack",
-      function (ViewStack) {
+      "ViewStack","$rootScope",
+      function (ViewStack, $rootScope) {
+        buildfire.messaging.onReceivedMessage = function (msg) {
+          switch (msg.type) {
+            case 'UpdateSettings':
+              $rootScope.$broadcast("SETTINGS_UPDATED", msg.data);
+              if (!$rootScope.$$phase) $rootScope.$apply();
+              break;
+            }
+        }
         buildfire.history.onPop(function (err, data) {
           if (ViewStack.hasViews()) {
             ViewStack.pop();
