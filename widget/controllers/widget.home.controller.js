@@ -42,9 +42,6 @@ function enforceLogin() {
 			return console.error(err);
 		}
 		_currentUser = user;
-		if(user){
-			buildfire.notifications.pushNotification.subscribe({ groupName: 'suggestions' });
-		}
 	});
 }
 
@@ -54,14 +51,24 @@ var config = {};
 (function (angular, buildfire) {
 	angular
 	  .module('upvote')
-	  .controller('listCtrl', ['$scope', 'ViewStack','$rootScope','$sce',
-		function ($scope, ViewStack, $rootScope, $sce) {
+	  .controller('listCtrl', ['$scope', 'ViewStack', '$sce',
+		function ($scope, ViewStack, $sce) {
 			var UpVoteHome = this;
 			UpVoteHome.listeners = {};
 			UpVoteHome.suggestions = [];
 			UpVoteHome.isInitalized = false;
 			UpVoteHome.text = "";
 		
+			showSkeleton()
+			getSettings();
+			buildfire.appearance.getAppTheme((err, result) => {
+				if (err) return console.error(err);
+				appThemeColors = result.colors
+			  });
+
+
+			  
+
 			UpVoteHome.goToItemDetails = function (selectedItem) {
 				if(isCardClicked){
 					isCardClicked = false
@@ -97,13 +104,6 @@ var config = {};
 			}
 		
 			function init() {
-				showSkeleton()
-				getSettings();
-				buildfire.spinner.show();
-				buildfire.appearance.getAppTheme((err, result) => {
-					if (err) return console.error(err);
-					appThemeColors = result.colors
-				  });
 				let date = new Date();
 				date.setDate(date.getDate() - 1);
 		
@@ -115,8 +115,11 @@ var config = {};
 				buildfire.datastore.get(function (err, obj) {
 					if (obj) config = obj.data;
 					getLanguageValue("mainScreen.introduction").then(result => {
-						if (result) config = result;
-						UpVoteHome.text = config;
+						if(result != ""){
+							UpVoteHome.text = result;
+						} else if(config.text != ""){
+							UpVoteHome.text = config.text;
+						}
 						if (!$scope.$$phase) $scope.$apply();
 					})
 				});
@@ -124,7 +127,6 @@ var config = {};
 				Suggestion.search(options).then(results => {
 					results = results.filter(x => x.status != 3 || new Date(x.createdOn) >= date)
 					document.getElementById("btn--add__container").classList.remove("hidden")
-					buildfire.spinner.hide();
 					if (!results || !results.length) return update([]);
 		
 					results = results.map(checkYear);
@@ -155,7 +157,7 @@ var config = {};
 					function update(data) {
 						hideSkeleton();
 						UpVoteHome.isInitalized = true;
-						UpVoteHome.suggestions = data;
+						$scope.suggestions = data;
 						buildfire.spinner.hide();
 						if (!$scope.$$phase) $scope.$apply();
 					}
@@ -183,6 +185,28 @@ var config = {};
 				_currentUser = null;
 				init();
 			});
+		
+			
+		
+			function renderStatusItem(text, index){
+				const element = `
+				<div style='display:flex;color:#000;font-weight:500;font-size:16px;line-height:24px'>
+						<span style='width: 24px;height: 24px;border-radius: 50%;margin-right: 16px;background-color:
+						   ${getStatusColor(index)}'></span> ${text} </div>`
+		
+				return element;
+			}
+		
+			function getStatusColor(index){
+				switch (index) {
+					case 1:
+						return "rgba(150, 150, 150, 0.1)";
+					case 2:
+						return appThemeColors.warningTheme
+					case 3:
+						return appThemeColors.successTheme
+				}
+			}
 		
 			UpVoteHome.goSocial = (suggestion = {}) => {
 				isCardClicked = true;
@@ -239,27 +263,7 @@ var config = {};
 					  );
 				});
 			};
-		
-			function renderStatusItem(text, index){
-				const element = `
-				<div style='display:flex;color:#000;font-weight:500;font-size:16px;line-height:24px'>
-						<span style='width: 24px;height: 24px;border-radius: 50%;margin-right: 16px;background-color:
-						   ${getStatusColor(index)}'></span> ${text} </div>`
-		
-				return element;
-			}
-		
-			function getStatusColor(index){
-				switch (index) {
-					case 1:
-						return "rgba(150, 150, 150, 0.1)";
-					case 2:
-						return appThemeColors.warningTheme
-					case 3:
-						return appThemeColors.successTheme
-				}
-			}
-		
+
 			UpVoteHome.openChangeStatusModal = function (suggestion) {
 				isCardClicked = true;
 				const callBacklogText = getLanguageValue("mainScreen.backlog") 
@@ -390,19 +394,6 @@ var config = {};
 				getUser(function (user) {
 					_addSuggestion(user, title, description);
 					Analytics.trackAction(analyticKeys.SUGGESTIONS_NUMBER.key, { _buildfire: { aggregationValue: 1 } });
-					buildfire.notifications.pushNotification.schedule(
-						{
-							title: 'New suggestion by ' + user.displayName,
-							text: title,
-							//,at: new Date()
-							groupName: 'suggestions'
-						},
-						function (err) {
-							if (err) console.error(err);
-						}
-					);
-		
-					$scope.clearForm();
 					if (!$scope.$$phase) $scope.$apply();
 				});
 			};

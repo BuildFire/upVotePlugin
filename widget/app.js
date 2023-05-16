@@ -2,7 +2,7 @@
 
 (function (angular, buildfire, window) {
   angular
-    .module("upvote", ["ngRoute", "ngAnimate"])
+    .module("upvote", [])
     .config([
       "$compileProvider",
       function ($compileProvider) {
@@ -48,7 +48,7 @@
                   var _newView =
                     '<div  id="' +
                     view.template +
-                    '" ><div class="slide content" ng-include="\'Item_details.html\'"></div></div>';
+                    '" ><div class="slide content" ng-include="\'templates/' + view.template + '.html\'"></div></div>';
 
                   var parTpl = $compile(_newView)(newScope);
 
@@ -110,65 +110,11 @@
         };
       },
     ])
-    .directive("getFocus", [
-      "$timeout",
-      function ($timeout) {
-        return {
-          link: function (scope, element, attrs) {
-            $(element)
-              .parents(".slide")
-              .eq(0)
-              .on(
-                "webkitTransitionEnd transitionend oTransitionEnd",
-                function () {
-                  $timeout(function () {
-                    $(element).focus();
-                  }, 300);
-                  //open keyboard manually
-                  if (
-                    window.cordova &&
-                    window.cordova.plugins &&
-                    window.cordova.plugins.Keyboard
-                  ) {
-                    window.cordova.plugins.Keyboard.show();
-                  }
-
-                  $(element).on("blur", function () {
-                    //open keyboard manually
-                    if (
-                      window.cordova &&
-                      window.cordova.plugins &&
-                      window.cordova.plugins.Keyboard
-                    ) {
-                      window.cordova.plugins.Keyboard.hide();
-                    }
-                  });
-                }
-              );
-
-            scope.$on("$destroy", function () {
-              $(element)
-                .parents(".slide")
-                .eq(0)
-                .off("webkitTransitionEnd transitionend oTransitionEnd", "**");
-            });
-          },
-        };
-      },
-    ])
     .run([
-      "Location",
-      "$location",
-      "$rootScope",
       "ViewStack",
-      function (Location, $location, $rootScope, ViewStack) {
+      function (ViewStack) {
         buildfire.history.onPop(function (err, data) {
           if (ViewStack.hasViews()) {
-            if (ViewStack.getCurrentView().template == "Item_Details") {
-              buildfire.messaging.sendMessageToControl({
-                type: "BackToHome",
-              });
-            }
             ViewStack.pop();
           }
         });

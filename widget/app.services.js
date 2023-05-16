@@ -2,21 +2,6 @@
 
 (function (angular, buildfire) {
   angular.module('upvote')
-    .provider('Buildfire', [function () {
-      var Buildfire = this;
-      Buildfire.$get = function () {
-        return buildfire
-      };
-      return Buildfire;
-    }])
-    .factory('Location', [function () {
-      var _location = window.location;
-      return {
-        goTo: function (path) {
-          _location.href = path;
-        }
-      };
-    }])
     .factory('ViewStack', ['$rootScope', function ($rootScope) {
       var views = [];
       var viewMap = {};
@@ -27,8 +12,6 @@
           } else {
             viewMap[view.template] = 1;
             views.push(view);
-
-            console.log("Trace", view)
             $rootScope.$broadcast('VIEW_CHANGED', 'PUSH', view);
           }
           return view;

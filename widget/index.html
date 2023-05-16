@@ -10,28 +10,23 @@
     <script src="../../../scripts/jquery/jquery-1.11.2.min.js"></script>
 
     <script src="../../../scripts/buildfire.min.js"></script>
-    
-  <script src="../../../scripts/angular/angular.min.js"></script>
-  <script src="../../../scripts/angular/angular-route.min.js"></script>
-  <script src="../../../scripts/angular/angular-animate.min.js"></script>
+    <script src="../../../scripts/angular/angular.min.js"></script>
     <script src="../../../scripts/buildfire/services/notifications/pushNotifications.js"></script>
     <script src="../../../scripts/buildfire/components/drawer/drawer.js"></script>
-    <!-- build:bundleJSFiles  -->
 
+    <!-- build:bundleJSFiles  -->
     <script src="app.js"></script>
     <script src="app.services.js"></script>
-
     <script src="assets/js/settings.js"></script>
-
     <script src="assets/js/suggestions.js"></script>
     <script src="assets/js/analyticsKeys.js"></script>
     <script src="assets/js/Analytics.js"></script>
     <script src="assets/js/PushNotifications.js"></script>
     <script src="controllers/widget.home.controller.js"></script>
     <script src="controllers/widget.item.controller.js"></script>
-
-  <link rel="stylesheet" href="../../../styles/transitionAnimation.css">
     <!-- endbuild -->
+
+    <link rel="stylesheet" href="../../../styles/transitionAnimation.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 
 </head>
@@ -51,9 +46,9 @@
             <div class="main--container">
                 <div  class="padded padded--x container--responsive">
                     <div class="container--responsive padded padded--x">
-                        <p id="text_container" class="margin-bottom--sm text--secondary word--break" ng-bind-html="_listCtrl.safeHtml(text)">{{_listCtrl.text}}</p>
+                        <p id="text_container" class="margin-bottom--sm text--secondary word--break" ng-bind-html="_listCtrl.safeHtml(_listCtrl.text)">{{_listCtrl.text}}</p>
                     </div>
-                    <div class="card suggestionCard" ng-cloak ng-repeat="s in _listCtrl.suggestions track by $index" ng-click="_listCtrl.goToItemDetails(s)">
+                    <div class="card suggestionCard" ng-cloak ng-repeat="s in suggestions track by $index" ng-click="_listCtrl.goToItemDetails(s)">
                         <div class="card__header padded padded--sm margin-bottom--sm" >
                             <img alt="{{s.createdBy.displayName}} profile image"  class="avatar" onerror="this.src='assets/images/avatar.png'" ng-src="{{ s.createdBy | getUserImage }}">
                             <div class="ellipsis padded padded--x padded--sm suggestion__name">
@@ -72,7 +67,7 @@
                                 <span class="margin--0" bfString="mainScreen.completed"></span>
                             </p>
                         </div>
-                        <div class="suggestion padded padded--m padded--x">
+                        <div class="suggestion">
                             <h4 class="word--break" ng-show="s.title">{{s.title}}</h4>
                             <p class="word--break margin-bottom--m">{{s.suggestion}}</p>
                         </div>
@@ -89,7 +84,7 @@
                             
                         </div>
                     </div>
-                    <div class="empty-state-holder" ng-if="_listCtrl.isInitalized && !_listCtrl.suggestions.length" >
+                    <div class="empty-state-holder" ng-if="_listCtrl.isInitalized && !suggestions.length" >
                         <img alt="empty state holder" src="./assets/images/empty.svg"></img>
                     </div> 
                     
