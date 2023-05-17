@@ -54,7 +54,6 @@ var config = {};
 		function ($scope, ViewStack, $sce, $rootScope) {
 			var UpVoteHome = this;
 			UpVoteHome.listeners = {};
-			UpVoteHome.suggestions = [];
 			UpVoteHome.isInitalized = false;
 			UpVoteHome.text = "";
 		
@@ -73,6 +72,7 @@ var config = {};
 					isCardClicked = false
 					return;
 				}
+				document.getElementById("btn--add__container").classList.add("hidden")
 				ViewStack.push({
 					template: 'Item_details',
 					item: selectedItem
@@ -110,19 +110,6 @@ var config = {};
 				const options = {
 					sort: { upVoteCount: -1 }
 				}
-				
-				// buildfire.datastore.get(function (err, obj) {
-				// 	if (obj) config = obj.data;
-				// 	getLanguageValue("mainScreen.introduction").then(result => {
-				// 		if(result == "{{defaultIntroduction}}"){
-				// 			UpVoteHome.text = config.text;
-				// 		} else if(config.text != ""){
-				// 			UpVoteHome.text = result;
-
-				// 		}
-				// 		if (!$scope.$$phase) $scope.$apply();
-				// 	})
-				// });
 
 				buildfire.datastore.onUpdate(function (obj) {
 					if (obj) config = obj.data;
@@ -172,6 +159,7 @@ var config = {};
 			
 						function update(data) {
 							hideSkeleton();
+							document.getElementById("text_container").classList.remove("hidden")
 							UpVoteHome.isInitalized = true;
 							$scope.suggestions = data;
 							buildfire.spinner.hide();
@@ -187,7 +175,6 @@ var config = {};
 							item.upvoteByYou = item.upVotedBy && _currentUser && item.upVotedBy[_currentUser._id] != null;
 							item.statusName = $rootScope.TextStatuses[item.status - 1]
 
-							console.log("Trace", item)
 							return item;
 						}
 					}).catch(err => console.log(err))
@@ -229,7 +216,7 @@ var config = {};
 				}
 			}
 		
-			UpVoteHome.goSocial = (suggestion = {}) => {
+			$rootScope.goSocial = (suggestion = {}) => {
 				isCardClicked = true;
 				if (!suggestion || !$rootScope.settings.enableComments) return;
 		
@@ -253,7 +240,7 @@ var config = {};
 				}, () => { });
 			};
 		
-			UpVoteHome.showVoterModal = function (suggestion) {
+			$rootScope.showVoterModal = function (suggestion) {
 				isCardClicked = true;
 				var voterIds = Object.keys(suggestion.upVotedBy);
 				Promise.all(
@@ -329,7 +316,8 @@ var config = {};
 			
 			}
 		
-			UpVoteHome.upVote = function(suggestionObj) {
+			$rootScope.upVote = function(suggestionObj) {
+				isCardClicked = true;
 				getUser(function(user) {
 					if(!user) enforceLogin()
 					if (!suggestionObj.upVotedBy) suggestionObj.upVotedBy = {};
@@ -371,9 +359,10 @@ var config = {};
 						/// then just to a hard count just in case
 						suggestionObj.upVoteCount = Object.keys(suggestionObj.upVotedBy).length;
 					}
+					console.log("Trace",suggestionObj)
+					
 					Suggestion.update(suggestionObj).then(()=>{
 						suggestionObj.upvoteByYou = suggestionObj.upVotedBy[user._id] != null
-						
 						if (!$scope.$$phase) $scope.$apply();
 					})
 				});
@@ -438,7 +427,8 @@ var config = {};
 					  });
 					const suggestion = new Suggestion(result)
 					suggestion.disableUpvote = true;
-					UpVoteHome.suggestions.unshift(suggestion);
+					suggestion.statusName = $rootScope.TextStatuses[0];
+					$scope.suggestions.unshift(suggestion);
 					if($rootScope.settings){
 						const title = "A new item has been created";
 						const message = `A "${suggestion.title}" has been created`;
@@ -468,6 +458,10 @@ var config = {};
 
 			UpVoteHome.listeners['SETTINGS_UPDATED'] = $rootScope.$on('SETTINGS_UPDATED', function (e, item) {
 				$rootScope.settings = item;
+			});
+
+			UpVoteHome.listeners['BEFORE_POP'] = $rootScope.$on('BEFORE_POP', function (e, item) {
+				document.getElementById("btn--add__container").classList.remove("hidden")
 			});
 		}
 	]

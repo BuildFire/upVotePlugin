@@ -343,6 +343,7 @@ textarea{
 .button__panel{
 	display: flex;
 	justify-content: flex-end;
+	align-items: center;
 }
 .button__panel .btn.btn--transparent{
 	padding-left: .75rem;
@@ -480,11 +481,11 @@ textarea{
 	color: var( --bf-theme-body) !important;
 }
 
-.body-theme {
+.bodyTheme {
 	color: var( --bf-theme-body) !important;
 }
 
-.icons-theme {
+.iconsTheme {
 	color:  var( --bf-theme-icons) !important;
 }
 
@@ -498,4 +499,17 @@ textarea{
 
 .ml-8 {
 	margin-left: 8px;
+}
+
+.bodyTheme1 {
+color: red  !important
+}
+.iconsTheme1 {
+	color: blue !important
+}
+
+.pill-count {
+	margin: 0 !important;
+	padding: 0 !important;
+	font-size: 14px;
 }

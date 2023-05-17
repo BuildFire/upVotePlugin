@@ -28,7 +28,7 @@
 
     <link rel="stylesheet" href="../../../styles/transitionAnimation.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-
+    <link rel="stylesheet" href="./assets/css/pluginIcons.css">
 </head>
 <style>
     .grid-block {
@@ -40,13 +40,13 @@
     <body>
         <div style="position: initial !important;height:100%"  ng-controller="listCtrl as _listCtrl">
             <div id="skeleton"></div>
-            <div id="btn--add__container" class="hidden"  onclick="openPopup()">
+            <div id="btn--add__container" class="hidden" onclick="openPopup()">
                 <a class="btn btn-primary btn--fab btn--add"><span></span></a>
             </div>
             <div class="main--container">
                 <div  class="padded padded--x container--responsive">
                     <div class="container--responsive padded padded--x">
-                        <p id="text_container" class="margin-bottom--sm text--secondary word--break" ng-bind-html="_listCtrl.safeHtml(_listCtrl.text)">{{_listCtrl.text}}</p>
+                        <p id="text_container" class="margin-bottom--sm word--break hidden" ng-bind-html="_listCtrl.safeHtml(_listCtrl.text)">{{_listCtrl.text}}</p>
                     </div>
                     <div class="card suggestionCard" ng-cloak ng-repeat="s in suggestions track by $index" ng-click="_listCtrl.goToItemDetails(s)">
                         <div class="card__header padded padded--sm margin-bottom--sm" >
@@ -72,16 +72,20 @@
                             <p class="word--break margin-bottom--m">{{s.suggestion}}</p>
                         </div>
                         <div class="button__panel shrink--0 padded padded--sm padded--x">
-                            <button class="voteButton btn btn--icon--text " ng-click="_listCtrl.goSocial(s)">
-                                <span class="material-icons body-theme">comment</span>
+                            <button class="voteButton btn btn--icon--text " ng-click="goSocial(s)">
+                                <span class="material-icons bodyTheme">comment</span>
                                 <span class="text-body margin--0"  bfString="mainScreen.commentButton"></span>
                             </button>
-                            <button class="voteButton btn btn--icon--text ml-8" ng-click="_listCtrl.upVote(s)"
-                            ng-class="{bodyTheme:!s.upvoteByYou,iconsTheme:s.upvoteByYou}">
-                                <span class="material-icons"
+                            <button id="upvote_icon" class="voteButton btn btn--icon--text ml-8" ng-click="upVote(s)"
+                            >
+                                <span ng-if="!s.upvoteByYou" class="material-icons" style="color: var(--bf-theme-body) !important" 
+                                >arrow_upward</span>
+                                <span ng-if="s.upvoteByYou" class="material-icons"  style="color: var(--bf-theme-icons) !important"
                                 >arrow_upward</span>
                             </button>
-                            
+                            <p class="pill-count shrink--0" ng-click="showVoterModal(s)">
+                                <span class="margin--0 bodyTheme">{{s.upVoteCount}}</span>
+                            </p>
                         </div>
                     </div>
                     <div class="empty-state-holder" ng-if="_listCtrl.isInitalized && !suggestions.length" >

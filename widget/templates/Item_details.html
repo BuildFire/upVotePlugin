@@ -25,15 +25,19 @@
         </div>
         <div class="button__panel shrink--0 padded padded--sm padded--x">
             <button class="voteButton btn btn--icon--text " ng-click="goSocial(selectedSuggestion)">
-                <span class="material-icons body-theme">comment</span>
+                <span class="material-icons bodyTheme">comment</span>
                 <span class="text-body margin--0"  bfString="mainScreen.commentButton"></span>
             </button>
-            <button class="voteButton btn btn--icon--text ml-8" ng-click="upVote(selectedSuggestion)"
-            ng-class="{bodyTheme:!selectedSuggestion.upvoteByYou,iconsTheme:selectedSuggestion.upvoteByYou}">
-                <span class="material-icons"
+            <button id="upvote_icon" class="voteButton btn btn--icon--text ml-8" ng-click="upVote(selectedSuggestion)"
+            >
+                <span ng-if="!selectedSuggestion.upvoteByYou" class="material-icons" style="color: var(--bf-theme-body) !important" 
+                >arrow_upward</span>
+                <span ng-if="selectedSuggestion.upvoteByYou" class="material-icons"  style="color: var(--bf-theme-icons) !important"
                 >arrow_upward</span>
             </button>
-            
+            <p class="pill-count shrink--0" ng-click="showVoterModal(selectedSuggestion)">
+                <span class="margin--0 bodyTheme">{{selectedSuggestion.upVoteCount}}</span>
+            </p>
         </div>
     </div>
 </div>
