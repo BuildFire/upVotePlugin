@@ -29,6 +29,12 @@ function getUser(callback) {
 		}
 		if(user){
 			_currentUser = user;
+			buildfire.notifications.pushNotification.subscribe(
+				{},
+				(err, subscribed) => {
+				  if (err) return console.error(err);
+				}
+			  );
 			callback(user)
 		}
 	});
@@ -274,6 +280,23 @@ var config = {};
 
 			$rootScope.openChangeStatusModal = function (suggestion) {
 					isCardClicked = true;
+					if($rootScope.settings.statusUpdateUsersSegment === STATUS_UPDATE_SEGMENT.NO_USERS){
+						return;
+					}
+					else if($rootScope.settings.statusUpdateUsersSegment === STATUS_UPDATE_SEGMENT.TAGS){
+						if(!_currentUser) return;
+						var userContainAnyStatusTags = false;
+						if(_currentUser.tags && _currentUser.tags[buildfire.context.appId] && $rootScope.settings.statusUpdateTags.length > 0){
+							_currentUser.tags[buildfire.context.appId].forEach(tag => {
+							 $rootScope.settings.statusUpdateTags.forEach(settingTag => {
+								if(settingTag.tagName == tag.tagName){
+									userContainAnyStatusTags = true;
+								}
+							  })
+							});
+						}
+						if(!userContainAnyStatusTags) return;
+					}
 					listItems = []
 					for(let i=1;i<=$rootScope.TextStatuses.length;i++){
 						listItems.push({
@@ -359,12 +382,11 @@ var config = {};
 						/// then just to a hard count just in case
 						suggestionObj.upVoteCount = Object.keys(suggestionObj.upVotedBy).length;
 					}
-					console.log("Trace",suggestionObj)
-					
-					Suggestion.update(suggestionObj).then(()=>{
-						suggestionObj.upvoteByYou = suggestionObj.upVotedBy[user._id] != null
-						if (!$scope.$$phase) $scope.$apply();
-					})
+					suggestionObj.upvoteByYou = suggestionObj.upVotedBy[user._id] != null
+					if (!$scope.$$phase) $scope.$apply();
+					Suggestion.update(suggestionObj)
+							  .then(()=>{})
+							  .catch((err) => console.log(err))
 				});
 			};
 		
@@ -380,13 +402,22 @@ var config = {};
 						placeholder: "Add more details*",
 						saveText: "Submit",
 						defaultValue: "",
-						required: true
+						required: true,
+						wysiwyg: true,
+						attachments: {
+							"images": {
+								enable: true
+							},
+							"gifs": {
+								enable: false
+							}
+						}
 					  }
 					const steps = [step1, step2];
 		
 					buildfire.input.showTextDialog(steps, (err, response)=>{
 						const title = response.results[0].textValue
-						const description = response.results[1].textValue
+						const description = response.results[1].wysiwygValue
 						addSuggestion(title, description)
 					})
 				} else {
@@ -443,7 +474,7 @@ var config = {};
 				})
 			}
 
-			UpVoteHome.safeHtml = function (html) {
+			$rootScope.safeHtml = function (html) {
 				if (html) {
 					var $html = $('<div />', {html: html});
 					$html.find('iframe').each(function (index, element) {

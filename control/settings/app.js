@@ -43,13 +43,14 @@ const buildUserTagsFields = (tags, containerId) => {
 
         let label = document.createElement("label")
         label.innerHTML = tags[i].tagName;
+        label.classList.add("ellipsis")
 
         let btnIcon = document.createElement("span")
         btnIcon.classList.add("icon-cross2")
         btnIcon.addEventListener("click", function(){
-            if(container == "status_update_tags"){
+            if(containerId == "status_update_tags"){
                 settings.statusUpdateTags = settings.statusUpdateTags.filter(statusUpdateTag => statusUpdateTag.id != tags[i].id )
-            } else if(container == "push_notification_tags"){
+            } else if(containerId == "push_notification_tags"){
                 settings.pushNotificationTags = settings.pushNotificationTags.filter(pushNotificationTag => pushNotificationTag.id != tags[i].id )
             }
             container.removeChild(div);
@@ -122,8 +123,8 @@ const openItemPushNotificationUserTags = () => {
     buildfire.auth.showTagsSearchDialog(null, (err, result) => {
         if (err) return console.error(err);
         if (result && result != null) {
-            buildUserTagsFields(result.data, "push_notification_tags")
-            settings.statusUpdateTags = result.data;
+            buildUserTagsFields(result, "push_notification_tags")
+            settings.pushNotificationTags = result;
             save();
         }
     });
@@ -133,8 +134,8 @@ const openStatusUpdateUserTagsDialog = () => {
     buildfire.auth.showTagsSearchDialog(null, (err, result) => {
         if (err) return console.error(err);
         if (result && result != null) {
-            buildUserTagsFields(result.data, "status_update_tagss")
-            settings.statusUpdateTags = result.data;
+            buildUserTagsFields(result, "status_update_tags")
+            settings.statusUpdateTags = result;
             save();
         }
     });

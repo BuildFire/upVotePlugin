@@ -29,6 +29,14 @@
     <link rel="stylesheet" href="../../../styles/transitionAnimation.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="./assets/css/pluginIcons.css">
+
+    <style>
+        /* keep compatibility with layout1 v0.1 */
+        html p,html span,html a, html .paragraph {
+            margin-bottom: 0;
+        }
+    </style>
+
 </head>
 <style>
     .grid-block {
@@ -69,7 +77,7 @@
                         </div>
                         <div class="suggestion">
                             <h4 class="word--break" ng-show="s.title">{{s.title}}</h4>
-                            <p class="word--break margin-bottom--m">{{s.suggestion}}</p>
+                            <p class="word--break margin-bottom--m" ng-bind-html="safeHtml(s.suggestion)">{{s.suggestion}}</p>
                         </div>
                         <div class="button__panel shrink--0 padded padded--sm padded--x">
                             <button class="voteButton btn btn--icon--text " ng-click="goSocial(s)">
@@ -78,9 +86,9 @@
                             </button>
                             <button id="upvote_icon" class="voteButton btn btn--icon--text ml-8" ng-click="upVote(s)"
                             >
-                                <span ng-if="!s.upvoteByYou" class="material-icons" style="color: var(--bf-theme-body) !important" 
+                                <span ng-if="!s.upvoteByYou" class="material-icons unactive-arrow"
                                 >arrow_upward</span>
-                                <span ng-if="s.upvoteByYou" class="material-icons"  style="color: var(--bf-theme-icons) !important"
+                                <span ng-if="s.upvoteByYou" class="material-icons active-arrow"
                                 >arrow_upward</span>
                             </button>
                             <p class="pill-count shrink--0" ng-click="showVoterModal(s)">

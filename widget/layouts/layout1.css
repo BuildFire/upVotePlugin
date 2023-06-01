@@ -14,8 +14,8 @@ hgroup,menu,nav,section {
 body {
 	line-height: 1;
 }
-ol:not(#text_container *),
-ul:not(#text_container *) {
+ol:not(#text_container) *,
+ul:not(#text_container) * {
 	list-style: none;
 }
 blockquote,q {
@@ -147,6 +147,13 @@ p,span,a, .paragraph {
 	margin-bottom: 0.5em;
 	font-weight: 400;
 }
+
+/* html body p,html body span,html body a, html body .paragraph {
+	font-size: 0.875rem;
+	line-height: 1.25rem;
+	margin-bottom: 0.5em;
+	font-weight: 400;
+} */
 .caption {
 	font-size: 0.75rem;
 }
@@ -327,7 +334,7 @@ textarea{
 	margin-bottom: .75rem;
 }
 .card.suggestionCard{
-	border-radius: .5rem;
+	border-radius: 4px;
 	padding: 0 0 10px 0
 }
 .card.suggestionCard:last-of-type{
@@ -343,7 +350,6 @@ textarea{
 .button__panel{
 	display: flex;
 	justify-content: flex-end;
-	align-items: center;
 }
 .button__panel .btn.btn--transparent{
 	padding-left: .75rem;
@@ -478,11 +484,11 @@ textarea{
 }
 .pill-body-theme {
 	background-color: #9696961A;
-	color: var( --bf-theme-body) !important;
+	color: var( --bf-theme-body-text) !important;
 }
 
 .bodyTheme {
-	color: var( --bf-theme-body) !important;
+	color: var( --bf-theme-body-text) !important;
 }
 
 .iconsTheme {
@@ -509,7 +515,13 @@ color: red  !important
 }
 
 .pill-count {
-	margin: 0 !important;
-	padding: 0 !important;
-	font-size: 14px;
+	align-self: center;
+}
+
+.active-arrow {
+	color: var(--bf-theme-icons) !important
+}
+
+.unactive-arrow {
+	color: var(--bf-theme-body-text) !important
 }

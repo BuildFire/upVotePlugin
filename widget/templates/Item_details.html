@@ -21,7 +21,7 @@
         </div>
         <div class="padded padded--m padded--x">
             <h4  ng-show="selectedSuggestion.title">{{selectedSuggestion.title}}</h4>
-            <p class="margin-bottom--m">{{selectedSuggestion.suggestion}}</p>
+            <p class="margin-bottom--m" ng-bind-html="safeHtml(selectedSuggestion.suggestion)">{{selectedSuggestion.suggestion}}</p>
         </div>
         <div class="button__panel shrink--0 padded padded--sm padded--x">
             <button class="voteButton btn btn--icon--text " ng-click="goSocial(selectedSuggestion)">

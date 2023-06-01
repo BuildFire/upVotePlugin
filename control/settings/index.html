@@ -17,17 +17,22 @@
   <body>
     <div class="settings-container">
       <div class="row margin-bottom-twenty">
-        <div class="labels col-md-4 pull-left">
-          <span>Comments</span>
-        </div>
-        <div class="button-switch col-md-8">
-          <input id="comments" type="checkbox" onchange="updateCommentsProperty()"/>
-          <label for="comments" class="label-success"></label>
+
+        <div class="item clearfix row">
+          <div class="labels col-md-4 pull-left tooltip-container">
+            <span>Comments</span>
+            <span class="tip btn-info-icon btn-primary"><span class="cp-tooltip">Enabling this option allows users to leave comments on items that have been upvoted. To make this work, you must have the Community Wall feature installed</span>
+          </div>
+          <div class="main col-md-8 button-switch">
+            <input id="comments" type="checkbox" onchange="updateCommentsProperty()"/>
+            <label for="comments" class="label-success"></label>
+          </div>
         </div>
       </div>
       <div class="row margin-bottom-twenty">
-        <div class="labels col-md-4 pull-left">
+        <div class="labels col-md-4 pull-left tooltip-container">
           <span>Allow Status Update</span>
+          <span class="tip btn-info-icon btn-primary"><span class="cp-tooltip">Specify who has permission to mark items as completed</span>
         </div>
         <div class="main col-md-8 pull-right">
           <span class="radios-row">
@@ -78,8 +83,10 @@
 
 
       <div class="row margin-bottom-twenty">
-        <div class="labels col-md-4 pull-left">
+        <div class="labels col-md-4 pull-left tooltip-container">
           <span>Allow new item Push notification</span>
+          <span class="tip btn-info-icon btn-primary"><span class="cp-tooltip">Specify who should receive push notifications whenever a new item is created</span>
+
         </div>
         <div class="main col-md-8 pull-right">
           <span class="radios-row">
