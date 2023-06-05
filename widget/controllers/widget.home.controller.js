@@ -65,11 +65,30 @@ var config = {};
 		
 			showSkeleton()
 			getSettings();
+
+
+			buildfire.deeplink.getData((deeplinkData) => {});
+
+			  buildfire.deeplink.onUpdate((deeplinkData) => {
+				if(deeplinkData){
+					init();
+					var id = deeplinkData.split(":")[1]
+					Suggestion.getById(id).then(_suggestion => {
+						ViewStack.push({
+								template: 'Item_details',
+								item: _suggestion
+						});
+						buildfire.history.push('Item_details', { elementToShow: 'Item_details' })
+					})
+				}
+				
+				  
+			  });
+
 			buildfire.appearance.getAppTheme((err, result) => {
 				if (err) return console.error(err);
 				appThemeColors = result.colors
 			  });
-
 
 			  
 
@@ -238,7 +257,9 @@ var config = {};
 							:
 							false
 				);
-				const queryString = `wid=${createdBy.displayName}-${createdOn}&wTitle=${title}`;
+				const headerContent = angular.element('<pre/>').text(title).html();
+				const queryString = `wid=${createdBy.displayName}-${createdOn}&wTitle=${title}&${headerContent}`;
+
 				buildfire.navigation.navigateToSocialWall({
 					title,
 					queryString,
@@ -324,11 +345,11 @@ var config = {};
 											required: true
 										}, (err, response)=>{
 											const voterIds = Object.keys(suggestion.upVotedBy);
-											PushNotification.sendToCustomUsers("Task Completed", response.results[0].textValue, voterIds);
+											PushNotification.sendToCustomUsers("Task Completed", response.results[0].textValue, suggestion.id, voterIds);
 										})
 									} else if(suggestion.status == SUGGESTION_STATUS.INPROGRESS){
 										const voterIds = Object.keys(suggestion.upVotedBy);
-										PushNotification.sendToCustomUsers("Task in Progress", `"${suggestion.title}" has been marked as in progress`, voterIds);
+										PushNotification.sendToCustomUsers("Task in Progress", `"${suggestion.title}" has been marked as in progress`,suggestion.id, voterIds);
 									}
 									if (!$scope.$$phase) $scope.$apply();
 								})
@@ -464,9 +485,9 @@ var config = {};
 						const title = "A new item has been created";
 						const message = `A "${suggestion.title}" has been created`;
 						if($rootScope.settings.pushNotificationUsersSegment === PUSH_NOTIFICATIONS_SEGMENT.ALL_USERS){
-							PushNotification.sendToAll(title, message);
+							PushNotification.sendToAll(title, message, suggestion.id);
 						} else if($rootScope.settings.pushNotificationUsersSegment === PUSH_NOTIFICATIONS_SEGMENT.TAGS){
-							PushNotification.sendToUserSegment(title, message, $rootScope.settings.pushNotificationTags)
+							PushNotification.sendToUserSegment(title, message, suggestion.id, $rootScope.settings.pushNotificationTags)
 						}
 					}
 					

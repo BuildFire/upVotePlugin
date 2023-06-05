@@ -1,10 +1,11 @@
 class PushNotification {
-  static sendToAll = (title, message) => {
+  static sendToAll = (title, message, id) => {
     const notification = {
       title: title,
       text: message,
       at: new Date(),
       sendToSelf: false,
+      queryString: `id:${id}`
     };
     buildfire.notifications.pushNotification.schedule(
       notification,
@@ -14,13 +15,14 @@ class PushNotification {
     );
   };
 
-  static sendToCustomUsers = (title, message, users) => {
+  static sendToCustomUsers = (title, message, id, users) => {
     const notification = {
       title: title,
       text: message,
       at: new Date(),
       sendToSelf: false,
       users: users,
+      queryString: `id:${id}`
     };
     buildfire.notifications.pushNotification.schedule(
       notification,
@@ -30,13 +32,14 @@ class PushNotification {
     );
   };
 
-  static sendToUserSegment = (title, message, userTags) => {
+  static sendToUserSegment = (title, message, id, userTags) => {
     const notification = {
       title: title,
       text: message,
       at: new Date(),
       userTags: [userTags],
       sendToSelf: false,
+      queryString: `id:${id}`
     };
     buildfire.notifications.pushNotification.schedule(
       notification,

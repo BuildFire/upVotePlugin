@@ -36,7 +36,6 @@
             margin-bottom: 0;
         }
     </style>
-
 </head>
 <style>
     .grid-block {
@@ -69,10 +68,10 @@
                                 <span class="margin--0" >{{s.statusName}}</span>
                             </p>
                             <p ng-if="s.status == 2" class="pill shrink--0 pill-warning-theme" ng-click="openChangeStatusModal(s)">
-                                <span class="margin--0">{{s.statusName}}</span>
+                                <span class="margin--0" style="color:white !important">{{s.statusName}}</span>
                             </p>
                             <p ng-if="s.status == 3" class="pill shrink--0 pill-success-theme" ng-click="openChangeStatusModal(s)">
-                                <span class="margin--0">{{s.statusName}}</span>
+                                <span class="margin--0" style="color:white !important">{{s.statusName}}</span>
                             </p>
                         </div>
                         <div class="suggestion">
@@ -81,14 +80,14 @@
                         </div>
                         <div class="button__panel shrink--0 padded padded--sm padded--x">
                             <button class="voteButton btn btn--icon--text " ng-click="goSocial(s)">
-                                <span class="material-icons bodyTheme">comment</span>
-                                <span class="text-body margin--0"  bfString="mainScreen.commentButton"></span>
+                                <span id="comment-icon" class="material-icons">comment</span>
+                                <span id="comment-message" class="margin--0"  bfString="mainScreen.commentButton"></span>
                             </button>
-                            <button id="upvote_icon" class="voteButton btn btn--icon--text ml-8" ng-click="upVote(s)"
+                            <button ng-if="s.status != 3" id="upvote_icon" class="voteButton btn btn--icon--text ml-8" ng-click="upVote(s)"
                             >
-                                <span ng-if="!s.upvoteByYou" class="material-icons unactive-arrow"
+                                <span ng-if="!s.upvoteByYou" id="unactive-arrow" class="material-icons "
                                 >arrow_upward</span>
-                                <span ng-if="s.upvoteByYou" class="material-icons active-arrow"
+                                <span ng-if="s.upvoteByYou" id="active-arrow" class="material-icons"
                                 >arrow_upward</span>
                             </button>
                             <p class="pill-count shrink--0" ng-click="showVoterModal(s)">

@@ -331,7 +331,7 @@ textarea{
 	background-color: rgba(255, 255, 255, .1);
 	border-radius: .5rem;
 	box-shadow: 0 .125rem .5rem rgba(50, 50, 50, 0.2);
-	margin-bottom: .75rem;
+	margin-bottom: 8px;
 }
 .card.suggestionCard{
 	border-radius: 4px;
@@ -515,13 +515,18 @@ color: red  !important
 }
 
 .pill-count {
+	margin: 0px 0 0 8px;
 	align-self: center;
 }
 
-.active-arrow {
+#comment-icon, #comment-message {
+	color: var( --bf-theme-body-text) !important;
+}
+
+#active-arrow {
 	color: var(--bf-theme-icons) !important
 }
 
-.unactive-arrow {
+#unactive-arrow {
 	color: var(--bf-theme-body-text) !important
 }

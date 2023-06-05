@@ -15,7 +15,7 @@
             <p ng-if="selectedSuggestion.status == 2" class="pill shrink--0 pill-warning-theme" ng-click="openChangeStatusModal(selectedSuggestion)">
                 <span class="margin--0">{{selectedSuggestion.statusName}}</span>
             </p>
-            <p ng-if="selectedSuggestion.status == 3" class="pill shrink--0 pillSuccessTheme" ng-click="openChangeStatusModal(selectedSuggestion)">
+            <p ng-if="selectedSuggestion.status == 3" class="pill shrink--0 pill-success-theme" ng-click="openChangeStatusModal(selectedSuggestion)">
                 <span class="margin--0">{{selectedSuggestion.statusName}}</span>
             </p>
         </div>
@@ -25,14 +25,14 @@
         </div>
         <div class="button__panel shrink--0 padded padded--sm padded--x">
             <button class="voteButton btn btn--icon--text " ng-click="goSocial(selectedSuggestion)">
-                <span class="material-icons bodyTheme">comment</span>
-                <span class="text-body margin--0"  bfString="mainScreen.commentButton"></span>
+                <span id="comment-icon" class="material-icons">comment</span>
+                <span id="comment-message" class="margin--0"  bfString="mainScreen.commentButton"></span>
             </button>
-            <button id="upvote_icon" class="voteButton btn btn--icon--text ml-8" ng-click="upVote(selectedSuggestion)"
+            <button ng-if="s.status != 3" id="upvote_icon" class="voteButton btn btn--icon--text ml-8" ng-click="upVote(selectedSuggestion)"
             >
-                <span ng-if="!selectedSuggestion.upvoteByYou" class="material-icons" style="color: var(--bf-theme-body) !important" 
+                <span ng-if="!selectedSuggestion.upvoteByYou" id="unactive-arrow" class="material-icons " 
                 >arrow_upward</span>
-                <span ng-if="selectedSuggestion.upvoteByYou" class="material-icons"  style="color: var(--bf-theme-icons) !important"
+                <span ng-if="selectedSuggestion.upvoteByYou" id="active-arrow" class="material-icons" 
                 >arrow_upward</span>
             </button>
             <p class="pill-count shrink--0" ng-click="showVoterModal(selectedSuggestion)">

@@ -34,6 +34,21 @@ class Suggestion {
       });
     });
   }
+
+  static getById(id) {
+   
+    return new Promise((resolve, reject) => {
+      buildfire.publicData.getById(
+        id,
+        DBTAG,
+        (err, result) => {
+         
+          if (err) reject(err);
+          resolve(new Suggestion(result) )
+        }
+      );
+    });
+  }
  
 
   static insert(suggestion, callback) {
