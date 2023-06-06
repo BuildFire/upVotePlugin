@@ -443,28 +443,30 @@ var config = {};
 					const step2 = {
 						placeholder: "Add more details*",
 						saveText: "Submit",
-						wysiwyg: true,
+						defaultValue: "",
 						attachments: {
-							"images": {
-								enable: true
-							},
-							"gifs": {
-								enable: false
+							images: { enable: true, multiple: false },
+						  },
+						required: true,
+					}
+
+					buildfire.input.showTextDialog([step1, step2], (err, response)=>{
+						const paragraph = document.createElement("p")
+						paragraph.innerHTML = response.results[1].textValue;
+						const images = response.results[1].images;
+						if(images && images.length > 0){
+							for(let i=0;i<images.length;i++){
+								const imgEl = document.createElement("img");
+								const imgUrl = buildfire.imageLib.cropImage( images[i],{ size: "full_width", aspect: "16:9" })
+								imgEl.src = imgUrl;
+								paragraph.append(imgEl);
 							}
-						},
-						
-						//required: true,
-					  }
-					buildfire.input.showTextDialog(step1, (err, response1)=>{
-						 const title = response1.results[0].textValue
-						setTimeout(()=>{
-							buildfire.input.showTextDialog(step2, (err, response2)=>{
-								const description = response2.results[0].wysiwygValue
-								addSuggestion(title, description)
+						}
+
+						const title = response.results[0].textValue;
+						const description = paragraph.innerHTML;
+						addSuggestion(title, description)
    
-							})
-						},700)
-						 
 					})
 					
 				} else {
@@ -506,7 +508,7 @@ var config = {};
 					const suggestion = new Suggestion(result)
 					suggestion.disableUpvote = true;
 					suggestion.statusName = $rootScope.TextStatuses[0];
-					suggestion.imgUrl = getUserImage(item.createdBy);
+					suggestion.imgUrl = getUserImage(suggestion.createdBy);
 
 					$scope.suggestions.unshift(suggestion);
 					if($rootScope.settings){
