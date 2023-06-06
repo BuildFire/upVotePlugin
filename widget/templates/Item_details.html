@@ -1,8 +1,8 @@
 
-<div ng-controller="WidgetItemCtrl as WidgetItem" class="container--responsive">
+<div ng-controller="WidgetItemCtrl as WidgetItem" class="container--responsive animated fadeInRight">
     <div  class="suggestionCard" >
         <div class="card__header padded padded--sm margin-bottom--sm" ng-click="goToItemDetails(selectedSuggestion)">
-            <img alt="{{selectedSuggestion.createdBy.displayName}} profile image"  class="avatar" onerror="this.src='assets/images/avatar.png'" ng-src="{{ selectedSuggestion.createdBy | getUserImage }}">
+            <img alt="{{selectedSuggestion.createdBy.displayName}} profile image"  class="avatar" onerror="this.src='assets/images/avatar.png'" ng-src="{{selectedSuggestion.imgUrl}}">
             <div class="ellipsis padded padded--x padded--sm suggestion__name">
                 <h5 class="margin--0 ellipsis">{{selectedSuggestion.createdBy.displayName}}</h5>
                 <h6 ng-if="selectedSuggestion.isCurrentYear" class="pull-left caption margin--0 text--secondary">{{selectedSuggestion.createdOn | date:'MMM dd'}}</h6>
@@ -13,10 +13,10 @@
                 <span class="margin--0">{{selectedSuggestion.statusName}}</span>
             </p>
             <p ng-if="selectedSuggestion.status == 2" class="pill shrink--0 pill-warning-theme" ng-click="openChangeStatusModal(selectedSuggestion)">
-                <span class="margin--0">{{selectedSuggestion.statusName}}</span>
+                <span class="margin--0" style="color:white !important">{{selectedSuggestion.statusName}}</span>
             </p>
             <p ng-if="selectedSuggestion.status == 3" class="pill shrink--0 pill-success-theme" ng-click="openChangeStatusModal(selectedSuggestion)">
-                <span class="margin--0">{{selectedSuggestion.statusName}}</span>
+                <span class="margin--0" style="color:white !important">{{selectedSuggestion.statusName}}</span>
             </p>
         </div>
         <div class="padded padded--m padded--x">
@@ -24,7 +24,7 @@
             <p class="margin-bottom--m" ng-bind-html="safeHtml(selectedSuggestion.suggestion)">{{selectedSuggestion.suggestion}}</p>
         </div>
         <div class="button__panel shrink--0 padded padded--sm padded--x">
-            <button class="voteButton btn btn--icon--text " ng-click="goSocial(selectedSuggestion)">
+            <button ng-if="settings && settings.enableComments" class="voteButton btn btn--icon--text " ng-click="goSocial(selectedSuggestion)">
                 <span id="comment-icon" class="material-icons">comment</span>
                 <span id="comment-message" class="margin--0"  bfString="mainScreen.commentButton"></span>
             </button>

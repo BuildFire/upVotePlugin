@@ -2,8 +2,8 @@ const DBTAG = 'suggestion';
 
 
 SUGGESTION_STATUS = Object.freeze({
-	BACKLOG: 1,
-    INPROGRESSS: 2,
+	  BACKLOG: 1,
+    INPROGRESS: 2,
     COMPLETED: 3,
   });
 

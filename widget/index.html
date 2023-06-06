@@ -29,6 +29,7 @@
     <link rel="stylesheet" href="../../../styles/transitionAnimation.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="./assets/css/pluginIcons.css">
+    <link rel="stylesheet" href="./assets/css/animations.css">
 
     <style>
         /* keep compatibility with layout1 v0.1 */
@@ -57,7 +58,7 @@
                     </div>
                     <div class="card suggestionCard" ng-cloak ng-repeat="s in suggestions track by $index" ng-click="_listCtrl.goToItemDetails(s)">
                         <div class="card__header padded padded--sm margin-bottom--sm" >
-                            <img alt="{{s.createdBy.displayName}} profile image"  class="avatar" onerror="this.src='assets/images/avatar.png'" ng-src="{{ s.createdBy | getUserImage }}">
+                            <img alt="{{s.createdBy.displayName}} profile image"  class="avatar" onerror="this.src='assets/images/avatar.png'" ng-src="{{s.imgUrl}}">
                             <div class="ellipsis padded padded--x padded--sm suggestion__name">
                                 <h5 class="margin--0 ellipsis">{{s.createdBy.displayName}}</h5>
                                 <h6 ng-if="s.isCurrentYear" class="pull-left caption margin--0 text--secondary">{{s.createdOn | date:'MMM dd'}}</h6>
@@ -78,8 +79,8 @@
                             <h4 class="word--break" ng-show="s.title">{{s.title}}</h4>
                             <p class="word--break margin-bottom--m" ng-bind-html="safeHtml(s.suggestion)">{{s.suggestion}}</p>
                         </div>
-                        <div class="button__panel shrink--0 padded padded--sm padded--x">
-                            <button class="voteButton btn btn--icon--text " ng-click="goSocial(s)">
+                        <div class="button__panel shrink--0 padded padded--sm padded--x padding-right-zero">
+                            <button ng-if="settings && settings.enableComments" class="voteButton btn btn--icon--text " ng-click="goSocial(s)">
                                 <span id="comment-icon" class="material-icons">comment</span>
                                 <span id="comment-message" class="margin--0"  bfString="mainScreen.commentButton"></span>
                             </button>

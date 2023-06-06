@@ -427,6 +427,10 @@ textarea{
 	margin-right: -.125rem;
 }
 
+.padding-right-zero {
+	padding-right: 0 !important;
+}
+
 /* Utilities */
 .ellipsis {
 	font-weight: lighter;
@@ -515,7 +519,7 @@ color: red  !important
 }
 
 .pill-count {
-	margin: 0px 0 0 8px;
+	padding: 0 16px 0 8px;
 	align-self: center;
 }
 

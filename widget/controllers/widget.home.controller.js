@@ -6,6 +6,10 @@ var appThemeColors = null;
 var isCardClicked = false;
 buildfire.appearance.titlebar.show();
 
+const callBacklogText = getLanguageValue("mainScreen.backlog") 
+const callInProgressText = getLanguageValue("mainScreen.inProgress") 
+const callCompletedText = getLanguageValue("mainScreen.completed") 
+
 function getLanguageValue(stringkey) {
 	return new Promise((resolve, reject) => {
 		buildfire.language.get({stringKey: stringkey}, (err, result) => {
@@ -71,14 +75,23 @@ var config = {};
 
 			  buildfire.deeplink.onUpdate((deeplinkData) => {
 				if(deeplinkData){
+					buildfire.spinner.show();
 					init();
 					var id = deeplinkData.split(":")[1]
 					Suggestion.getById(id).then(_suggestion => {
-						ViewStack.push({
+						Promise.all([callBacklogText, callInProgressText,callCompletedText]).then(result => {
+							$rootScope.TextStatuses = result;
+							_suggestion.statusName = $rootScope.TextStatuses[_suggestion.status - 1]
+							_suggestion.imgUrl = getUserImage(_suggestion.createdBy)
+							ViewStack.push({
 								template: 'Item_details',
 								item: _suggestion
-						});
-						buildfire.history.push('Item_details', { elementToShow: 'Item_details' })
+							});
+							buildfire.spinner.hide();
+
+							buildfire.history.push('Item_details', { elementToShow: 'Item_details' })
+						})
+					
 					})
 				}
 				
@@ -146,9 +159,7 @@ var config = {};
 					UpVoteHome.text = config.text;
 					if (!$scope.$$phase) $scope.$apply();
 				});
-				const callBacklogText = getLanguageValue("mainScreen.backlog") 
-				const callInProgressText = getLanguageValue("mainScreen.inProgress") 
-				const callCompletedText = getLanguageValue("mainScreen.completed") 
+				
 
 				Promise.all([callBacklogText, callInProgressText,callCompletedText]).then(result => {
 					$rootScope.TextStatuses = result;
@@ -161,7 +172,7 @@ var config = {};
 						const promises = results.map(suggestion => {
 							return new Promise(resolve => {
 								buildfire.auth.getUserProfile({ userId: suggestion.createdBy._id }, (error, updatedUser) => {
-									if (error || !updatedUser._id) {
+									if (error || !updatedUser || !updatedUser._id) {
 										console.warn('failed to update user profile:', suggestion.createdBy);
 										return resolve(suggestion);
 									}
@@ -199,7 +210,7 @@ var config = {};
 							item.disableUpvote = _currentUser ? !item || !item.upVotedBy || item.upVotedBy[_currentUser._id] : false;
 							item.upvoteByYou = item.upVotedBy && _currentUser && item.upVotedBy[_currentUser._id] != null;
 							item.statusName = $rootScope.TextStatuses[item.status - 1]
-
+							item.imgUrl = getUserImage(item.createdBy);
 							return item;
 						}
 					}).catch(err => console.log(err))
@@ -219,7 +230,14 @@ var config = {};
 				init();
 			});
 		
-			
+			function getUserImage(createdBy){
+				var url = './assets/images/avatar.png';
+				if (createdBy) {
+				  url = buildfire.auth.getUserPictureUrl({ userId: createdBy._id });
+				  url = buildfire.imageLib.cropImage(url,{ size: "xs", aspect: "1:1" });
+				}
+				return url;
+			}
 		
 			function renderStatusItem(text, index){
 				const element = `
@@ -258,7 +276,7 @@ var config = {};
 							false
 				);
 				const headerContent = angular.element('<pre/>').text(title).html();
-				const queryString = `wid=${createdBy.displayName}-${createdOn}&wTitle=${title}&${headerContent}`;
+				const queryString = `wid=${createdBy.displayName}-${createdOn}&wTitle=${title}&headerContent=${headerContent}`;
 
 				buildfire.navigation.navigateToSocialWall({
 					title,
@@ -274,7 +292,7 @@ var config = {};
 					voterIds.map(userId => {
 						return new Promise((resolve, reject) => {
 							buildfire.auth.getUserProfile({ userId }, (error, user) => {
-								if (error || !user) return reject(error);
+								//if (error || !user) return reject(error);
 								resolve(user);
 							});
 						});
@@ -282,9 +300,12 @@ var config = {};
 				).then(users => {
 					const listItems = [];
 					for(let i=0;i<users.length;i++){
-						listItems.push({
-							text: users[i].firstName + " " + users[i].lastName , imageUrl:buildfire.auth.getUserPictureUrl({ userId: users[i]._id }) 
-						})
+						if(users[i]){
+							listItems.push({
+								text: users[i].firstName + " " + users[i].lastName , imageUrl:buildfire.auth.getUserPictureUrl({ userId: users[i]._id }) 
+							})
+						}
+						
 					}
 					buildfire.components.drawer.open(
 						{
@@ -337,6 +358,7 @@ var config = {};
 								suggestion.status = parseInt(result.id) 
 								Suggestion.update(suggestion).then(()=>{
 									suggestion.statusName = $rootScope.TextStatuses[suggestion.status-1]
+									const voterIds = Object.keys(suggestion.upVotedBy);
 									if(suggestion.status == SUGGESTION_STATUS.COMPLETED){
 										buildfire.input.showTextDialog({
 											placeholder: `"${suggestion.title}" has been marked as completed`,
@@ -344,11 +366,10 @@ var config = {};
 											defaultValue: `"${suggestion.title}" has been marked as completed`,
 											required: true
 										}, (err, response)=>{
-											const voterIds = Object.keys(suggestion.upVotedBy);
+											
 											PushNotification.sendToCustomUsers("Task Completed", response.results[0].textValue, suggestion.id, voterIds);
 										})
-									} else if(suggestion.status == SUGGESTION_STATUS.INPROGRESS){
-										const voterIds = Object.keys(suggestion.upVotedBy);
+									} else if(suggestion.status === SUGGESTION_STATUS.INPROGRESS){
 										PushNotification.sendToCustomUsers("Task in Progress", `"${suggestion.title}" has been marked as in progress`,suggestion.id, voterIds);
 									}
 									if (!$scope.$$phase) $scope.$apply();
@@ -422,8 +443,6 @@ var config = {};
 					const step2 = {
 						placeholder: "Add more details*",
 						saveText: "Submit",
-						defaultValue: "",
-						required: true,
 						wysiwyg: true,
 						attachments: {
 							"images": {
@@ -432,15 +451,22 @@ var config = {};
 							"gifs": {
 								enable: false
 							}
-						}
+						},
+						
+						//required: true,
 					  }
-					const steps = [step1, step2];
-		
-					buildfire.input.showTextDialog(steps, (err, response)=>{
-						const title = response.results[0].textValue
-						const description = response.results[1].wysiwygValue
-						addSuggestion(title, description)
+					buildfire.input.showTextDialog(step1, (err, response1)=>{
+						 const title = response1.results[0].textValue
+						setTimeout(()=>{
+							buildfire.input.showTextDialog(step2, (err, response2)=>{
+								const description = response2.results[0].wysiwygValue
+								addSuggestion(title, description)
+   
+							})
+						},700)
+						 
 					})
+					
 				} else {
 					enforceLogin();
 				}
@@ -480,6 +506,8 @@ var config = {};
 					const suggestion = new Suggestion(result)
 					suggestion.disableUpvote = true;
 					suggestion.statusName = $rootScope.TextStatuses[0];
+					suggestion.imgUrl = getUserImage(item.createdBy);
+
 					$scope.suggestions.unshift(suggestion);
 					if($rootScope.settings){
 						const title = "A new item has been created";

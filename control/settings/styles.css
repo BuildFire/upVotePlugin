@@ -23,7 +23,7 @@ html {
 
 .radios-row {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
 }
 .user-tag-container {
     display:flex;

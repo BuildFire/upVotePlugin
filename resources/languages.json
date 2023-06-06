@@ -29,18 +29,21 @@
 					"title": "Backlog",
 					"defaultValue": "Backlog",
 					"inputType": "text",
+					"maxLength": 20,
 					"toolTip": ""
 				},
 				"inProgress": {
 					"title": "In Progress",
 					"defaultValue": "In Progress",
 					"inputType": "text",
+					"maxLength": 20,
 					"toolTip": ""
 				},
 				"completed": {
 					"title": "Completed",
 					"defaultValue": "Completed",
 					"inputType": "text",
+					"maxLength": 20,
 					"toolTip": ""
 				}
 			}

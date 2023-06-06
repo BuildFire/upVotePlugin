@@ -18,6 +18,8 @@
     <!-- WYSIWYG -->
     <script src="../../../../scripts/tinymce/tinymce.min.js"></script>
 
+
+    <link href="../../../../styles/control/bf-base.css" rel="stylesheet">
     <script>
 		Analytics.init();
 
@@ -82,13 +84,20 @@
             }
         });
     </script>
+    <style>
+        .tox {
+            margin-top: 70px !important
+        }
+    </style>
 </head>
 
 <body>
-
-
+    <div>
+        <h1>Introduction</h1>
 		<textarea id="text" ui-tinymce="editorOptions" class="form-control" rows="5" width="100%" height="300px"></textarea>
 
+    </div>
+       
 
         <script>
             function save(data) {
