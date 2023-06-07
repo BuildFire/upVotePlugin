@@ -516,7 +516,10 @@ var config = {};
 						if($rootScope.settings.pushNotificationUsersSegment === PUSH_NOTIFICATIONS_SEGMENT.ALL_USERS){
 							PushNotification.sendToAll(title, message, suggestion.id);
 						} else if($rootScope.settings.pushNotificationUsersSegment === PUSH_NOTIFICATIONS_SEGMENT.TAGS){
-							PushNotification.sendToUserSegment(title, message, suggestion.id, $rootScope.settings.pushNotificationTags)
+							const userTags = $rootScope.settings.pushNotificationTags.map(tag=> tag.tagName);
+							if(userTags.length > 0){
+								PushNotification.sendToUserSegment(title, message, suggestion.id, userTags)
+							}
 						}
 					}
 					suggestion._createdOn = getCurrentDate(suggestion.createdOn);

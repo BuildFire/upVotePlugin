@@ -37,13 +37,15 @@ class PushNotification {
       title: title,
       text: message,
       at: new Date(),
-      userTags: [userTags],
+      userTags: userTags,
       sendToSelf: false,
       queryString: `id:${id}`
     };
     buildfire.notifications.pushNotification.schedule(
       notification,
       function (err, data) {
+        console.log("Trace1", err)
+        console.log("Trace1", data)
         if (err) return;
       }
     );
