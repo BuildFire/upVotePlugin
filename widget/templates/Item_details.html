@@ -4,9 +4,9 @@
         <div class="card__header padded padded--sm margin-bottom--sm" ng-click="goToItemDetails(selectedSuggestion)">
             <img alt="{{selectedSuggestion.createdBy.displayName}} profile image"  class="avatar" onerror="this.src='assets/images/avatar.png'" ng-src="{{selectedSuggestion.imgUrl}}">
             <div class="ellipsis padded padded--x padded--sm suggestion__name">
-                <h5 class="margin--0 ellipsis">{{selectedSuggestion.createdBy.displayName}}</h5>
-                <h6 ng-if="selectedSuggestion.isCurrentYear" class="pull-left caption margin--0 text--secondary">{{selectedSuggestion.createdOn | date:'MMM dd'}}</h6>
-                <h6 ng-if="!selectedSuggestion.isCurrentYear" class="pull-left caption margin--0 text--secondary">{{selectedSuggestion.createdOn | date:'MMM dd, y'}}</h6>
+                <p class="margin--0 ellipsis header-text">{{selectedSuggestion._displayName}}</p>
+                <h6 ng-if="s._createdOn" class="pull-left caption margin--0 text--secondary">{{selectedSuggestion._createdOn}}</h6>
+                <h6 ng-if="!s._createdOn" class="pull-left caption margin--0 text--secondary">{{selectedSuggestion.createdOn | date:'MMM dd, y'}}</h6>
             </div>
     
             <p ng-if="selectedSuggestion.status == 1" class="pill shrink--0 pill-body-theme"  ng-click="openChangeStatusModal(selectedSuggestion)">
@@ -36,7 +36,7 @@
                 >arrow_upward</span>
             </button>
             <p class="pill-count shrink--0" ng-click="showVoterModal(selectedSuggestion)">
-                <span class="margin--0 bodyTheme">{{selectedSuggestion.upVoteCount}}</span>
+                <span class="margin--0 body-text">{{selectedSuggestion.upVoteCount}}</span>
             </p>
         </div>
     </div>

@@ -82,7 +82,10 @@ var config = {};
 						Promise.all([callBacklogText, callInProgressText,callCompletedText]).then(result => {
 							$rootScope.TextStatuses = result;
 							_suggestion.statusName = $rootScope.TextStatuses[_suggestion.status - 1]
-							_suggestion.imgUrl = getUserImage(_suggestion.createdBy)
+							_suggestion.imgUrl = getUserImage(_suggestion.createdBy);
+							_suggestion._createdOn = getCurrentDate(_suggestion.createdOn);
+							_suggestion._displayName = _suggestion.createdBy && _suggestion.createdBy.displayName ? _suggestion.createdBy.displayName : "Someone" 
+						
 							ViewStack.push({
 								template: 'Item_details',
 								item: _suggestion
@@ -164,7 +167,7 @@ var config = {};
 				Promise.all([callBacklogText, callInProgressText,callCompletedText]).then(result => {
 					$rootScope.TextStatuses = result;
 					Suggestion.search(options).then(results => {
-						results = results.filter(x => x.status != 3 || new Date(x.createdOn) >= date)
+						results = results.filter(x => x.status != 3 || (x.status == 3 && new Date(x.createdOn) >= date))
 						document.getElementById("btn--add__container").classList.remove("hidden")
 						if (!results || !results.length) return update([]);
 			
@@ -203,10 +206,8 @@ var config = {};
 						}
 			
 						function checkYear(item) {
-							var creationYear = new Date(item.createdOn).getFullYear();
-							var currentYear = new Date().getFullYear();
-			
-							item.isCurrentYear = creationYear === currentYear;
+							item._createdOn = getCurrentDate(item.createdOn);
+							item._displayName = item.createdBy && item.createdBy.displayName ? item.createdBy.displayName : "Someone" 
 							item.disableUpvote = _currentUser ? !item || !item.upVotedBy || item.upVotedBy[_currentUser._id] : false;
 							item.upvoteByYou = item.upVotedBy && _currentUser && item.upVotedBy[_currentUser._id] != null;
 							item.statusName = $rootScope.TextStatuses[item.status - 1]
@@ -233,8 +234,7 @@ var config = {};
 			function getUserImage(createdBy){
 				var url = './assets/images/avatar.png';
 				if (createdBy) {
-				  url = buildfire.auth.getUserPictureUrl({ userId: createdBy._id });
-				  url = buildfire.imageLib.cropImage(url,{ size: "xs", aspect: "1:1" });
+					url = buildfire.auth.getUserPictureUrl({ userId: createdBy._id });
 				}
 				return url;
 			}
@@ -525,6 +525,25 @@ var config = {};
 				})
 			}
 
+			function getCurrentDate(createdon){
+				const createdDate = new Date(createdon);
+				const currentDate = new Date();
+				
+				const timeDifference = currentDate.getTime() - createdDate.getTime();
+				const minutesDifference = Math.floor(timeDifference / (1000 * 60));
+				const hoursDifference = Math.floor(timeDifference / (1000 * 60 * 60));
+				const daysDifference = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+
+				if(hoursDifference < 24 && hoursDifference != 0){
+				  return hoursDifference + "hour";
+				} else if(hoursDifference == 0 && minutesDifference != 0){
+				  return minutesDifference + "min"
+				} else if(daysDifference == 1) {
+				  return "1day"
+				} else {
+				  return null;
+				}
+			}
 			$rootScope.safeHtml = function (html) {
 				if (html) {
 					var $html = $('<div />', {html: html});

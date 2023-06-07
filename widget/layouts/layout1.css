@@ -65,16 +65,16 @@ table {
 	padding-bottom: 0 !important;
 }
 .margin-bottom--xs{
-	margin-bottom: .5rem;
+	margin-bottom: 8px;
 }
 .margin-bottom--sm{
-	margin-bottom: .75rem;
+	margin-bottom: 12px;
 }
 .margin-bottom--m{
-	margin-bottom:1rem;
+	margin-bottom: 16px;
 }
 .margin-bottom--lg{
-	margin-bottom: 1.5rem;
+	margin-bottom: 24px;
 }
 .margin--0{
 	margin: 0;
@@ -159,6 +159,7 @@ p,span,a, .paragraph {
 }
 .text--secondary{
 	opacity: .5;
+	color: var(--bf-theme-body-text)
 }
 /*Icons*/
 .icon,
@@ -343,13 +344,17 @@ textarea{
 .card__header{
 	display: flex;
 	align-items: center;
+	
 }
+
+
 .suggestion__name{
 	flex: auto;
 }
 .button__panel{
 	display: flex;
 	justify-content: flex-end;
+	align-items: center;
 }
 .button__panel .btn.btn--transparent{
 	padding-left: .75rem;
@@ -358,8 +363,8 @@ textarea{
 .avatar {
 	border-radius: 50%;
 	overflow: hidden;
-	width: 3rem;
-	height: 3rem;
+	width: 40px;
+	height: 40px;
 	object-fit: cover;
 	background-color: rgba(128, 128, 128, 0.1);
 	flex-shrink: 0;
@@ -491,7 +496,7 @@ textarea{
 	color: var( --bf-theme-body-text) !important;
 }
 
-.bodyTheme {
+.body-text {
 	color: var( --bf-theme-body-text) !important;
 }
 
@@ -511,13 +516,6 @@ textarea{
 	margin-left: 8px;
 }
 
-.bodyTheme1 {
-color: red  !important
-}
-.iconsTheme1 {
-	color: blue !important
-}
-
 .pill-count {
 	padding: 0 16px 0 8px;
 	align-self: center;
@@ -533,4 +531,8 @@ color: red  !important
 
 #unactive-arrow {
 	color: var(--bf-theme-body-text) !important
+}
+
+.header-text {
+	color: var(--bf-theme-header-text)
 }
