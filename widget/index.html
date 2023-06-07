@@ -59,8 +59,8 @@
                     <div class="card suggestionCard" ng-cloak ng-repeat="s in suggestions track by $index" ng-click="_listCtrl.goToItemDetails(s)">
                         <div class="card__header padded padded--sm margin-bottom--sm" >
                             <img alt="{{s.createdBy.displayName}} profile image"  class="avatar" 
-                            onerror="this.onerror=null;this.src='./assets/images/avatar.png'"
-                            ng-src="{{s.imgUrl}}">
+                            onerror="this.src='assets/images/avatar.png'"
+                            src="{{s.imgUrl}}">
                             <div class="ellipsis padded padded--x padded--sm suggestion__name">
                                 <p class="margin--0 ellipsis header-text">{{s._displayName}}</p>
                                 <h6 ng-if="s._createdOn" class="pull-left caption margin--0 text--secondary">{{s._createdOn}}</h6>

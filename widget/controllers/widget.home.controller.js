@@ -149,7 +149,7 @@ var config = {};
 		
 		
 				const options = {
-					sort: { upVoteCount: -1 }
+					sort: { createdOn: -1 }
 				}
 
 				buildfire.datastore.onUpdate(function (obj) {
@@ -508,7 +508,6 @@ var config = {};
 					const suggestion = new Suggestion(result)
 					suggestion.disableUpvote = true;
 					suggestion.statusName = $rootScope.TextStatuses[0];
-					suggestion.imgUrl = getUserImage(suggestion.createdBy);
 
 					$scope.suggestions.unshift(suggestion);
 					if($rootScope.settings){
@@ -520,7 +519,12 @@ var config = {};
 							PushNotification.sendToUserSegment(title, message, suggestion.id, $rootScope.settings.pushNotificationTags)
 						}
 					}
-					
+					suggestion._createdOn = getCurrentDate(suggestion.createdOn);
+					suggestion.createdBy = _currentUser
+					suggestion._displayName = suggestion.createdBy && suggestion.createdBy.displayName ? suggestion.createdBy.displayName : "Someone" 
+					suggestion.imgUrl = getUserImage(suggestion.createdBy);
+
+					console.log("Trac2222e", suggestion)
 					if (!$scope.$$phase) $scope.$apply();
 				})
 			}
@@ -536,7 +540,7 @@ var config = {};
 
 				if(hoursDifference < 24 && hoursDifference != 0){
 				  return hoursDifference + "hour";
-				} else if(hoursDifference == 0 && minutesDifference != 0){
+				} else if(hoursDifference == 0){
 				  return minutesDifference + "min"
 				} else if(daysDifference == 1) {
 				  return "1day"
