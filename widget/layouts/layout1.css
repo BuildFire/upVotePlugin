@@ -519,6 +519,11 @@ textarea{
 	margin-left: 8px;
 }
 
+.ml-16 {
+	margin-left: 16px;
+
+}
+
 .pill-count {
 	padding: 0 16px 0 8px;
 	align-self: center;
