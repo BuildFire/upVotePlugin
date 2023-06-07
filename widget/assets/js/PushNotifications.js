@@ -1,5 +1,5 @@
 class PushNotification {
-  static sendToAll = (title, message, id) => {
+  static sendToAll(title, message, id) {
     const notification = {
       title: title,
       text: message,
@@ -15,7 +15,7 @@ class PushNotification {
     );
   };
 
-  static sendToCustomUsers = (title, message, id, users) => {
+  static sendToCustomUsers(title, message, id, users) {
     const notification = {
       title: title,
       text: message,
@@ -32,7 +32,7 @@ class PushNotification {
     );
   };
 
-  static sendToUserSegment = (title, message, id, userTags) => {
+  static sendToUserSegment(title, message, id, userTags) {
     const notification = {
       title: title,
       text: message,

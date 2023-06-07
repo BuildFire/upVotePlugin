@@ -1,12 +1,12 @@
   const TAG = 'settings';
 
-  STATUS_UPDATE_SEGMENT = Object.freeze({
+  var STATUS_UPDATE_SEGMENT = Object.freeze({
     ALL_USERS: 1,
     NO_USERS: 2,
     TAGS: 3,
   });
  
-  PUSH_NOTIFICATIONS_SEGMENT = Object.freeze({
+  var PUSH_NOTIFICATIONS_SEGMENT = Object.freeze({
     ALL_USERS: 1,
     NO_USERS: 2,
     TAGS: 3,

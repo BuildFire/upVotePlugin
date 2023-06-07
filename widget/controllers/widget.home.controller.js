@@ -339,7 +339,7 @@ var config = {};
 						}
 						if(!userContainAnyStatusTags) return;
 					}
-					listItems = []
+					const listItems = []
 					for(let i=1;i<=$rootScope.TextStatuses.length;i++){
 						listItems.push({
 							id: i,

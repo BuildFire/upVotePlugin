@@ -1,7 +1,7 @@
 const DBTAG = 'suggestion';
 
 
-SUGGESTION_STATUS = Object.freeze({
+var SUGGESTION_STATUS = Object.freeze({
 	  BACKLOG: 1,
     INPROGRESS: 2,
     COMPLETED: 3,
@@ -67,7 +67,7 @@ class Suggestion {
 
   static update(suggestion) {
     const suggestionId = suggestion.id;
-    let suggestionData = {...suggestion};
+    let suggestionData = structuredClone(suggestion);
     delete suggestionData.id;
     return new Promise((resolve, reject) => {
         buildfire.publicData.update(suggestionId, suggestionData, DBTAG, (e, r) => {
