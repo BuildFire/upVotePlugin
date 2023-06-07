@@ -160,6 +160,10 @@ p,span,a, .paragraph {
 	opacity: .5;
 	color: var(--bf-theme-body-text) !important;
 }
+
+.font-weight-500 {
+	font-weight: 500;
+}
 /*Icons*/
 .icon,
 .glyphicon {
