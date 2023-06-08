@@ -53,7 +53,6 @@
 
                         data = obj.data;
                         tinymce.activeEditor.setContent(obj.data.text);
-						tinymce.activeEditor.execCommand('mceFullScreen');
                     });
                 });
                 editor.on("keyup", function (saveWithDelay) {
@@ -84,11 +83,6 @@
             }
         });
     </script>
-    <style>
-        .tox {
-            margin-top: 70px !important
-        }
-    </style>
 </head>
 
 <body>
