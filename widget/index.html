@@ -53,8 +53,8 @@
             </div>
             <div class="main--container">
                 <div  class="padded padded--x container--responsive">
-                    <div class="container--responsive padded padded--x">
-                        <p id="text_container" class="margin-bottom--sm word--break hidden" ng-bind-html="_listCtrl.safeHtml(_listCtrl.text)">{{_listCtrl.text}}</p>
+                    <div class="container--responsive padded padded--x" ng-if="_listCtrl.text">
+                        <p id="text_container" class="margin-bottom--sm word--break" ng-bind-html="safeHtml(_listCtrl.text)">{{_listCtrl.text}}</p>
                     </div>
                     <div class="card suggestionCard" ng-cloak ng-repeat="s in suggestions track by $index" ng-click="_listCtrl.goToItemDetails(s)">
                         <div class="card__header padded padded--sm margin-bottom--sm" >

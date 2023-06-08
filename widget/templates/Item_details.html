@@ -6,8 +6,8 @@
              onerror="this.src='assets/images/avatar.png'" ng-src="{{selectedSuggestion.imgUrl}}">
             <div class="ellipsis padded padded--x padded--sm suggestion__name">
                 <p class="margin--0 ellipsis header-text">{{selectedSuggestion._displayName}}</p>
-                <h6 ng-if="s._createdOn" class="pull-left caption margin--0 text--secondary">{{selectedSuggestion._createdOn}}</h6>
-                <h6 ng-if="!s._createdOn" class="pull-left caption margin--0 text--secondary">{{selectedSuggestion.createdOn | date:'MMM dd, y'}}</h6>
+                <h6 ng-if="selectedSuggestion._createdOn" class="pull-left caption margin--0 text--secondary">{{selectedSuggestion._createdOn}}</h6>
+                <h6 ng-if="!selectedSuggestion._createdOn" class="pull-left caption margin--0 text--secondary">{{selectedSuggestion.createdOn | date:'MMM dd, y'}}</h6>
             </div>
     
             <p ng-if="selectedSuggestion.status == 1" class="pill shrink--0 pill-body-theme"  ng-click="openChangeStatusModal(selectedSuggestion)">

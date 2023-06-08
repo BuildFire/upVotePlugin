@@ -65,7 +65,7 @@ var config = {};
 			var UpVoteHome = this;
 			UpVoteHome.listeners = {};
 			UpVoteHome.isInitalized = false;
-			UpVoteHome.text = "";
+			UpVoteHome.text;
 		
 			showSkeleton()
 			getSettings();
@@ -198,7 +198,6 @@ var config = {};
 			
 						function update(data) {
 							hideSkeleton();
-							document.getElementById("text_container").classList.remove("hidden")
 							UpVoteHome.isInitalized = true;
 							$scope.suggestions = data;
 							buildfire.spinner.hide();
