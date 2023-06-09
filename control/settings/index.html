@@ -12,10 +12,16 @@
     <script src="../../widget/assets/js/settings.js"></script>
       <!-- endbuild -->
 
+      
+  <link href="../../../../styles/components/control/tagsInput/tagsInput.min.css" rel="stylesheet"/>
+  
+  <script src="../../../../scripts/buildfire/components/control/tagsInput/tagsInput.min.js"></script>
   </head>
 
   <body>
     <div class="settings-container">
+
+      
       <div class="row margin-bottom-sixteen">
 
         <div class="item clearfix row flex-center">
@@ -34,7 +40,7 @@
           <span>Allow Status Update</span>
           <span class="tip btn-info-icon btn-primary"><span class="cp-tooltip">Specify who has permission to mark items as completed</span>
         </div>
-        <div class="main col-md-8 pull-right">
+        <div class="main col-md-7 pull-right padding-lr-6">
           <span class="radios-row">
             <div class="radio radio-primary radio-inline">
               <input
@@ -66,18 +72,13 @@
           </span>
         </div>
       </div>
-      <div class="row margin-bottom-twenty" id="userTagsContainer">
+      <div class="row" id="userTagsContainer" style="margin: 20px 0;padding: 0 !important;">
         <div class="col-md-4"></div>
         <div class="user-tag-container col-md-8">
-            <div style="display:flex;width:100%">
+            <div style="display:flex;width:100%;height: fit-content;">
                 <label class="user-tag-title" >User Tags</label>
-                <div class="row" id="status_update_tags">
-                </div>
+                <div id="statusUpdatetagsInputContainer"></div>
             </div>
-           <div class="btn-add-user-tag" onclick="openStatusUpdateUserTagsDialog()">
-            <button class="btn-plus icon-plus" ></button>
-
-           </div>
         </div>
       </div>
 
@@ -88,7 +89,7 @@
           <span class="tip btn-info-icon btn-primary"><span class="cp-tooltip">Specify who should receive push notifications whenever a new item is created</span>
 
         </div>
-        <div class="main col-md-8 pull-right">
+        <div class="main col-md-7 pull-right padding-lr-6">
           <span class="radios-row">
             <div class="radio radio-primary radio-inline">
               <input
@@ -120,18 +121,14 @@
           </span>
         </div>
       </div>
-      <div class="row margin-bottom-twenty" id="itemPushNotificationTagsContainer">
+      <div class="row" id="itemPushNotificationTagsContainer"
+              style="margin: 20px 0;padding: 0 !important;">
         <div class="col-md-4"></div>
         <div class="user-tag-container col-md-8">
-            <div style="display:flex;width:100%">
+            <div style="display:flex;width:100%;height: fit-content;">
                 <label class="user-tag-title" >User Tags</label>
-                <div class="row" id="push_notification_tags">
-                </div>
+                <div id="pushNotificationtagsInputContainer"></div>
             </div>
-           <div class="btn-add-user-tag" onclick="openItemPushNotificationUserTags()">
-            <button class="btn-plus icon-plus" ></button>
-
-           </div>
         </div>
       </div>
     </div>

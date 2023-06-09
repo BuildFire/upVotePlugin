@@ -346,8 +346,6 @@ textarea{
 }
 .card__header{
 	display: flex;
-	align-items: center;
-	
 }
 
 
@@ -529,7 +527,10 @@ textarea{
 
 .ml-16 {
 	margin-left: 16px;
+}
 
+.ml-24 {
+	margin-left: 24px;
 }
 
 .pill-count {
@@ -537,8 +538,19 @@ textarea{
 	align-self: center;
 }
 
+#comment-icon {
+	margin-right: 6px;
+	font-size:20px !important
+
+}
+
+#comment-message {
+	font-size:14px !important
+}
+
 #comment-icon, #comment-message {
 	color: var( --bf-theme-body-text) !important;
+	
 }
 
 #active-arrow {

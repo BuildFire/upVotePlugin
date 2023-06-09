@@ -1,3 +1,7 @@
+#statusUpdatetagsInputContainer, #pushNotificationtagsInputContainer {
+    width: 100%;
+}
+
 html {
     padding: 0 !important;
 }
@@ -31,6 +35,7 @@ html {
 .button-switch {
     display: flex;
     justify-content: right;
+    margin: 0 14px !important;
 }
 
 .radios-row {
@@ -169,4 +174,17 @@ label {
 	transform: rotate(45deg) translateY(-50%);
 	top: 50%;
 	bottom: 50%;
+}
+
+.add_tagBtn {
+    background-color: white !important;
+    color: #05ACF0 !important;
+    border-color: #05ACF0 !important;
+}
+.tagify_input_hide_courser {
+    border-right-color:#05ACF0 !important;
+}
+
+.padding-lr-6 {
+    padding: 0 6px !important
 }

@@ -84,7 +84,8 @@ var config = {};
 							_suggestion.statusName = $rootScope.TextStatuses[_suggestion.status - 1]
 							_suggestion.imgUrl = getUserImage(_suggestion.createdBy);
 							_suggestion._createdOn = getCurrentDate(_suggestion.createdOn);
-							_suggestion._displayName = _suggestion.createdBy && _suggestion.createdBy.displayName ? _suggestion.createdBy.displayName : "Someone" 
+
+							_suggestion._displayName = getUserName(_suggestion.createdBy);
 						
 							ViewStack.push({
 								template: 'Item_details',
@@ -119,6 +120,14 @@ var config = {};
 					item: selectedItem
 				  });
 				buildfire.history.push('Item_details', { elementToShow: 'Item_details' });
+			}
+
+			function getUserName(user){
+				if(user){
+					if(user.displayName) return user.displayName;
+					else return user.firstName + " " + user.lastName
+				}
+				return "Someone";
 			}
 
 			
@@ -206,7 +215,7 @@ var config = {};
 			
 						function checkYear(item) {
 							item._createdOn = getCurrentDate(item.createdOn);
-							item._displayName = item.createdBy && item.createdBy.displayName ? item.createdBy.displayName : "Someone" 
+							item._displayName = getUserName(item.createdBy)
 							item.disableUpvote = _currentUser ? !item || !item.upVotedBy || item.upVotedBy[_currentUser._id] : false;
 							item.upvoteByYou = item.upVotedBy && _currentUser && item.upVotedBy[_currentUser._id] != null;
 							item.statusName = $rootScope.TextStatuses[item.status - 1]
@@ -257,12 +266,27 @@ var config = {};
 						return appThemeColors.successTheme
 				}
 			}
+
+			function buildHeaderContentHtml(title, description){
+				const div = document.createElement("div")
+				const h2 = document.createElement("h2")
+				h2.innerHTML = title;
+
+				const p = document.createElement("p")
+				p.innerHTML = description;
+
+				div.appendChild(h2)
+				div.appendChild(p)
+
+				return div.innerHTML;
+			}
 		
 			$rootScope.goSocial = (suggestion = {}) => {
 				isCardClicked = true;
 				if (!suggestion || !$rootScope.settings.enableComments) return;
 		
-				const { title, createdOn, createdBy } = suggestion;
+				const { title, createdOn, createdBy} = suggestion;
+
 				const navigateToCwByDefault = (
 					config && !Object.keys(config).length
 						?
@@ -274,12 +298,13 @@ var config = {};
 							:
 							false
 				);
-				const headerContent = angular.element('<pre/>').text(title).html();
-				const queryString = `wid=${createdBy.displayName}-${createdOn}&wTitle=${title}&headerContent=${headerContent}`;
+				const headerContentHtml = buildHeaderContentHtml(title, suggestion.suggestion);
+				const queryString = `wid=${createdBy.displayName}-${createdOn}&wTitle=${title}`;
 
 				buildfire.navigation.navigateToSocialWall({
 					title,
 					queryString,
+					headerContentHtml,
 					pluginTypeOrder: navigateToCwByDefault ? ['community', 'premium_social', 'social'] : ['premium_social', 'social', 'community']
 				}, () => { });
 			};
@@ -301,7 +326,7 @@ var config = {};
 					for(let i=0;i<users.length;i++){
 						if(users[i]){
 							listItems.push({
-								text: users[i].firstName + " " + users[i].lastName , imageUrl:buildfire.auth.getUserPictureUrl({ userId: users[i]._id }) 
+								text: getUserName(users[i]), imageUrl:buildfire.auth.getUserPictureUrl({ userId: users[i]._id }) 
 							})
 						}
 						
@@ -402,7 +427,7 @@ var config = {};
 							buildfire.notifications.pushNotification.schedule(
 								{
 									title: 'You got an upvote!',
-									text: user.displayName + ' upvoted your suggestion ' + suggestionObj.title,
+									text: getUserName(user) + ' upvoted your suggestion ' + suggestionObj.title,
 									users: [suggestionObj.createdBy._id]
 								},
 								function (err) {
@@ -526,10 +551,9 @@ var config = {};
 					}
 					suggestion._createdOn = getCurrentDate(suggestion.createdOn);
 					suggestion.createdBy = _currentUser
-					suggestion._displayName = suggestion.createdBy && suggestion.createdBy.displayName ? suggestion.createdBy.displayName : "Someone" 
+					suggestion._displayName = getUserName(suggestion.createdBy);
 					suggestion.imgUrl = getUserImage(suggestion.createdBy);
 
-					console.log("Trac2222e", suggestion)
 					if (!$scope.$$phase) $scope.$apply();
 				})
 			}
