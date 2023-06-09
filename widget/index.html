@@ -47,7 +47,6 @@
 </style>
     <body>
         <div style="position: initial !important;height:100%"  ng-controller="listCtrl as _listCtrl">
-            <div id="skeleton"></div>
             <div id="btn--add__container" class="hidden" onclick="openPopup()">
                 <a class="btn btn-primary btn--fab btn--add"><span></span></a>
             </div>
@@ -56,8 +55,10 @@
                     <div class="container--responsive padded padded--x" ng-if="_listCtrl.text">
                         <p id="text_container" class="margin-bottom--sm word--break" ng-bind-html="safeHtml(_listCtrl.text)">{{_listCtrl.text}}</p>
                     </div>
+            <div id="skeleton"></div>
+
                     <div class="card suggestionCard" ng-cloak ng-repeat="s in suggestions track by $index" ng-click="_listCtrl.goToItemDetails(s)">
-                        <div class="card__header padded padded--sm margin-bottom--sm" >
+                        <div class="card__header padded padded-l margin-bottom--sm" >
                             <img alt="{{s.createdBy.displayName}} profile image"  class="avatar" 
                             onerror="this.src='assets/images/avatar.png'"
                             src="{{s.imgUrl}}">

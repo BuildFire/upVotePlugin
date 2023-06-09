@@ -325,7 +325,7 @@ textarea{
 }
 
 .suggestion{
-	margin-left: 1rem;
+	margin: 0 16px;
 }
 .btntransparent{
 	opacity:.3;
@@ -418,6 +418,10 @@ textarea{
 	width: 85vw;
 }
 
+.padded-l {
+	padding: 16px !important;
+}
+
 .name-list {
 	margin-left:1rem;
 	margin-right: calc(54px + 1.5rem);
@@ -459,12 +463,16 @@ textarea{
 }
 @media (min-width:768px){
 	.container--responsive{
-		padding:0 20vw !important;
+		padding:0 1vw !important;
 	}
 	.popup {
 		left: 10vw;
 		width: 80vw;
 	}
+}
+
+.slide {
+	z-index: 1;
 }
 
 .text-danger {

@@ -4,25 +4,12 @@
 			"title": "General",
 			"info": "",
 			"labels": {
-				"voteBadge": {
-					"title": "Vote Badge",
-					"defaultValue": "Vote",
-					"required": true,
-					"inputType": "text",
-					"toolTip": "The word Vote in the vote count badge"
-				},
-				"voteButton": {
-					"title": "Vote Button",
-					"defaultValue": "Vote",
-					"required": true,
-					"inputType": "text",
-					"toolTip": "The word Vote in the vote button"
-				},
 				"commentButton": {
 					"title": "Comment Button",
 					"defaultValue": "Comment",
 					"required": true,
 					"inputType": "text",
+					"maxLength": 15,
 					"toolTip": "The word Comment in the comment button"
 				},
 				"backlog": {

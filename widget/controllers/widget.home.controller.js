@@ -73,7 +73,7 @@ var config = {};
 
 			buildfire.deeplink.getData((deeplinkData) => {});
 
-			  buildfire.deeplink.onUpdate((deeplinkData) => {
+			buildfire.deeplink.onUpdate((deeplinkData) => {
 				if(deeplinkData){
 					buildfire.spinner.show();
 					init();
@@ -240,7 +240,7 @@ var config = {};
 		
 			function renderStatusItem(text, index){
 				const element = `
-				<div style='display:flex;color:#000;font-weight:500;font-size:16px;line-height:24px'>
+				<div style='display:flex;color:'${appThemeColors.headerText}';font-weight:500;font-size:16px;line-height:24px'>
 						<span style='width: 24px;height: 24px;border-radius: 50%;margin-right: 16px;background-color:
 						   ${getStatusColor(index)}'></span> ${text} </div>`
 		
@@ -450,21 +450,24 @@ var config = {};
 					}
 
 					buildfire.input.showTextDialog([step1, step2], (err, response)=>{
-						const paragraph = document.createElement("p")
-						paragraph.innerHTML = response.results[1].textValue;
-						const images = response.results[1].images;
-						if(images && images.length > 0){
-							for(let i=0;i<images.length;i++){
-								const imgEl = document.createElement("img");
-								const imgUrl = buildfire.imageLib.cropImage( images[i],{ size: "full_width", aspect: "16:9" })
-								imgEl.src = imgUrl;
-								paragraph.append(imgEl);
+						if(response.results.length == 2){
+							const paragraph = document.createElement("p")
+							paragraph.innerHTML = response.results[1].textValue;
+							const images = response.results[1].images;
+							if(images && images.length > 0){
+								for(let i=0;i<images.length;i++){
+									const imgEl = document.createElement("img");
+									const imgUrl = buildfire.imageLib.cropImage( images[i],{ size: "full_width", aspect: "16:9" })
+									imgEl.src = imgUrl;
+									paragraph.append(imgEl);
+								}
 							}
+	
+							const title = response.results[0].textValue;
+							const description = paragraph.innerHTML;
+							addSuggestion(title, description)
 						}
-
-						const title = response.results[0].textValue;
-						const description = paragraph.innerHTML;
-						addSuggestion(title, description)
+						
    
 					})
 					

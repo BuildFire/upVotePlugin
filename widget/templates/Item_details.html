@@ -1,7 +1,7 @@
 
-<div ng-controller="WidgetItemCtrl as WidgetItem" class="container--responsive animated fadeInRight">
+<div ng-controller="WidgetItemCtrl as WidgetItem" class="container--responsive animated fadeInRight" >
     <div  class="suggestionCard" >
-        <div class="card__header padded padded--sm margin-bottom--sm" ng-click="goToItemDetails(selectedSuggestion)">
+        <div class="card__header padded padded-l margin-bottom--sm">
             <img alt="{{selectedSuggestion.createdBy.displayName}} profile image"  class="avatar"
              onerror="this.src='assets/images/avatar.png'" ng-src="{{selectedSuggestion.imgUrl}}">
             <div class="ellipsis padded padded--x padded--sm suggestion__name">
