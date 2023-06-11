@@ -70,36 +70,16 @@ var config = {};
 			showSkeleton()
 			getSettings();
 
-
-			buildfire.deeplink.getData((deeplinkData) => {});
+			const suggestionId = getSuggestionIdOnNewNotification()
+			if(suggestionId != ''){
+				navigateToItemDetails(suggestionId)
+			}
 
 			buildfire.deeplink.onUpdate((deeplinkData) => {
 				if(deeplinkData){
-					buildfire.spinner.show();
-					init();
-					var id = deeplinkData.split(":")[1]
-					Suggestion.getById(id).then(_suggestion => {
-						Promise.all([callBacklogText, callInProgressText,callCompletedText]).then(result => {
-							$rootScope.TextStatuses = result;
-							_suggestion.statusName = $rootScope.TextStatuses[_suggestion.status - 1]
-							_suggestion.imgUrl = getUserImage(_suggestion.createdBy);
-							_suggestion._createdOn = getCurrentDate(_suggestion.createdOn);
-
-							_suggestion._displayName = getUserName(_suggestion.createdBy);
-						
-							ViewStack.push({
-								template: 'Item_details',
-								item: _suggestion
-							});
-							buildfire.spinner.hide();
-
-							buildfire.history.push('Item_details', { elementToShow: 'Item_details' })
-						})
-					
-					})
+					var id = deeplinkData.split("=")[1]
+					navigateToItemDetails(id)
 				}
-				
-				  
 			  });
 
 			buildfire.appearance.getAppTheme((err, result) => {
@@ -120,6 +100,44 @@ var config = {};
 					item: selectedItem
 				  });
 				buildfire.history.push('Item_details', { elementToShow: 'Item_details' });
+			}
+
+			function getSuggestionIdOnNewNotification(){
+				const getParamsRegex = /\?(.+)/;
+				let suggestionId = '';
+				if (getParamsRegex.test(location.href)) {
+				const params = getParamsRegex.exec(location.href)[1].split('&');
+				params.forEach((param) => {
+						const keyValue = param.split('=');
+						if (keyValue[0] === 'id') {
+							suggestionId = keyValue[1];
+						}
+					});
+				}
+  				return suggestionId;
+			}
+
+			function navigateToItemDetails(suggestionId){
+				buildfire.spinner.show();
+				init();
+				Suggestion.getById(suggestionId).then(_suggestion => {
+					Promise.all([callBacklogText, callInProgressText,callCompletedText]).then(result => {
+						$rootScope.TextStatuses = result;
+						_suggestion.statusName = $rootScope.TextStatuses[_suggestion.status - 1]
+						_suggestion.imgUrl = getUserImage(_suggestion.createdBy);
+						_suggestion._createdOn = getCurrentDate(_suggestion.createdOn);
+						_suggestion._displayName = getUserName(_suggestion.createdBy);
+					
+						ViewStack.push({
+							template: 'Item_details',
+							item: _suggestion
+						});
+						buildfire.spinner.hide();
+
+						buildfire.history.push('Item_details', { elementToShow: 'Item_details' })
+					})
+				
+				})
 			}
 
 			function getUserName(user){

@@ -346,6 +346,7 @@ textarea{
 }
 .card__header{
 	display: flex;
+	align-items: start;
 }
 
 

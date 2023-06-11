@@ -5,7 +5,7 @@ class PushNotification {
       text: message,
       at: new Date(),
       sendToSelf: false,
-      queryString: `id:${id}`
+      queryString: `id=${id}`
     };
     buildfire.notifications.pushNotification.schedule(
       notification,
@@ -22,7 +22,7 @@ class PushNotification {
       at: new Date(),
       sendToSelf: false,
       users: users,
-      queryString: `id:${id}`
+      queryString: `id=${id}`
     };
     buildfire.notifications.pushNotification.schedule(
       notification,
@@ -39,7 +39,7 @@ class PushNotification {
       at: new Date(),
       userTags: userTags,
       sendToSelf: false,
-      queryString: `id:${id}`
+      queryString: `id=${id}`
     };
     buildfire.notifications.pushNotification.schedule(
       notification,
