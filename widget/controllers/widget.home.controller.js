@@ -94,7 +94,6 @@ var config = {};
 					isCardClicked = false
 					return;
 				}
-				document.getElementById("btn--add__container").classList.add("hidden")
 				ViewStack.push({
 					template: 'Item_details',
 					item: selectedItem
@@ -195,7 +194,6 @@ var config = {};
 					$rootScope.TextStatuses = result;
 					Suggestion.search(options).then(results => {
 						results = results.filter(x => x.status != 3 || (x.status == 3 && new Date(x.createdOn) >= date))
-						document.getElementById("btn--add__container").classList.remove("hidden")
 						if (!results || !results.length) return update([]);
 			
 						results = results.map(checkYear);
@@ -258,11 +256,8 @@ var config = {};
 			});
 		
 			function getUserImage(createdBy){
-				var url = './assets/images/avatar.png';
-				if (createdBy) {
-					url = buildfire.auth.getUserPictureUrl({ userId: createdBy._id });
-				}
-				return url;
+				return createdBy ? buildfire.auth.getUserPictureUrl({ userId: createdBy._id }) :
+									'./assets/images/avatar.png';
 			}
 		
 			function renderStatusItem(text, index){
@@ -316,8 +311,8 @@ var config = {};
 							:
 							false
 				);
-				const headerContentHtml = buildHeaderContentHtml(title, suggestion.suggestion);
-				const queryString = `wid=${createdBy.displayName}-${createdOn}&wTitle=${title}`;
+				const headerContentHtml = encodeURIComponent(buildHeaderContentHtml(title, suggestion.suggestion));
+				const queryString = `wid=${encodeURIComponent(createdBy.displayName + "-" + createdOn)}&wTitle=${encodeURIComponent(title)}`;
 
 				buildfire.navigation.navigateToSocialWall({
 					title,
@@ -363,6 +358,10 @@ var config = {};
 			};
 
 			$rootScope.openChangeStatusModal = function (suggestion) {
+					if(!_currentUser){
+						enforceLogin();
+						return;
+					}
 					isCardClicked = true;
 					if($rootScope.settings.statusUpdateUsersSegment === STATUS_UPDATE_SEGMENT.NO_USERS){
 						return;
@@ -408,7 +407,7 @@ var config = {};
 											defaultValue: `"${suggestion.title}" has been marked as completed`,
 											required: true
 										}, (err, response)=>{
-											
+											$rootScope.goSocial(suggestion);
 											PushNotification.sendToCustomUsers("Task Completed", response.results[0].textValue, suggestion.id, voterIds);
 										})
 									} else if(suggestion.status === SUGGESTION_STATUS.INPROGRESS){
@@ -613,7 +612,6 @@ var config = {};
 			});
 
 			UpVoteHome.listeners['BEFORE_POP'] = $rootScope.$on('BEFORE_POP', function (e, item) {
-				document.getElementById("btn--add__container").classList.remove("hidden")
 			});
 		}
 	]
