@@ -281,15 +281,23 @@ var config = {};
 			}
 
 			function buildHeaderContentHtml(title, description){
+				
 				const div = document.createElement("div")
-				const h2 = document.createElement("h2")
-				h2.innerHTML = title;
+				const titleParagraph = document.createElement("p")
+				titleParagraph.style.color = appThemeColors.bodyText;
+				titleParagraph.style.fontSize = "16px"
+				titleParagraph.style.fontWeight = 500;
+				titleParagraph.innerHTML = title;
 
-				const p = document.createElement("p")
-				p.innerHTML = description;
+				const descriptionParagraph = document.createElement("p")
+				descriptionParagraph.style.color = appThemeColors.bodyText;
+				descriptionParagraph.style.fontWeight = 400;
+				descriptionParagraph.style.fontSize = "14px"
 
-				div.appendChild(h2)
-				div.appendChild(p)
+				descriptionParagraph.innerHTML = description;
+
+				div.appendChild(titleParagraph)
+				div.appendChild(descriptionParagraph)
 
 				return div.innerHTML;
 			}
@@ -312,12 +320,13 @@ var config = {};
 							false
 				);
 				const headerContentHtml = encodeURIComponent(buildHeaderContentHtml(title, suggestion.suggestion));
-				const queryString = `wid=${encodeURIComponent(createdBy.displayName + "-" + createdOn)}&wTitle=${encodeURIComponent(title)}`;
+				const wid = encodeURIComponent(createdBy.displayName + "-" + createdOn)
+				const wTitle = encodeURIComponent(title);
+				const queryString = `wid=${wid}&wTitle=${wTitle}&headerContentHtml=${headerContentHtml}`;
 
 				buildfire.navigation.navigateToSocialWall({
 					title,
 					queryString,
-					headerContentHtml,
 					pluginTypeOrder: navigateToCwByDefault ? ['community', 'premium_social', 'social'] : ['premium_social', 'social', 'community']
 				}, () => { });
 			};
