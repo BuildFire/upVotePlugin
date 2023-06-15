@@ -212,7 +212,7 @@ var config = {};
 			
 									if (!hasUpdate) return;
 									// update suggestion out of sync for next time
-									Suggestion.update(suggestion,()=>{})
+									Suggestion.update(suggestion).then(()=>{})
 								});
 							});
 						});
@@ -255,9 +255,14 @@ var config = {};
 				init();
 			});
 		
-			function getUserImage(createdBy){
-				return createdBy ? buildfire.auth.getUserPictureUrl({ userId: createdBy._id }) :
-									'./assets/images/avatar.png';
+			function getUserImage(user){
+				var url = './avatar.png';
+				if (user) {
+				  url = buildfire.auth.getUserPictureUrl({ userId: user._id });
+				  url = buildfire.imageLib.cropImage(url,{ size: "xs", aspect: "1:1" });
+				  return url;
+				}
+				return url;
 			}
 		
 			function renderStatusItem(text, index){
@@ -322,11 +327,12 @@ var config = {};
 				const headerContentHtml = encodeURIComponent(buildHeaderContentHtml(title, suggestion.suggestion));
 				const wid = encodeURIComponent(createdBy.displayName + "-" + createdOn)
 				const wTitle = encodeURIComponent(title);
-				const queryString = `wid=${wid}&wTitle=${wTitle}&headerContentHtml=${headerContentHtml}`;
+				const queryString = `wid=${wid}&wTitle=${wTitle}`;
 
 				buildfire.navigation.navigateToSocialWall({
 					title,
 					queryString,
+					headerContentHtml,
 					pluginTypeOrder: navigateToCwByDefault ? ['community', 'premium_social', 'social'] : ['premium_social', 'social', 'community']
 				}, () => { });
 			};
@@ -367,11 +373,11 @@ var config = {};
 			};
 
 			$rootScope.openChangeStatusModal = function (suggestion) {
+					isCardClicked = true;
 					if(!_currentUser){
 						enforceLogin();
 						return;
 					}
-					isCardClicked = true;
 					if($rootScope.settings.statusUpdateUsersSegment === STATUS_UPDATE_SEGMENT.NO_USERS){
 						return;
 					}
@@ -416,11 +422,13 @@ var config = {};
 											defaultValue: `"${suggestion.title}" has been marked as completed`,
 											required: true
 										}, (err, response)=>{
-											$rootScope.goSocial(suggestion);
+											//$rootScope.goSocial(suggestion);
 											PushNotification.sendToCustomUsers("Task Completed", response.results[0].textValue, suggestion.id, voterIds);
 										})
 									} else if(suggestion.status === SUGGESTION_STATUS.INPROGRESS){
 										PushNotification.sendToCustomUsers("Task in Progress", `"${suggestion.title}" has been marked as in progress`,suggestion.id, voterIds);
+									} else if(suggestion.status === SUGGESTION_STATUS.BACKLOG){
+										PushNotification.sendToCustomUsers("Task in Backlog", `"${suggestion.title}" has been marked as in backlog`,suggestion.id, voterIds);
 									}
 									if (!$scope.$$phase) $scope.$apply();
 								})
@@ -437,8 +445,9 @@ var config = {};
 					if(!user) enforceLogin()
 					if (!suggestionObj.upVotedBy) suggestionObj.upVotedBy = {};
 					if (!suggestionObj.upVoteCount) suggestionObj.upVoteCount = 1;
-		
+					let isUserUpvoted = false;
 					if (!suggestionObj.upVotedBy[user._id]) {
+						isUserUpvoted = true;
 						// vote
 						Analytics.trackAction(analyticKeys.VOTE_NUMBER.key, { votes: 1, _buildfire: { aggregationValue: 1 } });
 		
@@ -476,9 +485,25 @@ var config = {};
 					}
 					suggestionObj.upvoteByYou = suggestionObj.upVotedBy[user._id] != null
 					if (!$scope.$$phase) $scope.$apply();
-					Suggestion.update(suggestionObj)
-							  .then(()=>{})
-							  .catch((err) => console.log(err))
+
+					Suggestion.getById(suggestionObj.id).then(_suggestion => {
+						if(_suggestion){
+							_suggestion.upVoteCount = isUserUpvoted ? _suggestion.upVoteCount + 1 : _suggestion.upVoteCount - 1
+							if(!isUserUpvoted){
+								delete _suggestion.upVotedBy[user._id];
+							} else {
+								_suggestion.upVotedBy[user._id] = {
+									votedOn: new Date(),
+									user: user
+								};
+							}
+							suggestionObj.upVoteCount = _suggestion.upVoteCount;
+							suggestionObj.upVotedBy = _suggestion.upVotedBy;
+						  if (!$scope.$$phase) $scope.$apply();
+						  Suggestion.update(_suggestion).then(()=>{})
+						}
+					})
+					
 				});
 			};
 		

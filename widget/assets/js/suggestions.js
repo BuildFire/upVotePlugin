@@ -80,4 +80,16 @@ class Suggestion {
       });
   }
 
+  static searchAndUpdate(id, payload){
+    return new Promise((resolve, reject) => {
+      buildfire.publicData.searchAndUpdate({"id": id}, payload, DBTAG, (e, r) => {
+        if (e) {
+          reject(e);
+        } else {
+          resolve(r);
+        }
+      });
+    });
+  }
+
 }
