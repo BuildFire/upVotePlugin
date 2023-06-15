@@ -324,7 +324,7 @@ var config = {};
 							:
 							false
 				);
-				const headerContentHtml = encodeURIComponent(buildHeaderContentHtml(title, suggestion.suggestion));
+				const headerContentHtml = buildHeaderContentHtml(title, suggestion.suggestion);
 				const wid = encodeURIComponent(createdBy.displayName + "-" + createdOn)
 				const wTitle = encodeURIComponent(title);
 				const queryString = `wid=${wid}&wTitle=${wTitle}`;
