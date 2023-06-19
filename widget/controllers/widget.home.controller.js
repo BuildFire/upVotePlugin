@@ -179,9 +179,12 @@ var config = {};
 				}
 
 				buildfire.datastore.onUpdate(function (obj) {
-					if (obj) config = obj.data;
-					UpVoteHome.text = config.text;
-					if (!$scope.$$phase) $scope.$apply();
+					if(obj && obj.tag === ''){
+						if (obj) config = obj.data;
+						UpVoteHome.text = config.text;
+						if (!$scope.$$phase) $scope.$apply();
+					}
+					
 				});
 				buildfire.datastore.get(function (err, obj) {
 					if (obj) config = obj.data;
