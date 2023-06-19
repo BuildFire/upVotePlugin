@@ -590,7 +590,7 @@ var config = {};
 					const suggestion = new Suggestion(result)
 					suggestion.disableUpvote = true;
 					suggestion.statusName = $rootScope.TextStatuses[0];
-
+					suggestion.upvoteByYou = true;
 					$scope.suggestions.unshift(suggestion);
 					if($rootScope.settings){
 						const title = "A new item has been created";
