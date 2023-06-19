@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="../../../../styles/helper.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../assets/control.css" />
+    <link href="../../../../styles/control/bf-base.css" rel="stylesheet" />
+    <link href="./styles.css" rel="stylesheet" />
+    <link href="../../../../styles/control/siteIcons-control.css" rel="stylesheet" />
+    <script src="../../../../scripts/buildfire.min.js"></script>
+    <!-- build:bundleJSFiles  -->
+    <script src="../../widget/assets/js/settings.js"></script>
+      <!-- endbuild -->
+
+      
+  <link href="../../../../styles/components/control/tagsInput/tagsInput.min.css" rel="stylesheet"/>
+  
+  <script src="../../../../scripts/buildfire/components/control/tagsInput/tagsInput.min.js"></script>
+  </head>
+
+  <body>
+    <div class="settings-container">
+
+      
+      <div class="row margin-bottom-sixteen">
+
+        <div class="item clearfix row flex-center">
+          <div class="labels col-md-4 pull-left tooltip-container">
+            <span>Comments</span>
+            <span class="tip btn-info-icon btn-primary"><span class="cp-tooltip">Enabling this option allows users to leave comments on items that have been upvoted. To make this work, you must have the Community Wall feature installed</span>
+          </div>
+          <div class="main col-md-8 button-switch">
+            <input id="comments" type="checkbox" onchange="updateCommentsProperty()"/>
+            <label for="comments" class="label-success"></label>
+          </div>
+        </div>
+      </div>
+      <div class="row margin-bottom-sixteen flex-center">
+        <div class="labels col-md-4 pull-left tooltip-container">
+          <span>Allow Status Update</span>
+          <span class="tip btn-info-icon btn-primary"><span class="cp-tooltip">Specify who has permission to mark items as completed</span>
+        </div>
+        <div class="main col-md-7 pull-right padding-lr-6">
+          <span class="radios-row">
+            <div class="radio radio-primary radio-inline">
+              <input
+                id="statusUpdateAllUsers"
+                type="radio"
+                name="allowStatusUpdate"
+                onchange="changeStatusUpdate(1)"
+              />
+              <label class="subtitles-labels" for="statusUpdateAllUsers">All Users</label>
+            </div>
+            <div class="radio radio-primary radio-inline">
+              <input
+                id="statusUpdateNoUsers"
+                type="radio"
+                name="allowStatusUpdate"
+                onchange="changeStatusUpdate(2)"
+              />
+              <label class="subtitles-labels" for="statusUpdateNoUsers">No Users</label>
+            </div>
+            <div class="radio radio-primary radio-inline">
+              <input
+                id="statusUpdateUsersWith"
+                type="radio"
+                name="allowStatusUpdate"
+                onchange="changeStatusUpdate(3)"
+              />
+              <label class="subtitles-labels" for="statusUpdateUsersWith">Users With</label>
+            </div>
+          </span>
+        </div>
+      </div>
+      <div class="row" id="userTagsContainer" style="margin: 20px 0;padding: 0 !important;">
+        <div class="col-md-4"></div>
+        <div class="user-tag-container col-md-8">
+            <div style="display:flex;width:100%;height: fit-content;">
+                <label class="user-tag-title" >User Tags</label>
+                <div id="statusUpdatetagsInputContainer"></div>
+            </div>
+        </div>
+      </div>
+
+
+      <div class="row margin-bottom-sixteen flex-center" >
+        <div class="labels col-md-4 pull-left tooltip-container">
+          <span>Allow new item Push notification</span>
+          <span class="tip btn-info-icon btn-primary"><span class="cp-tooltip">Specify who should receive push notifications whenever a new item is created</span>
+
+        </div>
+        <div class="main col-md-7 pull-right padding-lr-6">
+          <span class="radios-row">
+            <div class="radio radio-primary radio-inline">
+              <input
+                id="pushNotificationAllUsers"
+                type="radio"
+                name="pushNotificationTags"
+                onchange="changeItemPushNotification(1)"
+              />
+              <label class="subtitles-labels" for="pushNotificationAllUsers">All Users</label>
+            </div>
+            <div class="radio radio-primary radio-inline">
+              <input
+                id="pushNotificationNoUsers"
+                type="radio"
+                name="pushNotificationTags"
+                onchange="changeItemPushNotification(2)"
+              />
+              <label class="subtitles-labels" for="pushNotificationNoUsers">No Users</label>
+            </div>
+            <div class="radio radio-primary radio-inline">
+              <input
+                id="pushNotificationUsersWith"
+                type="radio"
+                name="pushNotificationTags"
+                onchange="changeItemPushNotification(3)"
+              />
+              <label class="subtitles-labels" for="pushNotificationUsersWith">Users With</label>
+            </div>
+          </span>
+        </div>
+      </div>
+      <div class="row" id="itemPushNotificationTagsContainer"
+              style="margin: 20px 0;padding: 0 !important;">
+        <div class="col-md-4"></div>
+        <div class="user-tag-container col-md-8">
+            <div style="display:flex;width:100%;height: fit-content;">
+                <label class="user-tag-title" >User Tags</label>
+                <div id="pushNotificationtagsInputContainer"></div>
+            </div>
+        </div>
+      </div>
+    </div>
+  </body>
+
+  <script src="./app.js"></script>
+</html>

@@ -3,107 +3,114 @@
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta name="buildfire" content="enablePluginJsonLoad">
+    <meta name="buildfire" content="enablePluginJsonLoad">
+
+    <link rel="stylesheet" href="../../../styles/components/skeleton.css" />
+
+    <script src="../../../scripts/jquery/jquery-1.11.2.min.js"></script>
+
     <script src="../../../scripts/buildfire.min.js"></script>
     <script src="../../../scripts/angular/angular.min.js"></script>
     <script src="../../../scripts/buildfire/services/notifications/pushNotifications.js"></script>
-    <script src="../../../scripts/buildfire/components/popup/popup.js"></script>
+    <script src="../../../scripts/buildfire/components/drawer/drawer.js"></script>
 
     <!-- build:bundleJSFiles  -->
-    <script src="js/analyticsKeys.js"></script>
-    <script src="js/Analytics.js"></script>
-    <script src="js/app.js"></script>
+    <script src="app.js"></script>
+    <script src="app.services.js"></script>
+    <script src="assets/js/settings.js"></script>
+    <script src="assets/js/suggestions.js"></script>
+    <script src="assets/js/analyticsKeys.js"></script>
+    <script src="assets/js/Analytics.js"></script>
+    <script src="assets/js/PushNotifications.js"></script>
+    <script src="controllers/widget.home.controller.js"></script>
+    <script src="controllers/widget.item.controller.js"></script>
     <!-- endbuild -->
 
-    <!-- build:bundleCSSFiles  -->
-    <link rel="stylesheet" href="css/pluginIcons.css">
-    <!-- endbuild -->
+    <link rel="stylesheet" href="../../../styles/transitionAnimation.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+
+    <link rel="stylesheet" href="./assets/css/pluginIcons.css">
+    <link rel="stylesheet" href="./assets/css/animations.css">
+
+    <style>
+        /* keep compatibility with layout1 v0.1 */
+        html p,html span,html a, html .paragraph {
+            margin-bottom: 0;
+        }
+    </style>
 </head>
-
-<body style="position: initial !important;">
-    <div id="btn--add__container"  onclick="openPopup()">
-        <a class="btn btn-primary btn--fab btn--add"><span></span></a>
-    </div>
-    <div class="main--container">
-        <div ng-controller="suggestionBoxCtrl" ng-cloak="">
-            <div class="container--responsive padded padded--x">
-                <p id="text_container" class="margin-bottom--sm text--secondary word--break" ng-bind-html="text">{{text}}</p>
+<style>
+    .grid-block {
+        height: 200px;
+        margin: 12px;
+        border-radius: 5px;
+    }
+</style>
+    <body>
+        <div style="position: initial !important;height:100%"  ng-controller="listCtrl as _listCtrl">
+            <div id="btn--add__container" onclick="openPopup()">
+                <a class="btn btn-primary btn--fab btn--add"><span></span></a>
             </div>
+            <div class="main--container">
+                <div  class="container--responsive">
+                    <div class="container--responsive padded padded--x" ng-if="_listCtrl.text">
+                        <p id="text_container" class="margin-bottom--sm word--break" ng-bind-html="safeHtml(_listCtrl.text)">{{_listCtrl.text}}</p>
+                    </div>
+            <div id="skeleton"></div>
 
-            <div class="overlay" ng-show="popupOn" ng-click="closeForm()"></div>
-
-            <div class="suggestionBox popup" ng-show="popupOn">
-                <form name="suggestionForm" class="form-main" novalidate>
-                    <div class="card backgroundColorTheme">
-                        <div class="padded">
-                            <div class="textfield">
-                                <input class="no-margin-bottom" type="text" placeholder="Title" ng-model="suggestionTitle"
-                                    maxlength="64"
-                                    name="suggestionTitle" required>
-                                <span class="text-danger caption" name="titleErr"
-                                    ng-show="suggestionForm.suggestionTitle.$touched && suggestionForm.suggestionTitle.$invalid">Title
-                                    is required
-                                </span>
+                    <div class="card suggestionCard" ng-cloak ng-repeat="s in suggestions track by $index" ng-click="_listCtrl.goToItemDetails(s)">
+                        <div class="card__header padded padded-l margin-bottom--sm" >
+                            <img alt="{{s.createdBy.displayName}} profile image"  class="avatar" 
+                            onerror="this.src='assets/images/avatar.png'"
+                            src="{{s.imgUrl}}">
+                            <div class="ellipsis padded padded--x padded--sm suggestion__name">
+                                <p class="margin--0 ellipsis header-text">{{s._displayName}}</p>
+                                <h6 ng-if="s._createdOn" class="pull-left caption margin--0 text--secondary">{{s._createdOn}}</h6>
+                                <h6 ng-if="!s._createdOn" class="pull-left caption margin--0 text--secondary">{{s.createdOn | date:'MMM dd, y'}}</h6>
                             </div>
-                            <div class="textfield">
-                                <textarea class="margin--0 no-margin-bottom" rows="5" placeholder="Add your suggestion here"
-                                    ng-model="suggestionText" maxlength="200" name="suggestionText" required></textarea>
-                                <span class="text-danger caption" name="textErr"
-                                    ng-show="suggestionForm.suggestionText.$touched && suggestionForm.suggestionText.$invalid">Text
-                                    is required
-                                </span>
-                            </div>
+        
+                            <p ng-if="s.status == 1" class="pill shrink--0 pill-body-theme"  ng-click="openChangeStatusModal(s)">
+                                <span class="margin--0" >{{s.statusName}}</span>
+                            </p>
+                            <p ng-if="s.status == 2" class="pill shrink--0 pill-warning-theme" ng-click="openChangeStatusModal(s)">
+                                <span class="margin--0" style="color:white !important">{{s.statusName}}</span>
+                            </p>
+                            <p ng-if="s.status == 3" class="pill shrink--0 pill-success-theme" ng-click="openChangeStatusModal(s)">
+                                <span class="margin--0" style="color:white !important">{{s.statusName}}</span>
+                            </p>
                         </div>
-                        <div class="button__panel padded padded--sm padded--x">
-                            <button class="btn btn--transparent" ng-click="clearForm()">
-                                <span class="text--secondary">Cancel</span>
+                        <div class="suggestion">
+                            <h4 class="word--break body-text font-weight-500" ng-show="s.title">{{s.title}}</h4>
+                            <p class="word--break margin-bottom--m body-text" ng-bind-html="safeHtml(s.suggestion)">{{s.suggestion}}</p>
+                        </div>
+                        <div class="button__panel shrink--0 padded padded--sm padded--x padding-right-zero">
+                            <button ng-if="settings && settings.enableComments" class="voteButton btn btn--icon--text " ng-click="goSocial(s)">
+                                <span id="comment-icon" class="material-icons-outlined">
+                                    mode_comment
+                                    </span>
+                                <span id="comment-message" class="margin--0"  bfString="mainScreen.commentButton"></span>
                             </button>
-                            <button class="btn btn--transparent" ng-click="addSuggestion()">
-                                <span class="text-primary">Submit</span>
+                            <button ng-if="s.status != 3" id="upvote_icon" class="voteButton btn btn--icon--text ml-24" ng-click="upVote(s)"
+                            >
+                                <span ng-if="!s.upvoteByYou" id="unactive-arrow" class="material-icons "
+                                >arrow_upward</span>
+                                <span ng-if="s.upvoteByYou" id="active-arrow" class="material-icons"
+                                >arrow_upward</span>
                             </button>
+                            <p class="pill-count shrink--0" ng-click="showVoterModal(s)">
+                                <span class="margin--0 body-text">{{s.upVoteCount}}</span>
+                            </p>
                         </div>
                     </div>
-                </form>
+                    <div class="empty-state-holder" ng-if="_listCtrl.isInitalized && !suggestions.length" >
+                        <img alt="empty state holder" src="./assets/images/empty.svg"></img>
+                    </div> 
+                    
+                </div>
             </div>
-
+        
         </div>
-
-        <div ng-controller="listCtrl" class="padded padded--x container--responsive">
-
-            <div class="card suggestionCard" ng-cloak ng-repeat="s in suggestions track by $index">
-                <div class="card__header padded padded--sm margin-bottom--sm">
-                    <img alt="{{s.data.createdBy.displayName}} profile image"  class="avatar" onerror="this.src='avatar.png'" ng-src="{{ s.data.createdBy | getUserImage }}">
-                    <div class="ellipsis padded padded--x padded--sm suggestion__name">
-                        <h5 class="margin--0 ellipsis">{{s.data.createdBy.displayName}}</h5>
-                        <h6 ng-if="s.isCurrentYear" class="pull-left caption margin--0 text--secondary">{{s.data.createdOn | date:'MMM dd'}}</h6>
-                        <h6 ng-if="!s.isCurrentYear" class="pull-left caption margin--0 text--secondary">{{s.data.createdOn | date:'MMM dd, y'}}</h6>
-                    </div>
-                    <p class="pill text--secondary shrink--0" ng-click="showVoterModal(s)">
-                        <span class="margin--0">{{s.data.upVoteCount}}</span>
-						<span class="margin--0" bfString="mainScreen.voteBadge"></span>
-                    </p>
-                </div>
-                <div class="suggestion padded padded--m padded--x">
-                    <h4 class="word--break" ng-show="s.data.title">{{s.data.title}}</h4>
-                    <p class="word--break margin-bottom--m">{{s.data.suggestion}}</p>
-                </div>
-                <div class="button__panel shrink--0 padded padded--sm padded--x">
-                    <button class="voteButton btn btn--icon--text btn--transparent" ng-click="upVote(s)"
-                        ng-class="{btnShadow:!s.disableUpvote,btntransparent:s.disableUpvote}">
-                        <span class="icon icon-thumbs-up2"></span>
-                        <span class="text-primary margin--0" bfString="mainScreen.voteButton"></span>
-                    </button>
-                    <button class="voteButton btn btn--icon--text " ng-click="goSocial(s)">
-                        <span class="icon icon-bubble"></span>
-                        <span class="text-primary margin--0"  bfString="mainScreen.commentButton"></span>
-                    </button>
-                </div>
-            </div>
-            <div class="empty-state-holder">
-                <img alt="empty state holder" ng-if="isInitalized && !suggestions.length" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4NCjxzdmcgd2lkdGg9IjE3OHB4IiBoZWlnaHQ9IjE5NXB4IiB2aWV3Qm94PSIwIDAgMTc4IDE5NSIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj4NCiAgICA8IS0tIEdlbmVyYXRvcjogU2tldGNoIDUyLjYgKDY3NDkxKSAtIGh0dHA6Ly93d3cuYm9oZW1pYW5jb2RpbmcuY29tL3NrZXRjaCAtLT4NCiAgICA8dGl0bGU+aWNfZW1wdHlfcGFnZTwvdGl0bGU+DQogICAgPGRlc2M+Q3JlYXRlZCB3aXRoIFNrZXRjaC48L2Rlc2M+DQogICAgPGcgaWQ9ImljX2VtcHR5X3BhZ2UiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGZpbGwtb3BhY2l0eT0iMC41Ij4NCiAgICAgICAgPHBhdGggc3R5bGU9ImZpbGw6Y3VycmVudENvbG9yIiBkPSJNODEuNjU3NDYyOCw5MCBDODEuODA3MDY5OCw5MS4wMDc3MDM3IDgyLjAxMzgyMDIsOTIuMDA0OTUwNyA4Mi4yNzc3NDI1LDkyLjk5MTkyMyBMODIuMjQ3NTM3Myw5MyBMOTksOTMgQzEwMS43NjE0MjQsOTMgMTA0LDk1LjIzODU3NjMgMTA0LDk4IEMxMDQsMTAwLjc2MTQyNCAxMDEuNzYxNDI0LDEwMyA5OSwxMDMgTDc5LDEwMyBDNzYuMjM4NTc2MywxMDMgNzQsMTAwLjc2MTQyNCA3NCw5OCBDNzQsOTUuMjM4NTc2MyA3Ni4yMzg1NzYzLDkzIDc5LDkzIEw4MC4yMTQ1NTI0LDkzIEM3OS45Njg4NzM1LDkyLjAwOTY5ODggNzkuNzc2Mzc2OSw5MS4wMDk2NDk5IDc5LjYzNzA4NTUsOTAgTDU2LDkwIEw1NiwxMjMgTDEyMiwxMjMgTDEyMiw5MCBMODEuNjU3NDYyOCw5MCBaIE04Mi45MjM1MDYsMTAwIEM4Mi42NDA4NDA1LDk5LjQ2OTY4MTkgODIuMzc0OTQ1Miw5OC45MzYwODIyIDgyLjEyNTgzODcsOTguMzk5MjA3MiBMODMuOTQwMDU5LDk3LjU1NzQyMDYgQzg0LjMyMTE0MDYsOTguMzc4NzI4NSA4NC43NDQ2NTYsOTkuMTkyOTEyNSA4NS4yMTA2ODYsMTAwIEw5OSwxMDAgQzEwMC4xMDQ1NjksMTAwIDEwMSw5OS4xMDQ1Njk1IDEwMSw5OCBDMTAxLDk2Ljg5NTQzMDUgMTAwLjEwNDU2OSw5NiA5OSw5NiBMNzksOTYgQzc3Ljg5NTQzMDUsOTYgNzcsOTYuODk1NDMwNSA3Nyw5OCBDNzcsOTkuMTA0NTY5NSA3Ny44OTU0MzA1LDEwMCA3OSwxMDAgTDgyLjkyMzUwNiwxMDAgWiBNMTI1LDg3IEwxNDgsMTAwIEwxNzgsMTQ2IEwxMzcsMTI1LjUgTDEzNywxOTUgTDQxLDE5NSBMNDEsMTI1LjUgTDAsMTQ2IEwzMCwxMDAgTDUzLDg3IEwxMjUsODcgWiBNMTI1LDk3IEwxMjUsMTIzIEwxMzMuNjY2NjY3LDEyMyBMMTI1LDk3IFogTTEyNSwxMjYgTDUzLDEyNiBMNDQsMTI2IEw0NCwxOTIgTDEzNCwxOTIgTDEzNCwxMjYgTDEyNSwxMjYgWiBNNTMsMTIzIEw1Myw5NyBMNDQuMzMzMzMzMywxMjMgTDUzLDEyMyBaIE03NywxMzQgQzc1LjM0MzE0NTgsMTM0IDc0LDEzNS4zNDMxNDYgNzQsMTM3IEM3NCwxMzguNjU2ODU0IDc1LjM0MzE0NTgsMTQwIDc3LDE0MCBMMTAxLDE0MCBDMTAyLjY1Njg1NCwxNDAgMTA0LDEzOC42NTY4NTQgMTA0LDEzNyBDMTA0LDEzNS4zNDMxNDYgMTAyLjY1Njg1NCwxMzQgMTAxLDEzNCBMNzcsMTM0IFogTTc3LDEzMSBMMTAxLDEzMSBDMTA0LjMxMzcwOCwxMzEgMTA3LDEzMy42ODYyOTIgMTA3LDEzNyBDMTA3LDE0MC4zMTM3MDkgMTA0LjMxMzcwOCwxNDMgMTAxLDE0MyBMNzcsMTQzIEM3My42ODYyOTE1LDE0MyA3MSwxNDAuMzEzNzA5IDcxLDEzNyBDNzEsMTMzLjY4NjI5MiA3My42ODYyOTE1LDEzMSA3NywxMzEgWiBNMTM2LjQ1MzA5MiwxMjEuODcyNDQ0IEwxNjkuNDM5NDM4LDEzOC4zNjU2MTcgTDE0NS44ODY4NTksMTAyLjI1MTY2MiBMMTI2LjIwNDU3NSw5MS4xMjY4OTM1IEwxMzYuNDUzMDkyLDEyMS44NzI0NDQgWiBNNDEuNTQ2OTA3NiwxMjEuODcyNDQ0IEw1MS43OTU0MjQ1LDkxLjEyNjg5MzUgTDMyLjExMzE0MTEsMTAyLjI1MTY2MiBMOC41NjA1NjE5OSwxMzguMzY1NjE3IEw0MS41NDY5MDc2LDEyMS44NzI0NDQgWiBNOTIuNjgzOTQxMSwxMDkuMTkxNTE1IEw5MS4zMTYwNTg5LDExMC42NTA1OSBDOTAuMDMxNzg5MywxMDkuNDQ2NTg3IDg4Ljg1MDU2NCwxMDguMjIyMzggODcuNzcyNTI4MSwxMDYuOTc3ODUxIEw4OS4yODQyNDA1LDEwNS42NjgzNzUgQzkwLjMxNjE0NTMsMTA2Ljg1OTY0OSA5MS40NDkzMzA0LDEwOC4wMzQwNjggOTIuNjgzOTQxMSwxMDkuMTkxNTE1IFogTTgxLjQ3ODMwMzksODMuNDI0MzMwOCBMNzkuNDg2MTMxMSw4My4yNDc1NjA3IEM3OS42MzQzNjM2LDgxLjU3NzAwMyA3OS45MTcwNTc3LDc5Ljg4MzgyMiA4MC4zMzM4NjQ0LDc4LjE2ODI3NjYgTDgyLjI3NzMyNjUsNzguNjQwNDU3NyBDODEuODgzODA1Niw4MC4yNjAxNjAyIDgxLjYxNzU4MSw4MS44NTQ2OTgzIDgxLjQ3ODMwMzksODMuNDI0MzMwOCBaIE04My43NjA4OTA3LDczLjk2MjM4ODMgTDgxLjkwNTEzNzcsNzMuMjE2NjEzIEM4Mi41ODEyNjEsNzEuNTM0MTc4NyA4My4zNjcyNzU0LDY5Ljk5ODkyNzQgODQuMjYwNzU2NCw2OC41OTc0NjcgTDg1Ljk0NzE4MzUsNjkuNjcyNjI0NSBDODUuMTIwODE3Niw3MC45Njg4MTIzIDg0LjM5MTI4NzQsNzIuMzkzNzM4IDgzLjc2MDg5MDcsNzMuOTYyMzg4MyBaIE04OC45NDE3NTI0LDY1LjkyNDIyNDIgTDg3LjUyNDAzMDIsNjQuNTEzNTI4IEM4OC43NDUxNzQ3LDYzLjI4NjMwMTcgOTAuMDgyNzc3Miw2Mi4yMDU5OTgyIDkxLjU1ODIzODksNjEuMjI4MDA4MiBMOTIuNjYzMjE1MSw2Mi44OTUwNDk4IEM5MS4yOTY2NjU0LDYzLjgwMDg0OSA5MC4wNjM5MzE2LDY0Ljc5NjQ1NjEgODguOTQxNzUyNCw2NS45MjQyMjQyIFogTTk2LjkwOTg0NDEsNjAuNTI3MjY1MSBMOTYuMDQ1NjU5Niw1OC43MjM2MDYzIEM5Ni43NTY4OTc1LDU4LjM4MjgzMTkgOTcuNDczODE2MSw1OC4wNTY3MjIzIDk4LjQxMzcwMjYsNTcuNjQxNzkxIEM5OC41ODM2OTMxLDU3LjU2Njc0NTMgOTguNzAwNzA2Myw1Ny41MTUyNzYxIDk4Ljk4NDMzNzMsNTcuMzkwNzIyMiBDOTkuMjY2MTk0Myw1Ny4yNjcwNDY3IDk5LjI2NjE5NDMsNTcuMjY3MDQ2NyA5OS41NDQzMjcxLDU3LjE0NDkyNjkgQzk5Ljk5MjE0MTYsNTYuOTQ4MTYwNiAxMDAuMzE1NjkyLDU2LjgwNDg2MDkgMTAwLjYyODEzMSw1Ni42NjQzNjcgTDEwMS40NDgzNTcsNTguNDg4NDM2OCBDMTAxLjEyOTY3OCw1OC42MzE3MzYyIDEwMC44MDE0NzgsNTguNzc3MDk1MSAxMDAuMzQ4ODcyLDU4Ljk3NTk2NjggQzEwMC4wNjk2NDQsNTkuMDk4NTY3NSAxMDAuMDY5NjQ0LDU5LjA5ODU2NzUgOTkuNzg4MjI2Miw1OS4yMjIwNTAzIEM5OS41MDU3ODMxLDU5LjM0NjA4MjggOTkuMzg5OTE5LDU5LjM5NzA0NjUgOTkuMjIxNDMxOSw1OS40NzE0Mjg1IEM5OC4yOTg4NzQ2LDU5Ljg3ODcwOTUgOTcuNTk5MTkyOCw2MC4xOTY5Nzg1IDk2LjkwOTg0NDEsNjAuNTI3MjY1MSBaIE0xMDYuMDQyNDc4LDU1Ljk2MjEyNzEgTDEwNC44NDA3NjgsNTQuMzYzNDExNCBDMTA1LjkzOTU4Niw1My41Mzc0NjAzIDEwNi42NjA1NDksNTIuNjQ0OTIwNiAxMDcuMDYzNjcxLDUxLjU2OTkyOTIgQzEwNy4xNTA3ODcsNTEuMzM3NjE5OCAxMDcuMjI3MjMsNTEuMTA1MjY3OCAxMDcuMjkzMDUzLDUwLjg3MzIyNDQgTDEwOS4yMTcxMzksNTEuNDE5MDIyIEMxMDkuMTM2MjgyLDUxLjcwNDA2NDUgMTA5LjA0MjY2OSw1MS45ODg2MDQxIDEwOC45MzYzMjksNTIuMjcyMTc2MSBDMTA4LjM4OTQ1NCw1My43MzA1MDkgMTA3LjQyODIxMyw1NC45MjA1MDg1IDEwNi4wNDI0NzgsNTUuOTYyMTI3MSBaIE0xMDkuMTMxOTk1LDQ1Ljg3MTU1MjMgTDEwNy4yMzk1NTYsNDYuNTE4NjA0MiBDMTA2Ljc1MDgyMSw0NS4wODkxOTcyIDEwNS43OTA5NjUsNDMuOTEzNjIzOCAxMDQuNTI3NjI1LDQzLjE4NzIxMzcgTDEwNS41MjQ1NTYsNDEuNDUzMzk0OSBDMTA3LjIxMTA3NSw0Mi40MjMxMjkyIDEwOC40ODczOTYsNDMuOTg2Mjg5MiAxMDkuMTMxOTk1LDQ1Ljg3MTU1MjMgWiBNOTkuOTg0MTI4Nyw0MC41MTM3NzU2IEwxMDAuMzE0NDc0LDQyLjQ4NjMwNSBDOTguOTU5NjQxNiw0Mi43MTMyMDI1IDk3LjU2Mzk1NzMsNDMuMzMyMjY1MSA5Ni4xODg1MzM1LDQ0LjM1Njc4MjUgTDk0Ljk5MzgwMTksNDIuNzUyODQ0NyBDOTYuNjE2NTcyMyw0MS41NDQwODUyIDk4LjMwNTY5MTYsNDAuNzk0ODY4MiA5OS45ODQxMjg3LDQwLjUxMzc3NTYgWiBNOTEuMzg5OTEzNCw0Ni43MDg2NzgyIEw5My4xNDAzMjc5LDQ3LjY3NjE3NDYgQzkyLjQxMzIyMTEsNDguOTkxNjcxNCA5Mi4wMzcyMTU2LDUwLjQ4MjE3MDkgOTIuMDI4OTUyLDUyLjA0MjQ4MzYgTDkwLjAyODk4MDEsNTIuMDMxODkxNSBDOTAuMDM4OTg4OCw1MC4xNDIwNzQxIDkwLjQ5ODA4ODIsNDguMzIyMTg3MSA5MS4zODk5MTM0LDQ2LjcwODY3ODIgWiBNOTEuMTgwOTIyOSw1Ny4zNDcyNDE1IEw5My4wMDU1ODc3LDU2LjUyODM0MDkgQzkzLjYyNzAwNjcsNTcuOTEyOTc5NSA5NC41MjY4NjA3LDU5LjE5OTY1NTggOTUuNjY2Mjg5OSw2MC4zMTMxOTgxIEw5NC4yNjg0MTgyLDYxLjc0MzU2NjggQzkyLjk1MDA5ODEsNjAuNDU1MTk3OSA5MS45MDUyNzQ2LDU4Ljk2MTIzMzggOTEuMTgwOTIyOSw1Ny4zNDcyNDE1IFogTTk4LjcyMTExMjYsNjQuNzkwNTE5NCBMOTkuNTYwMTg2Niw2Mi45NzUwNDI5IEMxMDAuOTM0MzkyLDYzLjYxMDE3MDggMTAyLjQ0OTEzNSw2NC4wNTc0NDM0IDEwNC4wODUxMTQsNjQuMjk4MTE0NyBMMTAzLjc5NDAyNCw2Ni4yNzY4MTggQzEwMS45NzAwNjcsNjYuMDA4NDkzMSAxMDAuMjcwNjk3LDY1LjUwNjcwMzggOTguNzIxMTEyNiw2NC43OTA1MTk0IFogTTEwOC44ODY2MjYsNjYuNDMwNjAzNCBMMTA4LjczMjg5MSw2NC40MzY1MjA4IEMxMTAuMjU1NTc4LDY0LjMxOTEyODEgMTExLjg0MjU0LDY0LjA0OTk0OTcgMTEzLjQ4NzQ0MSw2My42MjM4MjEyIEwxMTMuOTg5MDA0LDY1LjU1OTkwODUgQzExMi4yMzE4NTEsNjYuMDE1MTE3IDExMC41Mjg2NjUsNjYuMzA0MDA5MiAxMDguODg2NjI2LDY2LjQzMDYwMzQgWiBNMTE4LjkxOTg5Myw2My44Mzk0MjM0IEwxMTguMDgzODAxLDYyLjAyMjU3MTQgQzExOS41MjU2NjQsNjEuMzU5MDQ1IDEyMC45MTM2NTksNjAuNTQ3MDcxMyAxMjIuMjM2MDQsNTkuNTk2OTQwNiBMMTIzLjQwMzA0NCw2MS4yMjExNjM5IEMxMjEuOTc3OTE3LDYyLjI0NTExNzggMTIwLjQ3OTMwNSw2My4xMjE4MDI2IDExOC45MTk4OTMsNjMuODM5NDIzNCBaIE0xMjcuMzM0ODA2LDU3LjgzMTgwNDUgTDEyNS45MDQ0MSw1Ni40MzM5NjA0IEMxMjcuMDE4MzIyLDU1LjI5NDEwOTQgMTI4LjA1NTAxNyw1NC4wNDgxODk0IDEyOS4wMDMzMTgsNTIuNzExNTg2IEwxMzAuNjM0NDgsNTMuODY4ODcyMSBDMTI5LjYyNjIxMyw1NS4yODk5OTUgMTI4LjUyMjUzNCw1Ni42MTY0MTg2IDEyNy4zMzQ4MDYsNTcuODMxODA0NSBaIE0xMzMuMjkyOTgxLDQ5LjQ3MjE3NzkgTDEzMS41MTE3MDEsNDguNTYyNzU5OCBDMTMyLjI0NTU3NSw0Ny4xMjUzMTkzIDEzMi44ODI0MzIsNDUuNjI4MzI2NyAxMzMuNDE0NTg5LDQ0LjA4OTYxNzcgTDEzNS4zMDQ3NDEsNDQuNzQzMzE5NSBDMTM0Ljc0MjMyNyw0Ni4zNjk1MTQyIDEzNC4wNjkxMTYsNDcuOTUxOTYwNyAxMzMuMjkyOTgxLDQ5LjQ3MjE3NzkgWiBNMTM2LjY1NjQ0LDM5LjcyNzkwNTggTDEzNC42OTM2NzksMzkuMzQzNzU1OCBDMTM1LjAwNjY3NSwzNy43NDQ1NDg5IDEzNS4yMDYxNDIsMzYuMTMxMzE1MSAxMzUuMjg4Njg4LDM0LjUyMTIwNDIgTDEzNy4yODYwNjUsMzQuNjIzNjA1MiBDMTM3LjE5ODY0MSwzNi4zMjg4NTMzIDEzNi45ODc1MzUsMzguMDM2MjIwNiAxMzYuNjU2NDQsMzkuNzI3OTA1OCBaIE0xMzcuMTYzNzcxLDI5LjQzMDI3MTkgTDEzNS4xNzM3MjYsMjkuNjI5NTc0OCBDMTM1LjAxMTM3NCwyOC4wMDg0OTEgMTM0LjcyNDQzLDI2LjQxNTkyODEgMTM0LjMxMjkxOSwyNC44NjU2ODkxIEwxMzYuMjQ1OTczLDI0LjM1MjU1OSBDMTM2LjY4NTA0NiwyNi4wMDY2MjgzIDEzNi45OTA4OTcsMjcuNzA0MTI5IDEzNy4xNjM3NzEsMjkuNDMwMjcxOSBaIE0xMzQuNTM0NTgxLDE5LjU0NzY1MDcgTDEzMi43MTM0MDgsMjAuMzc0Mjg3NiBDMTMyLjA0ODAyLDE4LjkwODM2MzIgMTMxLjI1ODExNywxNy41MDMzOTM3IDEzMC4zNDUwNSwxNi4xNjg1NDcgTDEzMS45OTU4MDcsMTUuMDM5Mzg4NiBDMTMyLjk3NDY2LDE2LjQ3MDQwODggMTMzLjgyMTQ5MywxNy45NzY2MzgzIDEzNC41MzQ1ODEsMTkuNTQ3NjUwNyBaIE0xMjguNjc2OTc1LDEwLjk5NDY1NTIgTDEyNy4yNDU2NTMsMTIuMzkxNTUwOCBDMTI2LjEzNzc0NiwxMS4yNTYzMzk3IDEyNC45MjA0NCwxMC4xOTU2Mjg0IDEyMy41OTQ4MjUsOS4yMTQ2NTkzNyBMMTI0Ljc4NDUyMiw3LjYwNjk4MzUzIEMxMjYuMTk1ODkyLDguNjUxNDExODUgMTI3LjQ5NDAzNSw5Ljc4MjU2MTEzIDEyOC42NzY5NzUsMTAuOTk0NjU1MiBaIE0xMjAuMzg2ODg3LDQuODI2Mjc3NTQgTDExOS40MzY3NjUsNi41ODYxODMgQzExOC4wMDY5LDUuODE0MjM5NjUgMTE2LjUzMDkwMiw1LjEzOTg4NTUgMTE1LjAwODUwNCw0LjU2MzAwNjIyIEwxMTUuNzE3MTg3LDIuNjkyNzc0MDkgQzExNy4zMjIzODIsMy4zMDEwMjcxOCAxMTguODc5MDM4LDQuMDEyMjMzMSAxMjAuMzg2ODg3LDQuODI2Mjc3NTQgWiBNMTEwLjgxMDI4LDEuMTg5Nzg5MDQgTDExMC4zNDc2NjEsMy4xMzU1NDk2IEMxMDguNzg4NjQ4LDIuNzY0ODgzMDEgMTA3LjE4NTcxNSwyLjQ4NDkwMzA5IDEwNS41Mzg2NjcsMi4yOTU2OTM1NiBMMTA1Ljc2NjkyMiwwLjMwODc2MTMwOSBDMTA3LjQ5MjIwMiwwLjUwNjk1NzkzOSAxMDkuMTczMzg2LDAuODAwNjA1OTQ0IDExMC44MTAyOCwxLjE4OTc4OTA0IFogTTEwMC42MTQ2MzQsMC4wMDEyOTkyNDA3IEwxMDAuNjAwNDQsMi4wMDEyNDg4NyBDOTkuMDAzMzE5MywxLjk4OTkxMzIxIDk3LjM2ODU0NjcsMi4wNTU3NDM0MiA5NS42OTYwODEzLDIuMTk4ODQ0NTUgTDk1LjUyNTU3ODMsMC4yMDYxMjU2MTUgQzk3LjI1ODc0MDIsMC4wNTc4MzExMTM2IDk4Ljk1NTEwNTgsLTAuMDEwNDc5MzY0MiAxMDAuNjE0NjM0LDAuMDAxMjk5MjQwNyBaIE05MC41MTg2MDE3LDAuODM5ODg3OTQgTDkwLjg0NjEwMzQsMi44MTI4OTE0MSBDODkuMjY1NTkxMSwzLjA3NTI0Mjg3IDg3LjY1NDE4MzUsMy40MDExMzg1IDg2LjAxMTg5NzEsMy43OTA2MzU4OCBMODUuNTUwMzY0MywxLjg0NDYxNzUxIEM4Ny4yMzY0NTU2LDEuNDQ0NzMxMDQgODguODkyNTI5MywxLjEwOTgwMiA5MC41MTg2MDE3LDAuODM5ODg3OTQgWiBNODAuNjMyMjA4NiwzLjE2OTU4MTAyIEw4MS4yMDc4OTY5LDUuMDg0OTM1NTMgQzc5LjY2NTkxODEsNS41NDg0MDAzIDc4LjA5ODY3OTYsNi4wNjQxMjM1OSA3Ni41MDYyMDM1LDYuNjMyMTMwNjEgTDc1LjgzNDMwMTMsNC43NDgzNzE3NiBDNzcuNDU4MjAzNiw0LjE2OTE1NTU4IDc5LjA1NzQ5ODcsMy42NDI4ODM2IDgwLjYzMjIwODYsMy4xNjk1ODEwMiBaIE03MS4wODYwNTEyLDYuNTY0MjQwNCBMNzEuODQwNjk5Miw4LjQxNjQwMzAzIEM3MC4zNDI0OTI3LDkuMDI2ODM0NTkgNjguODIzMzI4NSw5LjY4MDg0MTQ4IDY3LjI4MzIyMzEsMTAuMzc4NDM0IEw2Ni40NTgwMjUsOC41NTY2MDg1MiBDNjguMDIxMjAyMyw3Ljg0ODU2NTU1IDY5LjU2Mzg3MjIsNy4xODQ0MzkzOSA3MS4wODYwNTEyLDYuNTY0MjQwNCBaIE02MS45ODI2OTM5LDEwLjY3NjAxMjkgTDYyLjg2ODA2NzMsMTIuNDY5MzY1NiBDNjEuNDExNjgxNywxMy4xODgzNzkyIDU5LjkzNzU0NjUsMTMuOTQ0NDMyNyA1OC40NDU2NzI5LDE0LjczNzUzMDQgTDU3LjUwNjg2NDEsMTIuOTcxNTYzOCBDNTkuMDE2MjQyMSwxMi4xNjkxNjA1IDYwLjUwODE4MTcsMTEuNDAzOTc1NSA2MS45ODI2OTM5LDEwLjY3NjAxMjkgWiBNNTEuOTQxNDY0MywxNC44MDc5MTMyIEw0OC45MzI0NTI3LDE1LjYxNDE3NTQgQzQ4LjY2NTcxOTYsMTUuNjg1NjQ2NCA0OC41MDc0Mjg0LDE1Ljk1OTgxNDggNDguNTc4ODk5MywxNi4yMjY1NDc5IEM0OC42NTAzNzAyLDE2LjQ5MzI4MDkgNDguOTI0NTM4NiwxNi42NTE1NzIyIDQ5LjE5MTI3MTcsMTYuNTgwMTAxMyBMNTMuMDU0OTc1LDE1LjU0NDgyNTEgQzUzLjMwODc5ODgsMTUuNDc2ODEzMiA1My40NjQ0MjM1LDE1LjIyNTI0OTEgNTMuNDE3MzA0NywxNC45NzEyMDg4IEM1My4yODA5MjMxLDE0Ljk5MDE4ODcgNTMuMTQxNjA3MywxNSA1MywxNSBDNTIuNjI3Mzg1MywxNSA1Mi4yNzA2MzcxLDE0LjkzMjA2OCA1MS45NDE0NjQzLDE0LjgwNzkxMzIgWiBNNTUuMjA1MDA0LDE0LjAzNDIxOTIgQzU1LjI1OTQzMzUsMTQuMTU1MzQ0MiA1NS4zMDQ5MDE2LDE0LjI4MjQwNzIgNTUuMzQwMzgsMTQuNDE0ODE0NiBDNTUuNjk3NzM0NiwxNS43NDg0Nzk4IDU0LjkwNjI3ODQsMTcuMTE5MzIyMiA1My41NzI2MTMxLDE3LjQ3NjY3NjcgTDQ5LjcwODkwOTgsMTguNTExOTUyOSBDNDguMzc1MjQ0NSwxOC44NjkzMDc1IDQ3LjAwNDQwMjEsMTguMDc3ODUxMiA0Ni42NDcwNDc2LDE2Ljc0NDE4NiBDNDYuMzU1MDkwNywxNS42NTQ1ODggNDYuODI5OTQzMSwxNC41NDAxNzUgNDcuNzQwODA3NiwxMy45NzM5MDQ4IEM0Ny4yNzk1MTE1LDEzLjQ0NjM3MTMgNDcsMTIuNzU1ODI3NCA0NywxMiBDNDcsMTAuMzQzMTQ1OCA0OC4zNDMxNDU4LDkgNTAsOSBDNTAuNTQ2NDMwNyw5IDUxLjA1ODczOTksOS4xNDYwOTE0MyA1MS41LDkuNDAxMzQ2NTkgQzUxLjk0MTI2MDEsOS4xNDYwOTE0MyA1Mi40NTM1NjkzLDkgNTMsOSBDNTQuNjU2ODU0Miw5IDU2LDEwLjM0MzE0NTggNTYsMTIgQzU2LDEyLjc4NDk4MjkgNTUuNjk4NTA4NiwxMy40OTk1NDg3IDU1LjIwNTAwNCwxNC4wMzQyMTkyIFogTTUzLjcyMjA0NSwxMi42OTE4NDgxIEM1My44OTQyMTA3LDEyLjUxMjIxNTggNTQsMTIuMjY4NDYyMSA1NCwxMiBDNTQsMTEuNDQ3NzE1MyA1My41NTIyODQ3LDExIDUzLDExIEM1Mi45NDM0ODE4LDExIDUyLjg4ODA1ODcsMTEuMDA0Njg4NyA1Mi44MzQwOTg0LDExLjAxMzY5ODQgQzUyLjk0MTU4NzQsMTEuMzIyNTk4NCA1MywxMS42NTQ0Nzc3IDUzLDEyIEM1MywxMi4xOTE4NDczIDUyLjk4MTk5MiwxMi4zNzk0ODg3IDUyLjk0NzU3NDEsMTIuNTYxMzI1OSBDNTMuMjE0MzUxNSwxMi41NjM1MjQgNTMuNDc1NDIyMSwxMi42MDg3MTM2IDUzLjcyMjA0NSwxMi42OTE4NDgxIFogTTUwLjE2NTkwMTYsMTIuOTg2MzAxNiBDNTAuMDU4NDEyNiwxMi42Nzc0MDE2IDUwLDEyLjM0NTUyMjMgNTAsMTIgQzUwLDExLjY1NDQ3NzcgNTAuMDU4NDEyNiwxMS4zMjI1OTg0IDUwLjE2NTkwMTYsMTEuMDEzNjk4NCBDNTAuMTExOTQxMywxMS4wMDQ2ODg3IDUwLjA1NjUxODIsMTEgNTAsMTEgQzQ5LjQ0NzcxNTMsMTEgNDksMTEuNDQ3NzE1MyA0OSwxMiBDNDksMTIuNTUyMjg0OCA0OS40NDc3MTUzLDEzIDUwLDEzIEM1MC4wNTY1MTgyLDEzIDUwLjExMTk0MTMsMTIuOTk1MzExMyA1MC4xNjU5MDE2LDEyLjk4NjMwMTYgWiBNMTMyLDc3IEMxMzMuNjU2ODU0LDc3IDEzNSw3NS42NTY4NTQzIDEzNSw3NCBDMTM1LDcyLjM0MzE0NTggMTMzLjY1Njg1NCw3MSAxMzIsNzEgQzEzMC4zNDMxNDYsNzEgMTI5LDcyLjM0MzE0NTggMTI5LDc0IEMxMjksNzUuNjU2ODU0MyAxMzAuMzQzMTQ2LDc3IDEzMiw3NyBaIE0xMzIsNzkgQzEyOS4yMzg1NzYsNzkgMTI3LDc2Ljc2MTQyMzggMTI3LDc0IEMxMjcsNzEuMjM4NTc2MyAxMjkuMjM4NTc2LDY5IDEzMiw2OSBDMTM0Ljc2MTQyNCw2OSAxMzcsNzEuMjM4NTc2MyAxMzcsNzQgQzEzNyw3Ni43NjE0MjM4IDEzNC43NjE0MjQsNzkgMTMyLDc5IFogTTExMy41LDIzIEMxMTQuMzI4NDI3LDIzIDExNSwyMi4zMjg0MjcxIDExNSwyMS41IEMxMTUsMjAuNjcxNTcyOSAxMTQuMzI4NDI3LDIwIDExMy41LDIwIEMxMTIuNjcxNTczLDIwIDExMiwyMC42NzE1NzI5IDExMiwyMS41IEMxMTIsMjIuMzI4NDI3MSAxMTIuNjcxNTczLDIzIDExMy41LDIzIFogTTExMy41LDI1IEMxMTEuNTY3MDAzLDI1IDExMCwyMy40MzI5OTY2IDExMCwyMS41IEMxMTAsMTkuNTY3MDAzNCAxMTEuNTY3MDAzLDE4IDExMy41LDE4IEMxMTUuNDMyOTk3LDE4IDExNywxOS41NjcwMDM0IDExNywyMS41IEMxMTcsMjMuNDMyOTk2NiAxMTUuNDMyOTk3LDI1IDExMy41LDI1IFogTTQ1LjUsNTUgQzQ2LjMyODQyNzEsNTUgNDcsNTQuMzI4NDI3MSA0Nyw1My41IEM0Nyw1Mi42NzE1NzI5IDQ2LjMyODQyNzEsNTIgNDUuNSw1MiBDNDQuNjcxNTcyOSw1MiA0NCw1Mi42NzE1NzI5IDQ0LDUzLjUgQzQ0LDU0LjMyODQyNzEgNDQuNjcxNTcyOSw1NSA0NS41LDU1IFogTTQ1LjUsNTcgQzQzLjU2NzAwMzQsNTcgNDIsNTUuNDMyOTk2NiA0Miw1My41IEM0Miw1MS41NjcwMDM0IDQzLjU2NzAwMzQsNTAgNDUuNSw1MCBDNDcuNDMyOTk2Niw1MCA0OSw1MS41NjcwMDM0IDQ5LDUzLjUgQzQ5LDU1LjQzMjk5NjYgNDcuNDMyOTk2Niw1NyA0NS41LDU3IFogTTU5LjUsNjkgQzYwLjg4MDcxMTksNjkgNjIsNjcuODgwNzExOSA2Miw2Ni41IEM2Miw2NS4xMTkyODgxIDYwLjg4MDcxMTksNjQgNTkuNSw2NCBDNTguMTE5Mjg4MSw2NCA1Nyw2NS4xMTkyODgxIDU3LDY2LjUgQzU3LDY3Ljg4MDcxMTkgNTguMTE5Mjg4MSw2OSA1OS41LDY5IFogTTU5LjUsNzEgQzU3LjAxNDcxODYsNzEgNTUsNjguOTg1MjgxNCA1NSw2Ni41IEM1NSw2NC4wMTQ3MTg2IDU3LjAxNDcxODYsNjIgNTkuNSw2MiBDNjEuOTg1MjgxNCw2MiA2NCw2NC4wMTQ3MTg2IDY0LDY2LjUgQzY0LDY4Ljk4NTI4MTQgNjEuOTg1MjgxNCw3MSA1OS41LDcxIFoiIGlkPSJDb21iaW5lZC1TaGFwZSIgZmlsbD0iI0JDQkNCQyI+PC9wYXRoPg0KICAgIDwvZz4NCjwvc3ZnPg=="></img>
-            </div>
-        </div>
-    </div>
-</body>
-
+        <div view-switcher=""></div>
+        </body>
 </html>

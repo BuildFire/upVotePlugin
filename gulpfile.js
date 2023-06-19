@@ -55,7 +55,7 @@ cssTasks.forEach(function(task){
 });
 
 const jsTasks=[
-    {name:"widgetJS",src:"widget/**/*.js",dest:"/widget"}
+    {name:"widgetJS",src:["widget/assets/**/*.js", "widget/*.js" ,"widget/controllers/*.js"],dest:"/widget"}
     ,{name:"controlContentJS",src:"control/content/**/*.js",dest:"/control/content"}
     ,{name:"controlDesignJS",src:"control/design/**/*.js",dest:"/control/design"}
     ,{name:"controlSettingsJS",src:"control/settings/**/*.js",dest:"/control/settings"}
@@ -95,7 +95,7 @@ gulp.task('clean',function(){
  a processes copy in the 'build' folder
  */
 gulp.task('html', function(){
-    return gulp.src(['widget/**/*.html','widget/**/*.htm'],{base: '.'})
+    return gulp.src(['widget/**/*.html','widget/**/*.htm', 'widget/layouts/*.css'],{base: '.'})
     /// replace all the <!-- build:bundleJSFiles  --> comment bodies
     /// with scripts.min.js with cache buster
         .pipe(htmlReplace({

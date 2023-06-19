@@ -1,0 +1,190 @@
+#statusUpdatetagsInputContainer, #pushNotificationtagsInputContainer {
+    width: 100%;
+}
+
+html {
+    padding: 0 !important;
+}
+.settings-container {
+    padding: 20px 20px !important
+
+}
+
+.row {
+    padding: 0px 8px !important
+}
+
+.item {
+    padding-left: 16px !important;
+}
+
+.flex-center {
+    display: flex;
+    align-items: center;
+}
+
+.margin-bottom-sixteen {
+    margin-bottom: 16px !important;
+}
+
+#userTagsContainer, #itemPushNotificationTagsContainer {
+    display: none;
+    margin: 0 10px 20px 10px !important
+}
+
+.button-switch {
+    display: flex;
+    justify-content: right;
+    margin: 0 14px !important;
+}
+
+.radios-row {
+    display: flex;
+    justify-content: space-between;
+}
+.user-tag-container {
+    display:flex;
+    justify-content: space-between;
+    margin: 0;
+    padding: 0 !important;
+    min-height: 45px !important;
+}
+
+.user-tag-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 80px;
+    background-color: #F2F2F2;
+    border: 1px solid #DDD;
+    border-radius: 4px 0px 0px 4px;
+}
+#status_update_tags, #push_notification_tags {
+    width:100%;
+    border-bottom: 1px solid #DDD;
+    border-top: 1px solid #DDD;
+    margin: 0;
+}
+.user-tag-field {
+    background-color: #05ACF0;
+    border-radius: 2px;
+    color: white;
+    padding: 6px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+label {
+    margin: 0 !important
+}
+.col-md-4 {
+    padding: 5px 2px !important
+}
+.icon-cross2 {
+    cursor: pointer;
+}
+
+.btn-add-user-tag {
+    border: 1px solid #05ACF0;
+    padding: 7px 32px;
+    border-radius: 0px 4px 4px 0px;
+    cursor: pointer;
+}
+.btn-plus {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    font-size: 20;
+    background-color: transparent;
+    border: none;
+    color: #05ACF0;
+}
+
+.ellipsis {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+.tooltip-container{
+	display: flex;
+	align-items: center;
+}
+.tooltip-container .btn-info-icon:after{
+	content: 'i';
+	font-weight: 400;
+	font-size: 12px;
+	font-style: normal;
+	left: 0;
+	top: auto !important;
+	left: auto;
+}
+.tooltip-container .btn-info-icon{
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-left: 8px;
+	width: 16px;
+	height: 16px;
+	line-height: 16px;
+	color: #fff;
+    position: relative;
+    margin-bottom: 5px;
+}
+.tooltip-container .btn-info-icon .cp-tooltip{
+	background-color: rgba(0, 0, 0, .75);
+	color: #fff;
+	padding: 8px;
+	border-radius: 4px;
+	position: absolute;
+	left: calc(100% + 12px);
+	cursor: auto;
+	font-size: 12px;
+	min-width: 160px;
+	opacity: 0;
+	transform: scale(.1);
+	transition: opacity ease .1s, transform ease .1s;
+	transform-origin: left;
+    pointer-events: none;
+    z-index: 100;
+}
+
+.tooltip-container .btn-info-icon .cp-tooltip.second-tooltip{
+    top: -105px;
+}
+
+.tooltip-container .btn-info-icon:hover .cp-tooltip{
+	opacity: 1;
+	transform: scale(1);
+}
+.tooltip-container .btn-info-icon .cp-tooltip::before{
+	content: '';
+	width: 4px;
+	height: 4px;
+	border-left: 4px solid rgba(0, 0, 0, .75);
+	border-bottom: 4px solid rgba(0, 0, 0, .75);
+	border-right: 4px solid transparent;
+	border-top: 4px solid transparent;
+	position: absolute;
+	left: -7px;
+	transform: rotate(45deg) translateY(-50%);
+	top: 50%;
+	bottom: 50%;
+}
+
+.add_tagBtn {
+    background-color: white !important;
+    color: #05ACF0 !important;
+    border-color: #05ACF0 !important;
+}
+.tagify_input_hide_courser {
+    border-right-color:#05ACF0 !important;
+}
+
+.padding-lr-6 {
+    padding: 0 6px !important
+}

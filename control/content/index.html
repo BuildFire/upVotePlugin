@@ -11,13 +11,15 @@
     <!-- JS -->
     <script src="../../../../scripts/buildfire.min.js"></script>
     <!-- build:bundleJSFiles  -->
-    <script src="../../widget/js/Analytics.js"></script>
-    <script src="../../widget/js/analyticsKeys.js"></script>
+    <script src="../../widget/assets/js/Analytics.js"></script>
+    <script src="../../widget/assets/js/analyticsKeys.js"></script>
     <!-- endbuild -->
 
     <!-- WYSIWYG -->
     <script src="../../../../scripts/tinymce/tinymce.min.js"></script>
 
+
+    <link href="../../../../styles/control/bf-base.css" rel="stylesheet">
     <script>
 		Analytics.init();
 
@@ -51,7 +53,6 @@
 
                         data = obj.data;
                         tinymce.activeEditor.setContent(obj.data.text);
-						tinymce.activeEditor.execCommand('mceFullScreen');
                     });
                 });
                 editor.on("keyup", function (saveWithDelay) {
@@ -85,10 +86,12 @@
 </head>
 
 <body>
-
-
+    <div>
+        <h1>Introduction</h1>
 		<textarea id="text" ui-tinymce="editorOptions" class="form-control" rows="5" width="100%" height="300px"></textarea>
 
+    </div>
+       
 
         <script>
             function save(data) {
