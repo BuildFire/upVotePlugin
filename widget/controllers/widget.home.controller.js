@@ -513,7 +513,8 @@ var config = {};
 						placeholder: "Enter short title*",
 						saveText: "Next",
 						defaultValue: "",
-						required: true
+						required: true,
+						maxLength: 500
 					  }
 					const step2 = {
 						placeholder: "Add more details*",
