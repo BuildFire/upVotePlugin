@@ -11,7 +11,12 @@
     NO_USERS: 2,
     TAGS: 3,
   });
- 
+
+  var DEFAULT_ITEM_SORTING_SEGMENT = Object.freeze({
+    NEWEST: 1,
+    OLDEST: 2,
+    MOST_VOTES: 3,
+  });
 
   class Settings {
     constructor(data = {}){
@@ -20,6 +25,7 @@
       this.statusUpdateTags = data.statusUpdateTags || [];
       this.pushNotificationUsersSegment = data.pushNotificationUsersSegment || PUSH_NOTIFICATIONS_SEGMENT.NO_USERS;
       this.pushNotificationTags = data.pushNotificationTags || [];
+      this.defaultItemSorting = data.defaultItemSorting || DEFAULT_ITEM_SORTING_SEGMENT.NEWEST;
       this.createdOn = data.createdOn || new Date();
       this.createdBy = data.createdBy || null;
       this.lastUpdatedOn = data.lastUpdatedOn || new Date();

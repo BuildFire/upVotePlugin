@@ -78,6 +78,7 @@ const init = () => {
         }
         setCheckedInputAllowUsersStatus(result.statusUpdateUsersSegment)
         setCheckedInputItemPushNotification(result.pushNotificationUsersSegment)
+        setCheckedInputDefaultItemSorting(result.defaultItemSorting)
 
         if(settings.statusUpdateTags && settings.statusUpdateTags.length){
             statusUpdatetagsInputContainer.set(settings.statusUpdateTags);
@@ -135,6 +136,24 @@ const setCheckedInputItemPushNotification = (status) => {
     showItemPushNotificationTagsContainer();
 }
 
+const setCheckedInputDefaultItemSorting = (status) => {
+    switch (status) {
+        case DEFAULT_ITEM_SORTING_SEGMENT.NEWEST:
+            newestSorting.checked = true;
+        break;
+        case DEFAULT_ITEM_SORTING_SEGMENT.OLDEST:
+            oldestSorting.checked = true;
+        break;
+        case DEFAULT_ITEM_SORTING_SEGMENT.MOST_VOTES:
+            mostVotesSorting.checked = true;
+        break;
+        default:
+            newestSorting.checked = true;
+        break;
+    } 
+    
+}
+
 const updateCommentsProperty = () => {
     settings.enableComments = commentInput.checked;
     save();
@@ -149,6 +168,12 @@ const changeStatusUpdate = (status) => {
 const changeItemPushNotification = (status) => {
     setCheckedInputItemPushNotification(status)
     settings.pushNotificationUsersSegment = status;
+    save();
+}
+
+const changeDefaultItemSorting = (status) =>{
+    setCheckedInputDefaultItemSorting(status);
+    settings.defaultItemSorting = status;
     save();
 }
 

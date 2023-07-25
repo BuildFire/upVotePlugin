@@ -131,6 +131,42 @@
             </div>
         </div>
       </div>
+      <div class="row margin-bottom-sixteen flex-center" >
+        <div class="labels col-md-4 pull-left tooltip-container">
+          <span>Default Item Sorting</span>
+        </div>
+        <div class="main col-md-7 pull-right padding-lr-6">
+          <span class="radios-row">
+            <div class="radio radio-primary radio-inline">
+              <input
+                id="newestSorting"
+                type="radio"
+                name="defaultSorting"
+                onchange="changeDefaultItemSorting(1)"
+              />
+              <label class="subtitles-labels" for="newestSorting">Newest</label>
+            </div>
+            <div class="radio radio-primary radio-inline">
+              <input
+                id="oldestSorting"
+                type="radio"
+                name="defaultSorting"
+                onchange="changeDefaultItemSorting(2)"
+              />
+              <label class="subtitles-labels" for="oldestSorting">Oldest</label>
+            </div>
+            <div class="radio radio-primary radio-inline">
+              <input
+                id="mostVotesSorting"
+                type="radio"
+                name="defaultSorting"
+                onchange="changeDefaultItemSorting(3)"
+              />
+              <label class="subtitles-labels" for="mostVotesSorting">Most Votes</label>
+            </div>
+          </span>
+        </div>
+      </div>
     </div>
   </body>
 
