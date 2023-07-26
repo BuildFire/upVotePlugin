@@ -18,6 +18,20 @@
     MOST_VOTES: 3,
   });
 
+  var HIDE_COMPLETED_ITEMS_SEGMENT = Object.freeze({
+    IMMEDIATELY: 1,
+    ONE_DAY: 2,
+    THREE_DAYS: 3,
+    FIVE_DAYS: 4,
+    SEVEN_DAYS: 5,
+    TEN_DAYS: 6,
+    FIFTEEN_DAYS: 7,
+    THIRTY_DAYS: 8,
+    SIXTY_DAYS: 9,
+    NINETY_DAYS: 10,
+    NEVER: 11,
+  });
+
   class Settings {
     constructor(data = {}){
       this.enableComments = data.enableComments || false;
@@ -26,6 +40,7 @@
       this.pushNotificationUsersSegment = data.pushNotificationUsersSegment || PUSH_NOTIFICATIONS_SEGMENT.NO_USERS;
       this.pushNotificationTags = data.pushNotificationTags || [];
       this.defaultItemSorting = data.defaultItemSorting || DEFAULT_ITEM_SORTING_SEGMENT.NEWEST;
+      this.hideCompletedItems = data.hideCompletedItems || HIDE_COMPLETED_ITEMS_SEGMENT.IMMEDIATELY;
       this.createdOn = data.createdOn || new Date();
       this.createdBy = data.createdBy || null;
       this.lastUpdatedOn = data.lastUpdatedOn || new Date();

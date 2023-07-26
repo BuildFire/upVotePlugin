@@ -167,6 +167,34 @@
           </span>
         </div>
       </div>
+      <div class="row margin-bottom-sixteen flex-center" >
+        <div class="labels col-md-4 pull-left tooltip-container">
+          <span>Hide Completed Items</span>
+          <span class="tip btn-info-icon btn-primary"><span class="cp-tooltip">Set the time interval for removing completed items from the list.</span>
+        </div>
+        <div class="main col-md-8 pull-right padding-lr-6">
+          <div class="btn-group" id="hideCompletedDropdown">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+              aria-expanded="false" onclick="openDropdown(event)">
+              <span id="defaultDropdownTxt">Immediately</span>
+              <span class="icon-chevron-down rotate icon"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+              <li><a onclick="changeHideCompletedItems(1)">Immediately</a></li>
+              <li><a onclick="changeHideCompletedItems(2)">1 day (24 hours)</a></li>
+              <li><a onclick="changeHideCompletedItems(3)">3 days</a></li>
+              <li><a onclick="changeHideCompletedItems(4)">5 days</a></li>
+              <li><a onclick="changeHideCompletedItems(5)">7 days</a></li>
+              <li><a onclick="changeHideCompletedItems(6)">10 days</a></li>
+              <li><a onclick="changeHideCompletedItems(7)">15 days</a></li>
+              <li><a onclick="changeHideCompletedItems(8)">30 days</a></li>
+              <li><a onclick="changeHideCompletedItems(9)">60 days</a></li>
+              <li><a onclick="changeHideCompletedItems(10)">90 days</a></li>
+              <li><a onclick="changeHideCompletedItems(11)">Never</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
     </div>
   </body>
 

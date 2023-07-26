@@ -56,6 +56,26 @@ const pushNotificationtagsInputContainer = new buildfire.components.control.tags
     }
 });
 
+const openDropdown = (e) => {
+    e.stopPropagation();
+    const sortDropdown = document.querySelector('#hideCompletedDropdown');
+    toggleDropdown(sortDropdown);
+    document.body.onclick = () => {
+        toggleDropdown(sortDropdown, true);
+    };
+};
+
+const toggleDropdown = (dropdownElement, forceClose) => {
+    if (!dropdownElement) {
+        return;
+    }
+    if (dropdownElement.classList.contains('open') || forceClose) {
+        dropdownElement.classList.remove('open');
+    } else {
+        dropdownElement.classList.add('open');
+    }
+};
+
 statusUpdatetagsInputContainer.onUpdate = (data) => {
     settings.statusUpdateTags = data.tags;
 
@@ -79,7 +99,7 @@ const init = () => {
         setCheckedInputAllowUsersStatus(result.statusUpdateUsersSegment)
         setCheckedInputItemPushNotification(result.pushNotificationUsersSegment)
         setCheckedInputDefaultItemSorting(result.defaultItemSorting)
-
+        setDropdownCompletedItems(result.hideCompletedItems);
         if(settings.statusUpdateTags && settings.statusUpdateTags.length){
             statusUpdatetagsInputContainer.set(settings.statusUpdateTags);
         }
@@ -154,6 +174,51 @@ const setCheckedInputDefaultItemSorting = (status) => {
     
 }
 
+const setDropdownCompletedItems = (status) => {
+    const sortTextElem = document.querySelector('#defaultDropdownTxt');
+    let dropdownText = '';
+    switch (status) {
+        case HIDE_COMPLETED_ITEMS_SEGMENT.IMMEDIATELY:
+            dropdownText = 'Immediately';
+            break;
+        case HIDE_COMPLETED_ITEMS_SEGMENT.ONE_DAY:
+            dropdownText = '1 day (24 hours)';
+            break;
+        case HIDE_COMPLETED_ITEMS_SEGMENT.THREE_DAYS:
+            dropdownText = '3 days';
+            break;
+        case HIDE_COMPLETED_ITEMS_SEGMENT.FIVE_DAYS:
+            dropdownText = '5 days';
+            break;
+        case HIDE_COMPLETED_ITEMS_SEGMENT.SEVEN_DAYS:
+            dropdownText = '7 days';
+            break;
+        case HIDE_COMPLETED_ITEMS_SEGMENT.TEN_DAYS:
+            dropdownText = '10 days';
+            break;
+        case HIDE_COMPLETED_ITEMS_SEGMENT.FIFTEEN_DAYS:
+            dropdownText = '15 days';
+            break;
+        case HIDE_COMPLETED_ITEMS_SEGMENT.THIRTY_DAYS:
+            dropdownText = '30 days';
+            break;
+        case HIDE_COMPLETED_ITEMS_SEGMENT.SIXTY_DAYS:
+            dropdownText = '60 days';
+            break;
+        case HIDE_COMPLETED_ITEMS_SEGMENT.NINETY_DAYS:
+            dropdownText = '90 days';
+            break;
+        case HIDE_COMPLETED_ITEMS_SEGMENT.NEVER:
+            dropdownText = 'Never';
+            break;
+        default:
+            dropdownText = 'Immediately';
+            break;
+    }
+
+    sortTextElem.innerText = dropdownText;
+};
+
 const updateCommentsProperty = () => {
     settings.enableComments = commentInput.checked;
     save();
@@ -177,13 +242,19 @@ const changeDefaultItemSorting = (status) =>{
     save();
 }
 
+const changeHideCompletedItems = (status) =>{
+    setDropdownCompletedItems(status);
+    settings.hideCompletedItems = status;
+    save();
+}
+
 const save = () => {
     Settings.save(settings,()=>{})
 
     buildfire.messaging.sendMessageToWidget({
         type: 'UpdateSettings',
         data: settings
-      });
+    });
 }
 
 init();
