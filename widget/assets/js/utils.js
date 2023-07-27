@@ -1,14 +1,87 @@
-function convertTimeToMinutes(timeString) {
-    const regex = /(\d+)(min|hour)/;
-    const matches = timeString.match(regex);
-    if (matches && matches.length === 3) {
-        const value = parseInt(matches[1]);
-        const unit = matches[2];
-        if (unit === 'min') {
-            return value;
-        } else if (unit === 'hour') {
-            return value * 60;
+function sortArray(status, array) {
+    function sortByStatusAndDate(a, b) {
+        if (a.status === 3 && b.status !== 3) {
+            return -1;
+        } else if (a.status !== 3 && b.status === 3) {
+            return 1;
+        } else {
+            return new Date(b.createdOn) - new Date(a.createdOn);
         }
     }
-    return 0; // Return 0 if the time format is not recognized
+
+    function moveCompletedToBottom(arr) {
+        const status3Objects = arr.filter((obj) => obj.status === 3);
+        const nonStatus3Objects = arr.filter((obj) => obj.status !== 3);
+        return [...nonStatus3Objects, ...status3Objects];
+    }
+
+    let sortedArray = [];
+
+    switch (status) {
+        case DEFAULT_ITEM_SORTING_SEGMENT.NEWEST:
+            sortedArray = array.sort(sortByStatusAndDate);
+            sortedArray = moveCompletedToBottom(sortedArray);
+            break;
+        case DEFAULT_ITEM_SORTING_SEGMENT.OLDEST:
+            sortedArray = array.sort((a, b) => -sortByStatusAndDate(a, b));
+            sortedArray = moveCompletedToBottom(sortedArray);
+            break;
+        case DEFAULT_ITEM_SORTING_SEGMENT.MOST_VOTES:
+            sortedArray = array.sort((a, b) => {
+                if (a.status === 3 && b.status !== 3) {
+                    return -1;
+                } else if (a.status !== 3 && b.status === 3) {
+                    return 1;
+                } else {
+                    return b.upVoteCount - a.upVoteCount;
+                }
+            });
+            sortedArray = moveCompletedToBottom(sortedArray);
+            break;
+        default:
+            break;
+    }
+
+    return sortedArray;
+}
+
+function getStartDate(selectedDuration) {
+    if (selectedDuration === HIDE_COMPLETED_ITEMS_SEGMENT.NEVER) {
+        return null; // Return null for "NEVER" case to indicate no date range filtering
+    }
+
+    const startDate = new Date();
+    switch (selectedDuration) {
+        case HIDE_COMPLETED_ITEMS_SEGMENT.ONE_DAY:
+            startDate.setDate(startDate.getDate() - 1);
+            break;
+        case HIDE_COMPLETED_ITEMS_SEGMENT.THREE_DAYS:
+            startDate.setDate(startDate.getDate() - 3);
+            break;
+        case HIDE_COMPLETED_ITEMS_SEGMENT.FIVE_DAYS:
+            startDate.setDate(startDate.getDate() - 5);
+            break;
+        case HIDE_COMPLETED_ITEMS_SEGMENT.SEVEN_DAYS:
+            startDate.setDate(startDate.getDate() - 7);
+            break;
+        case HIDE_COMPLETED_ITEMS_SEGMENT.TEN_DAYS:
+            startDate.setDate(startDate.getDate() - 10);
+            break;
+        case HIDE_COMPLETED_ITEMS_SEGMENT.FIFTEEN_DAYS:
+            startDate.setDate(startDate.getDate() - 15);
+            break;
+        case HIDE_COMPLETED_ITEMS_SEGMENT.THIRTY_DAYS:
+            startDate.setDate(startDate.getDate() - 30);
+            break;
+        case HIDE_COMPLETED_ITEMS_SEGMENT.SIXTY_DAYS:
+            startDate.setDate(startDate.getDate() - 60);
+            break;
+        case HIDE_COMPLETED_ITEMS_SEGMENT.NINETY_DAYS:
+            startDate.setDate(startDate.getDate() - 90);
+            break;
+        default:
+            // For IMMEDIATELY , no need to modify the start date
+            break;
+    }
+    return startDate;
 }

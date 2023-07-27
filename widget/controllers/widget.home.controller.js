@@ -195,7 +195,7 @@ var config = {};
 				Promise.all([callBacklogText, callInProgressText,callCompletedText]).then(result => {
 					$rootScope.TextStatuses = result;
 					Suggestion.search(options).then(results => {
-						results = results.filter(x => x.status != 3 || (x.status == 3 && new Date(x.createdOn) >= date))
+						results = results.filter(x => x.status != 3 || (x.status == 3 && new Date(x.createdOn) >= getStartDate($rootScope.settings.hideCompletedItems)))
 						if (!results || !results.length) return update([]);
 			
 						results = results.map(checkYear);
@@ -227,7 +227,7 @@ var config = {};
 							hideSkeleton();
 							UpVoteHome.isInitalized = true;
 							$scope.suggestions = data;
-							_handleSortSuggestions($rootScope.settings.defaultItemSorting)
+							$scope.suggestions = sortArray($rootScope.settings.defaultItemSorting,$scope.suggestions);
 							buildfire.spinner.hide();
 							if (!$scope.$$phase) $scope.$apply();
 						}
@@ -506,7 +506,6 @@ var config = {};
 						  Suggestion.update(_suggestion).then(()=>{})
 						}
 					})
-					
 				});
 			};
 		
@@ -644,34 +643,10 @@ var config = {};
 				}
 			};
 
-			function _handleSortSuggestions(status){
-				switch (status) {
-					case DEFAULT_ITEM_SORTING_SEGMENT.NEWEST:
-						$scope.suggestions=$scope.suggestions.sort((a, b) => {
-							const aMinutes = convertTimeToMinutes(a._createdOn);
-							const bMinutes = convertTimeToMinutes(b._createdOn);
-							return aMinutes - bMinutes;
-						});
-						break;
-					case DEFAULT_ITEM_SORTING_SEGMENT.OLDEST:
-						$scope.suggestions=$scope.suggestions.sort((a, b) => {
-							const aMinutes = convertTimeToMinutes(b._createdOn);
-							const bMinutes = convertTimeToMinutes(a._createdOn);
-							return aMinutes - bMinutes;
-						});
-						break;
-					case DEFAULT_ITEM_SORTING_SEGMENT.MOST_VOTES:
-						$scope.suggestions=$scope.suggestions.sort((a, b) => b.upVoteCount - a.upVoteCount);
-						break;
-				
-					default:
-						break;
-				}
-			}
 
 			UpVoteHome.listeners['SETTINGS_UPDATED'] = $rootScope.$on('SETTINGS_UPDATED', function (e, item) {
 				$rootScope.settings = item;
-				_handleSortSuggestions($rootScope.settings.defaultItemSorting)
+				init();
 			});
 
 			UpVoteHome.listeners['BEFORE_POP'] = $rootScope.$on('BEFORE_POP', function (e, item) {
