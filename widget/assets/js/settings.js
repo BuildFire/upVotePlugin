@@ -41,6 +41,8 @@
       this.pushNotificationTags = data.pushNotificationTags || [];
       this.defaultItemSorting = data.defaultItemSorting || DEFAULT_ITEM_SORTING_SEGMENT.NEWEST;
       this.hideCompletedItems = data.hideCompletedItems || HIDE_COMPLETED_ITEMS_SEGMENT.IMMEDIATELY;
+      this.productId = data.productId || null;
+      this.votesPerPurchase = data.votesPerPurchase || 1;
       this.createdOn = data.createdOn || new Date();
       this.createdBy = data.createdBy || null;
       this.lastUpdatedOn = data.lastUpdatedOn || new Date();
@@ -80,5 +82,14 @@
           }
         });
       });
+    }
+
+    static getProducts(){
+      return new Promise((resolve, reject) => {
+        buildfire.services.commerce.inAppPurchase.getProducts((err, products) => {
+          if (err) return reject(err);
+          resolve(products);
+        });
+      })  
     }
   }

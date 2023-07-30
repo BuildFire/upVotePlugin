@@ -56,12 +56,17 @@ const pushNotificationtagsInputContainer = new buildfire.components.control.tags
     }
 });
 
-const openDropdown = (e) => {
+const openDropdown = (e,dropdownFor) => {
     e.stopPropagation();
-    const sortDropdown = document.querySelector('#hideCompletedDropdown');
-    toggleDropdown(sortDropdown);
+    let dropdown;
+    if(dropdownFor === 'inAppPurchaseDropdown'){
+        dropdown = document.querySelector('#inAppPurchaseDropdown');
+    }else{
+        dropdown = document.querySelector('#hideCompletedDropdown');
+    }
+    toggleDropdown(dropdown);
     document.body.onclick = () => {
-        toggleDropdown(sortDropdown, true);
+        toggleDropdown(dropdown, true);
     };
 };
 
@@ -100,6 +105,8 @@ const init = () => {
         setCheckedInputItemPushNotification(result.pushNotificationUsersSegment)
         setCheckedInputDefaultItemSorting(result.defaultItemSorting)
         setDropdownCompletedItems(result.hideCompletedItems);
+        showVotesPerPurchaseInput(result.productId);
+        setVotesNumberInput(result.votesPerPurchase);
         if(settings.statusUpdateTags && settings.statusUpdateTags.length){
             statusUpdatetagsInputContainer.set(settings.statusUpdateTags);
         }
@@ -108,8 +115,35 @@ const init = () => {
         }
         showUsersTagsContainer();
         showItemPushNotificationTagsContainer();
-    })
+    }).then(()=>{
+        Settings.getProducts().then(products =>{
+            let currentProduct = (products.find(product => product.id === settings.productId));
+            if(currentProduct && currentProduct.name && currentProduct.id !== null){
+                setDropdownInAppPurchase(currentProduct.name);
+            }else{
+                setDropdownInAppPurchase('Disabled');
+            }
+            buildInAppPurchaseDropdown(products)
+        }).catch(err => console.error(err));
+    });
 }
+
+const buildInAppPurchaseDropdown = (products) => {
+    const productsList = document.getElementById('productsList');
+
+    products.forEach((product) => {
+        const productElement = document.createElement('li');
+        const productContent = document.createElement('a');
+
+        productContent.textContent = product.name;
+        productContent.addEventListener('click', () =>
+            changeInAppPurchase(product)
+        );
+
+        productElement.appendChild(productContent);
+        productsList.appendChild(productElement);
+    });
+};  
 
 const showUsersTagsContainer = () => {
     userTagsContainer.style.display = allowUsersWithStatusUpdate.checked ? "block" : "none"
@@ -218,6 +252,28 @@ const setDropdownCompletedItems = (status) => {
 
     sortTextElem.innerText = dropdownText;
 };
+const setDropdownInAppPurchase = (status) => {
+    const inAppPurchaseTextElem = document.querySelector(
+        '#inAppPurchaseDefaultDropdownTxt'
+    );
+    inAppPurchaseTextElem.innerText = status;
+};
+
+const setVotesNumberInput = (number) => {
+    const votesNumberInput = document.getElementById('votesNumberInput');
+    votesNumberInput.value = number;
+};
+
+const showVotesPerPurchaseInput = (productId) => {
+    const votesNumberContainer = document.getElementById(
+        'votesNumberContainer'
+    );
+    if (productId) {
+        votesNumberContainer.classList.remove('hidden');
+    } else {
+        votesNumberContainer.classList.add('hidden');
+    }
+};
 
 const updateCommentsProperty = () => {
     settings.enableComments = commentInput.checked;
@@ -247,6 +303,43 @@ const changeHideCompletedItems = (status) =>{
     settings.hideCompletedItems = status;
     save();
 }
+
+const changeInAppPurchase = (product) => {
+    if (!product.name.startsWith('c_')) {
+        buildfire.dialog.toast({
+            message:
+                'The product you have selected does not appear to be a consumable product. Please refer to the help article for more information.',
+            type: 'warning',
+        });
+    }
+    showVotesPerPurchaseInput(product.id);
+    setDropdownInAppPurchase(product.name);
+    settings.productId = product.id;
+    save();
+};
+
+const changeVotesPerPurchase = () => {
+    const votesNumberInput = document.getElementById('votesNumberInput');
+    const errMessage = document.getElementById('errMessage');
+    const votesNumber = Number(votesNumberInput.value);
+
+    if (votesNumberInput.value.trim() === '') {
+        errMessage.innerText = 'This field is required';
+        errMessage.classList.remove('hidden');
+        return;
+    } else if (votesNumber <= 0) {
+        votesNumberInput.value = 1;
+        errMessage.classList.add('hidden');
+    } else if (`${votesNumberInput.value}`.includes('.')) {
+        votesNumberInput.value = parseInt(votesNumberInput.value);
+        errMessage.classList.add('hidden');
+    } else {
+        errMessage.classList.add('hidden');
+    }
+
+    settings.votesPerPurchase = Number(votesNumberInput.value);
+    save();
+};
 
 const save = () => {
     Settings.save(settings,()=>{})
