@@ -90,6 +90,6 @@
           if (err) return reject(err);
           resolve(products);
         });
-      })  
+      });
     }
   }

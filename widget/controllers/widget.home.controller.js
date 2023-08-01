@@ -8,7 +8,9 @@ buildfire.appearance.titlebar.show();
 
 const callBacklogText = getLanguageValue("mainScreen.backlog") 
 const callInProgressText = getLanguageValue("mainScreen.inProgress") 
-const callCompletedText = getLanguageValue("mainScreen.completed") 
+const callCompletedText = getLanguageValue("mainScreen.completed")
+// secret key for user credit encoding 
+const secretKey = 'upvote';
 
 function getLanguageValue(stringkey) {
 	return new Promise((resolve, reject) => {
@@ -66,9 +68,10 @@ var config = {};
 			UpVoteHome.listeners = {};
 			UpVoteHome.isInitalized = false;
 			UpVoteHome.text;
+			const platform = buildfire.context.device.platform.toLowerCase();
+			let mock = platform !== 'ios' && platform !== 'android';	
 			showSkeleton()
 			getSettings();
-
 			const suggestionId = getSuggestionIdOnNewNotification()
 			if(suggestionId != ''){
 				navigateToItemDetails(suggestionId)
@@ -441,73 +444,203 @@ var config = {};
 					);
 			
 			}
-		
-			$rootScope.upVote = function(suggestionObj) {
-				isCardClicked = true;
-				getUser(function(user) {
-					if(!user) enforceLogin()
-					if (!suggestionObj.upVotedBy) suggestionObj.upVotedBy = {};
-					if (!suggestionObj.upVoteCount) suggestionObj.upVoteCount = 1;
-					let isUserUpvoted = false;
-					if (!suggestionObj.upVotedBy[user._id]) {
-						isUserUpvoted = true;
-						// vote
-						Analytics.trackAction(analyticKeys.VOTE_NUMBER.key, { votes: 1, _buildfire: { aggregationValue: 1 } });
-		
-						suggestionObj.upVoteCount++;
-						suggestionObj.disableUpvote = true;
-						suggestionObj.upVotedBy[user._id] = {
-							votedOn: new Date(),
-							user: user
-						};
-		
-						if (suggestionObj.createdBy._id != user._id) {
-							buildfire.notifications.pushNotification.schedule(
-								{
-									title: 'You got an upvote!',
-									text: getUserName(user) + ' upvoted your suggestion ' + suggestionObj.title,
-									users: [suggestionObj.createdBy._id]
-								},
-								function (err) {
-									if (err) console.error(err);
+
+			const checkUserCredits = function(){
+					if(!$rootScope.settings.productId){
+						return Promise.resolve({});
+					}
+					return UserCredit.get().then((result)=>{
+						let credits = Number(decryptCredit(result.credits,secretKey));
+						if(credits > 0){
+							return result;
+						}else{
+							const firstTimePurchaseOptions ={
+								title:'Buy Credits',
+								message:
+									'Upvoting items is a premium feature. To upvote items, you need to purchase voting credits.',
+								confirmButton : {text: 'Buy'},
+								cancelButtonText:'Cancel'
+							};
+
+							const defaultOptions = {
+								title:'Get More Votes',
+								message:
+									'You don’t have enough votes to cast a vote for this song. Please consider purchasing additional votes.',
+								confirmButton : {text: 'Buy More'},
+								cancelButtonText:'Cancel'
+							};
+
+							buildfire.dialog.confirm(
+								result.firstTimePurchase ? defaultOptions: firstTimePurchaseOptions,
+								(err, isConfirmed) => {
+									if (err) return console.error(err);
+									
+									if (isConfirmed) {
+										if($rootScope.settings.productId){
+											if(!mock){
+												buildfire.services.commerce.inAppPurchase.purchase($rootScope.settings.productId, (err, res) => {
+													if (err) return console.error(err);
+												
+													return updateUserCredit().then(()=>{
+														return result;
+													});
+												});
+											}else{
+												console.warn('Sorry, you can\'t purchase this item on a browser, use IOS or Android devices to purchase');
+												return null;
+											}
+										}else{
+											console.warn('tests isuue');
+										}
+									}
 								}
 							);
 						}
-					} else {
-						// unvote
-						Analytics.trackAction(analyticKeys.VOTE_NUMBER.key, { votes: -1, _buildfire: { aggregationValue: -1 } });
-		
-						suggestionObj.upVoteCount--;
-						suggestionObj.disableUpvote = false;
-						delete suggestionObj.upVotedBy[user._id];
-					}
-		
-					if (suggestionObj.upVoteCount < 10) {
-						/// then just to a hard count just in case
-						suggestionObj.upVoteCount = Object.keys(suggestionObj.upVotedBy).length;
-					}
-					suggestionObj.upvoteByYou = suggestionObj.upVotedBy[user._id] != null
-					if (!$scope.$$phase) $scope.$apply();
+					});
+			}
 
-					Suggestion.getById(suggestionObj.id).then(_suggestion => {
-						if(_suggestion){
-							_suggestion.upVoteCount = isUserUpvoted ? _suggestion.upVoteCount + 1 : _suggestion.upVoteCount - 1
-							if(!isUserUpvoted){
-								delete _suggestion.upVotedBy[user._id];
-							} else {
-								_suggestion.upVotedBy[user._id] = {
-									votedOn: new Date(),
-									user: user
-								};
-							}
-							suggestionObj.upVoteCount = _suggestion.upVoteCount;
-							suggestionObj.upVotedBy = _suggestion.upVotedBy;
-						  if (!$scope.$$phase) $scope.$apply();
-						  Suggestion.update(_suggestion).then(()=>{})
+			const updateUserCredit = function(){
+				let encrypted = encryptCredit($rootScope.settings.votesPerPurchase,secretKey);
+				let payload = {
+					$set:{
+						createdBy: _currentUser.userId,
+						credits: encrypted,
+						firstTimePurchase: true
+					}
+				}
+				return UserCredit.save(payload);
+			}
+			
+			$rootScope.upVote = function (suggestionObj) {
+                isCardClicked = true;
+                getUser(function (user) {
+                    if (!user) enforceLogin();
+                    if (!suggestionObj.upVotedBy) suggestionObj.upVotedBy = {};
+                    if (!suggestionObj.upVoteCount)
+                        suggestionObj.upVoteCount = 1;
+                    let isUserUpvoted = false;
+                    if (!suggestionObj.upVotedBy[user._id]) {
+                        checkUserCredits()
+                            .then((res) => {
+                                if (res) {
+                                    isUserUpvoted = true;
+                                    // vote
+                                    Analytics.trackAction(
+                                        analyticKeys.VOTE_NUMBER.key,
+                                        {
+                                            votes: 1,
+                                            _buildfire: { aggregationValue: 1 },
+                                        }
+                                    );
+
+                                    suggestionObj.upVoteCount++;
+                                    suggestionObj.disableUpvote = true;
+                                    suggestionObj.upVotedBy[user._id] = {
+                                        votedOn: new Date(),
+                                        user: user,
+                                    };
+
+                                    if (
+                                        suggestionObj.createdBy._id != user._id
+                                    ) {
+                                        buildfire.notifications.pushNotification.schedule(
+                                            {
+                                                title: 'You got an upvote!',
+                                                text:
+                                                    getUserName(user) +
+                                                    ' upvoted your suggestion ' +
+                                                    suggestionObj.title,
+                                                users: [
+                                                    suggestionObj.createdBy._id,
+                                                ],
+                                            },
+                                            function (err) {
+                                                if (err) console.error(err);
+                                            }
+                                        );
+                                    }
+
+                                    if ($rootScope.settings.productId) {
+                                        let credit = Number(
+                                            decryptCredit(
+                                                res.credits,
+                                                secretKey
+                                            )
+                                        );
+                                        credit -= 1;
+                                        let payload = {
+                                            $set: {
+                                                updatedBy: _currentUser.userId,
+                                                credits: encryptCredit(
+                                                    credit,
+                                                    secretKey
+                                                ),
+                                            },
+                                        };
+                                        return UserCredit.save(payload).then(
+                                            () => {
+                                                buildfire.dialog.toast({
+                                                    message: `Thank you for your vote! You have ${credit} votes left.`,
+                                                    type: 'info',
+                                                });
+                                                return res;
+                                            }
+                                        );
+                                    } else {
+                                        return res;
+                                    }
+                                } else {
+                                    return null;
+                                }
+                            })
+                            .then((res) => {
+                                if (res)
+                                    updateSuggestion(
+                                        suggestionObj,
+                                        user,
+                                        isUserUpvoted
+                                    );
+                            });
+                    } else {
+                        // unvote
+                        Analytics.trackAction(analyticKeys.VOTE_NUMBER.key, {
+                            votes: -1,
+                            _buildfire: { aggregationValue: -1 },
+                        });
+                        suggestionObj.upVoteCount--;
+                        suggestionObj.disableUpvote = false;
+                        delete suggestionObj.upVotedBy[user._id];
+                        updateSuggestion(suggestionObj, user, isUserUpvoted);
+                    }
+                });
+            };
+
+			const updateSuggestion =(suggestionObj,user, isUserUpvoted)=>{
+				if (suggestionObj.upVoteCount < 10) {
+					/// then just to a hard count just in case
+					suggestionObj.upVoteCount = Object.keys(suggestionObj.upVotedBy).length;
+				}
+				suggestionObj.upvoteByYou = suggestionObj.upVotedBy[user._id] != null
+				if (!$scope.$$phase) $scope.$apply();
+
+				Suggestion.getById(suggestionObj.id).then(_suggestion => {
+					if(_suggestion){
+						_suggestion.upVoteCount = isUserUpvoted ? _suggestion.upVoteCount + 1 : _suggestion.upVoteCount - 1
+						if(!isUserUpvoted){
+							delete _suggestion.upVotedBy[user._id];
+						} else {
+							_suggestion.upVotedBy[user._id] = {
+								votedOn: new Date(),
+								user: user
+							};
 						}
-					})
-				});
-			};
+						suggestionObj.upVoteCount = _suggestion.upVoteCount;
+						suggestionObj.upVotedBy = _suggestion.upVotedBy;
+						if (!$scope.$$phase) $scope.$apply();
+						Suggestion.update(_suggestion).then(()=>{})
+					}
+				})
+			}
 		
 			window.openPopup = function() {
 				if(_currentUser){

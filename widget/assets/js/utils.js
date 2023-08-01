@@ -85,3 +85,37 @@ function getStartDate(selectedDuration) {
     }
     return startDate;
 }
+
+/**
+ * 
+ * @param {string} credit 
+ * @param {string} key 
+ * @returns Base64 encoding value
+ */
+function encryptCredit(credit, key) {
+    if(typeof credit !== 'string') credit = `${credit}`;
+
+    let encryptedCredit = '';
+    for (let i = 0; i < credit.length; i++) {
+        const charCode = credit.charCodeAt(i) ^ key.charCodeAt(i % key.length);
+        encryptedCredit += String.fromCharCode(charCode);
+    }
+    return btoa(encryptedCredit);
+}
+
+/**
+ * 
+ * @param {string} encryptedCredit 
+ * @param {string} key 
+ * @returns Base64 decoding value
+ */
+function decryptCredit(encryptedCredit, key) {
+    encryptedCredit = atob(encryptedCredit);
+    let decryptedCredit = '';
+    for (let i = 0; i < encryptedCredit.length; i++) {
+        const charCode =
+            encryptedCredit.charCodeAt(i) ^ key.charCodeAt(i % key.length);
+        decryptedCredit += String.fromCharCode(charCode);
+    }
+    return decryptedCredit;
+}

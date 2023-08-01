@@ -305,13 +305,21 @@ const changeHideCompletedItems = (status) =>{
 }
 
 const changeInAppPurchase = (product) => {
-    if (!product.name.startsWith('c_')) {
+    if(product.disabled){
+        handelIAPChange(product);
+    }else if (!product.name.startsWith('c_')) {
         buildfire.dialog.toast({
             message:
                 'The product you have selected does not appear to be a consumable product. Please refer to the help article for more information.',
             type: 'warning',
         });
+        return;
+    }else{
+        handelIAPChange(product);
     }
+};
+
+const handelIAPChange = (product) =>{
     showVotesPerPurchaseInput(product.id);
     setDropdownInAppPurchase(product.name);
     settings.productId = product.id;
