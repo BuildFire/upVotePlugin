@@ -5,7 +5,7 @@
             "info": "",
             "labels": {
                 "commentButton": {
-                    "title": "Comment Button",
+                    "title": "Comment",
                     "defaultValue": "Comment",
                     "required": true,
                     "inputType": "text",
@@ -38,14 +38,14 @@
                     "placeholder": "Completed"
                 },
                 "voteConfirmed": {
-                    "title": "Thank you for your vote! You have [Votes Left] votes left.",
+                    "title": "Thank You for Your Vote! You Have [Votes Left] Votes Left.",
                     "defaultValue": "Thank you for your vote! You have ${context.plugin.remainingVotes} votes left.",
                     "inputType": "text",
                     "toolTip": "This message will only be shown if you have enabled the In-App purchase system.",
                     "placeholder": "Thank you for your vote! You have ${context.plugin.remainingVotes} votes left."
                 },
                 "preparingPurchaseMessage": {
-                    "title": "Getting your purchase ready, please wait...",
+                    "title": "Getting Your Purchase Ready, Please Wait…",
                     "defaultValue": "Getting your purchase ready, please wait...",
                     "inputType": "text",
                     "toolTip": "",
@@ -109,7 +109,7 @@
                     "placeholder": "Buy Credit"
                 },
                 "body": {
-                    "title": "Upvoting items is a premium feature. To upvote items, you need to purchase voting credits.",
+                    "title": "Upvoting Items Is a Premium Feature. To Upvote Items, You Need To Purchase Voting Credits.",
                     "defaultValue": "Upvoting items is a premium feature. To upvote items, you need to purchase voting credits.",
                     "inputType": "text",
                     "toolTip": "",
@@ -143,7 +143,7 @@
                     "placeholder": "Get More Votes"
                 },
                 "body": {
-                    "title": "You don't have enough credit to cast a vote. Please consider purchasing additional voting credit.",
+                    "title": "You Don't Have Enough Credit To Cast a Vote. Please Consider Purchasing Additional Voting Credit.",
                     "defaultValue": "You don't have enough credit to cast a vote. Please consider purchasing additional voting credit.",
                     "inputType": "text",
                     "toolTip": "",
@@ -177,7 +177,7 @@
                     "placeholder": "Remove Vote"
                 },
                 "body": {
-                    "title": "Removing your vote will not refund your voting credit. Voting again will deduct anther credit.",
+                    "title": "Removing Your Vote Will Not Refund Your Voting Credit. Voting Again Will Deduct Anther Credit.",
                     "defaultValue": "Removing your vote will not refund your voting credit. Voting again will deduct anther credit.",
                     "inputType": "text",
                     "toolTip": "",
