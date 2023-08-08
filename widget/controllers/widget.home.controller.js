@@ -71,7 +71,8 @@ var config = {};
 			UpVoteHome.isInitalized = false;
 			UpVoteHome.text;
 			const platform = buildfire.context.device.platform.toLowerCase();
-			let mock = platform !== 'ios' && platform !== 'android';	
+			let blockIAP = platform !== 'ios' && platform !== 'android';
+			$scope.blockVote = false;	
 			showSkeleton()
 			getSettings();
 			const suggestionId = getSuggestionIdOnNewNotification()
@@ -102,6 +103,8 @@ var config = {};
 			}	
 			
 			UpVoteHome.goToItemDetails = function (selectedItem) {
+				if($scope.blockVote) return;
+
 				if(isCardClicked){
 					isCardClicked = false
 					return;
@@ -507,16 +510,22 @@ var config = {};
                     if (credits > 0) {
                         return result;
                     } else {
+						$scope.blockVote = true;
+						$scope.$apply();
                         buildfire.dialog.confirm(
                             !result.firstTimePurchase
                                 ? defaultOptions
                                 : firstTimePurchaseOptions,
                             (err, isConfirmed) => {
-                                if (err) return console.error(err);
+                                if (err) {
+									$scope.blockVote = false;
+									$scope.$apply();
+									return console.error(err)
+								};
 
                                 if (isConfirmed) {
                                     if ($rootScope.settings.productId) {
-										if (!mock) {
+										if (!blockIAP) {
 											buildfire.dialog.toast({
 												message: 'Getting your purchase ready, please wait...',
 												duration: 4000,
@@ -526,14 +535,20 @@ var config = {};
                                                 $rootScope.settings.productId,
                                                 (err, res) => {
                                                     if (err){
+														$scope.blockVote = false;
+														$scope.$apply();
                                                         return console.error(
                                                             err
                                                         );
 													}
 													if(res.hasErrors){
+														$scope.blockVote = false;
+														$scope.$apply();
 														return console.error('Something went wrong, please try again')
 													}
 													if(res.isCancelled){
+														$scope.blockVote = false;
+														$scope.$apply();
 														buildfire.dialog.toast({
 															message: 'The purchase was cancelled',
 															type: 'warning',
@@ -543,6 +558,8 @@ var config = {};
 													if(res.isApproved){
 														return updateUserCredit().then(
 															() => {
+																$scope.blockVote = false;
+																$scope.$apply();
 																return result;
 															}
 														);
@@ -550,15 +567,20 @@ var config = {};
                                                 }
                                             );
                                         } else {
+											$scope.blockVote = false;
+											$scope.$apply();
                                             console.warn(
                                                 "Sorry, you can't purchase this item on a browser, use IOS or Android devices to purchase"
                                             );
                                             return null;
                                         }
                                     }
-                                }
+                                }else{
+									$scope.blockVote = false;
+									$scope.$apply();
+								}
                             }
-                        );
+						);
                     }
                 });
             };
