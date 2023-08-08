@@ -31,7 +31,7 @@ class UserCredit {
      * @returns user collection tag
      */
     static get TAG() {
-        return 'creditsxxxxyyzzq';
+        return 'credits';
     }
 
     /**
@@ -51,18 +51,13 @@ class UserCredit {
                 ) {
                     const data = new UserCredit();
                     this.save(data);
+                    results.id = 
                     resolve(
-                        new UserCredit({
-                            ...results.data,
-                            id: results.id,
-                        }).toJSON()
+                        new UserCredit(results.data).toJSON()
                     );
                 } else {
                     resolve(
-                        new UserCredit({
-                            ...results.data,
-                            id: results.id,
-                        }).toJSON()
+                        new UserCredit(results.data).toJSON()
                     );
                 }
             });
@@ -79,11 +74,10 @@ class UserCredit {
             buildfire.userData.save(data, this.TAG, (err, results) => {
                 if (err) return reject(err);
                 if (results.data.$set && results.data.$set.credits) {
+                    let userCredit  = new UserCredit();
+                    userCredit .credits = results.data.$set.credits;
                     resolve(
-                        new UserCredit({
-                            ...results,
-                            credits: results.data.$set.credits,
-                        }).toJSON()
+                        new UserCredit(userCredit ).toJSON()
                     );
                 } else {
                     resolve(new UserCredit(results).toJSON());

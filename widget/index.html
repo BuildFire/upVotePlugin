@@ -13,6 +13,7 @@
     <script src="../../../scripts/angular/angular.min.js"></script>
     <script src="../../../scripts/buildfire/services/notifications/pushNotifications.js"></script>
     <script src="../../../scripts/buildfire/components/drawer/drawer.js"></script>
+    <script src="../../../scripts/buildfire/services/commerce/inAppPurchase.js"></script>
 
     <!-- build:bundleJSFiles  -->
     <script src="app.js"></script>
@@ -50,6 +51,58 @@
     }
 </style>
     <body>
+        <!-- ! for demo  -->
+            <style>
+                .dummy-container{
+                    position: absolute;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: flex-start;
+                    overflow-x: scroll;
+                    width: 100%;
+                    border: 2px solid black;
+                    padding: 8px;
+                    gap: 8px;
+                    z-index: 50;
+                }
+                .dummy-row-1,
+                .dummy-row-2{
+                    display: flex;
+                    flex-direction: row;
+                }
+                .dummy-btn{
+                    background-color: black;
+                    width: 20px;
+                    height: 20px;
+                    color: #fff;
+                }
+                #dummyDayInput{
+                    border: 1px solid black;
+                    width: 60%;
+                    margin-right: 8px;
+                }
+            </style>
+        <div class="dummy-container">
+            <div class="dummy-row-1">
+                <button class="dummy-btn" ng-click="insertDummySuggestion(1,'before 1 day', 'text')">1</button>
+                <button class="dummy-btn" ng-click="insertDummySuggestion(3,'before 3 day', 'text')">3</button>
+                <button class="dummy-btn" ng-click="insertDummySuggestion(5,'before 5 day', 'text')">5</button>
+                <button class="dummy-btn" ng-click="insertDummySuggestion(7,'before 7 day', 'text')">7</button>
+                <button class="dummy-btn" ng-click="insertDummySuggestion(95,'before 95 day', 'text')">95</button>
+                <!-- <button class="dummy-btn" ng-click="insertDummySuggestion(10,'before 10 day', 'text')">10</button>
+                    <button class="dummy-btn" ng-click="insertDummySuggestion(60,'before 60 day', 'text')">60</button>
+                <button class="dummy-btn" ng-click="insertDummySuggestion(15,'before 15 day', 'text')">15</button>
+                <button class="dummy-btn" ng-click="insertDummySuggestion(30,'before 30 day', 'text')">30</button>
+                <button class="dummy-btn" ng-click="insertDummySuggestion(90,'before 90 day', 'text')">90</button>
+             -->
+
+            </div>
+            <div class="dummy-row-2">
+                <input type="number" id="dummyDayInput" placeholder="Enter created on day number">
+                <button class="dummy-btn" ng-click="insertDummySuggestion(null,'', 'text')">Insert</button>
+            </div>
+        </div>
+        <!-- !------------ -->
         <div style="position: initial !important;height:100%"  ng-controller="listCtrl as _listCtrl">
             <div id="btn--add__container" onclick="openPopup()">
                 <a class="btn btn-primary btn--fab btn--add"><span></span></a>
