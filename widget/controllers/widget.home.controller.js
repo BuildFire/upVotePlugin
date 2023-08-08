@@ -218,7 +218,6 @@ var config = {};
 				Promise.all([callBacklogText, callInProgressText,callCompletedText]).then(result => {
 					$rootScope.TextStatuses = result;
 					Suggestion.search(options).then(results => {
-						console.log('🚀 ~ file: widget.home.controller.js:221 ~ Suggestion.search ~ results:', results)
 						results = results.filter(x => x.status != 3 || (x.status == 3 && new Date(x.createdOn) >= getStartDate($rootScope.settings.hideCompletedItems)))
 						if (!results || !results.length) return update([]);
 			
@@ -532,7 +531,7 @@ var config = {};
 													if(res.isCancelled){
 														buildfire.dialog.toast({
 															message: 'The purchase was cancelled',
-															type: 'info',
+															type: 'warning',
 														});
 														return;
 													}
@@ -685,7 +684,16 @@ var config = {};
 						if (!suggestionObj.upVotedBy[user._id]) {
 							upVoteHandler(suggestionObj, user, isUserUpvoted);
 						} else {
-							downVoteHandler(suggestionObj, user, isUserUpvoted);
+							if($rootScope.settings.productId){
+								unvoteDialog((err, result) => {
+									if (err) return new Error(err);
+									if (result){
+										downVoteHandler(suggestionObj, user, isUserUpvoted);
+									}
+								})
+							}else{
+								downVoteHandler(suggestionObj, user, isUserUpvoted);
+							}
 						}
                 });
             };
@@ -715,6 +723,28 @@ var config = {};
 						Suggestion.update(_suggestion).then(()=>{})
 					}
 				})
+			}
+
+			const unvoteDialog = (callback) =>{
+				const dialogOptions = {
+					title:'Remove Vote',
+					message:'Removing your vote will not refund your voting credit. Voting again will deduct anther credit.',
+					confirmButton:{
+						text:'Remove'
+					},
+					cancelButtonText:'Cancel',
+				}
+				buildfire.dialog.confirm(
+					dialogOptions,
+					(err, isConfirmed) => {
+							if (err) return console.error(err);
+							if (isConfirmed) {
+							callback(null, true);
+						} else {
+							callback(null, false);
+						}
+					}
+				);
 			}
 		
 			window.openPopup = function() {
