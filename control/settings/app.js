@@ -9,6 +9,7 @@ const itemPushNotificationNoUsers = document.getElementById("pushNotificationNoU
 const itemPushNotificationUsersWith = document.getElementById("pushNotificationUsersWith")
 const userTagsContainer = document.getElementById("userTagsContainer")
 const itemPushNotificationTagsContainer = document.getElementById("itemPushNotificationTagsContainer")
+const votesNumberInput = document.getElementById('votesNumberInput');
 
 
 const statusUpdatetagsInputContainer = new buildfire.components.control.tagsInput("#statusUpdatetagsInputContainer", {
@@ -357,5 +358,16 @@ const save = () => {
         data: settings
     });
 }
+
+const debounce = (func, delay) => {
+    let timerId;
+    return (...args) => {
+        clearTimeout(timerId);
+        timerId = setTimeout(() => func.apply(this, args), delay);
+    };
+};
+
+const debouncedChangeVotesPerPurchase = debounce(changeVotesPerPurchase, 400);
+votesNumberInput.addEventListener('input', debouncedChangeVotesPerPurchase);
 
 init();
