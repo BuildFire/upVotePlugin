@@ -841,22 +841,19 @@ var config = {};
 				getUser(function (user) {
 					if (!user || !title || !text) return;
 					
-					let isIAPEnabled = $rootScope.settings.productId ? true: false;
 					var obj = {
 						title: title,
 						suggestion: text,
 						createdBy: user,
 						createdOn: new Date(Date.now() - dayBefore * 24 * 60 * 60 * 1000).toISOString(),
-						upVoteCount: isIAPEnabled ? 0: 1,
+						upVoteCount: 1,
 						upVotedBy: {},
 						status: SUGGESTION_STATUS.BACKLOG
 					};
-					if(!$rootScope.settings.productId){
-						obj.upVotedBy[user._id] = {
-							votedOn: new Date(),
-							user: user, 
-						};
-					}
+					obj.upVotedBy[user._id] = {
+						votedOn: new Date(),
+						user: user, 
+					};
 			
 					Suggestion.insert(obj, (err, result) => {
 						buildfire.dialog.toast({
@@ -864,9 +861,9 @@ var config = {};
 							type: "info"
 						  });
 						const suggestion = new Suggestion(result)
-						suggestion.disableUpvote = isIAPEnabled ? false : true;
+						suggestion.disableUpvote = true;
 						suggestion.statusName = $rootScope.TextStatuses[0];
-						suggestion.upvoteByYou =  isIAPEnabled ? false : true;
+						suggestion.upvoteByYou = true;
 						$scope.suggestions.unshift(suggestion);
 						if($rootScope.settings){
 							const title = "A new item has been created";
