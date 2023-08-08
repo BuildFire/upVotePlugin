@@ -516,7 +516,12 @@ var config = {};
 
                                 if (isConfirmed) {
                                     if ($rootScope.settings.productId) {
-                                        if (!mock) {
+										if (!mock) {
+											buildfire.dialog.toast({
+												message: 'Getting your purchase ready, please wait...',
+												duration: 4000,
+												type: 'info',
+											});
                                             buildfire.services.commerce.inAppPurchase.purchase(
                                                 $rootScope.settings.productId,
                                                 (err, res) => {
