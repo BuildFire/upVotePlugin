@@ -210,40 +210,40 @@ const setCheckedInputDefaultItemSorting = (status) => {
 }
 
 const setDropdownCompletedItems = (status) => {
-    const sortTextElem = document.querySelector('#defaultDropdownTxt');
+    const activeCompletedItemElem = document.querySelector('#activeCompletedItem');
     let dropdownText = '';
     switch (status) {
-        case HIDE_COMPLETED_ITEMS_SEGMENT.IMMEDIATELY:
+        case 0:
             dropdownText = 'Immediately';
             break;
-        case HIDE_COMPLETED_ITEMS_SEGMENT.ONE_DAY:
+        case 1:
             dropdownText = '1 day (24 hours)';
             break;
-        case HIDE_COMPLETED_ITEMS_SEGMENT.THREE_DAYS:
+        case 3:
             dropdownText = '3 days';
             break;
-        case HIDE_COMPLETED_ITEMS_SEGMENT.FIVE_DAYS:
+        case 5:
             dropdownText = '5 days';
             break;
-        case HIDE_COMPLETED_ITEMS_SEGMENT.SEVEN_DAYS:
+        case 7:
             dropdownText = '7 days';
             break;
-        case HIDE_COMPLETED_ITEMS_SEGMENT.TEN_DAYS:
+        case 10:
             dropdownText = '10 days';
             break;
-        case HIDE_COMPLETED_ITEMS_SEGMENT.FIFTEEN_DAYS:
+        case 15:
             dropdownText = '15 days';
             break;
-        case HIDE_COMPLETED_ITEMS_SEGMENT.THIRTY_DAYS:
+        case 30:
             dropdownText = '30 days';
             break;
-        case HIDE_COMPLETED_ITEMS_SEGMENT.SIXTY_DAYS:
+        case 60:
             dropdownText = '60 days';
             break;
-        case HIDE_COMPLETED_ITEMS_SEGMENT.NINETY_DAYS:
+        case 90:
             dropdownText = '90 days';
             break;
-        case HIDE_COMPLETED_ITEMS_SEGMENT.NEVER:
+        case -1:
             dropdownText = 'Never';
             break;
         default:
@@ -251,13 +251,13 @@ const setDropdownCompletedItems = (status) => {
             break;
     }
 
-    sortTextElem.innerText = dropdownText;
+    activeCompletedItemElem.innerText = dropdownText;
 };
 const setDropdownInAppPurchase = (status) => {
-    const inAppPurchaseTextElem = document.querySelector(
-        '#inAppPurchaseDefaultDropdownTxt'
+    const activeIAPItemEle = document.querySelector(
+        '#activeIAPItem'
     );
-    inAppPurchaseTextElem.innerText = status;
+    activeIAPItemEle.innerText = status;
 };
 
 const setVotesNumberInput = (number) => {

@@ -46,43 +46,11 @@ function sortArray(status, array) {
 }
 
 function getStartDate(selectedDuration) {
-    if (selectedDuration === HIDE_COMPLETED_ITEMS_SEGMENT.NEVER) {
+    if (selectedDuration === -1) {
         return null; // Return null for "NEVER" case to indicate no date range filtering
     }
-
     const startDate = new Date();
-    switch (selectedDuration) {
-        case HIDE_COMPLETED_ITEMS_SEGMENT.ONE_DAY:
-            startDate.setDate(startDate.getDate() - 1);
-            break;
-        case HIDE_COMPLETED_ITEMS_SEGMENT.THREE_DAYS:
-            startDate.setDate(startDate.getDate() - 3);
-            break;
-        case HIDE_COMPLETED_ITEMS_SEGMENT.FIVE_DAYS:
-            startDate.setDate(startDate.getDate() - 5);
-            break;
-        case HIDE_COMPLETED_ITEMS_SEGMENT.SEVEN_DAYS:
-            startDate.setDate(startDate.getDate() - 7);
-            break;
-        case HIDE_COMPLETED_ITEMS_SEGMENT.TEN_DAYS:
-            startDate.setDate(startDate.getDate() - 10);
-            break;
-        case HIDE_COMPLETED_ITEMS_SEGMENT.FIFTEEN_DAYS:
-            startDate.setDate(startDate.getDate() - 15);
-            break;
-        case HIDE_COMPLETED_ITEMS_SEGMENT.THIRTY_DAYS:
-            startDate.setDate(startDate.getDate() - 30);
-            break;
-        case HIDE_COMPLETED_ITEMS_SEGMENT.SIXTY_DAYS:
-            startDate.setDate(startDate.getDate() - 60);
-            break;
-        case HIDE_COMPLETED_ITEMS_SEGMENT.NINETY_DAYS:
-            startDate.setDate(startDate.getDate() - 90);
-            break;
-        default:
-            // For IMMEDIATELY , no need to modify the start date
-            break;
-    }
+    startDate.setDate(startDate.getDate() - selectedDuration);
     return startDate;
 }
 

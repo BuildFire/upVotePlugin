@@ -177,21 +177,21 @@
           <div class="btn-group" id="hideCompletedDropdown">
             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
               aria-expanded="false" onclick="openDropdown(event)">
-              <span id="defaultDropdownTxt">Immediately</span>
+              <span id="activeCompletedItem">Immediately</span>
               <span class="icon-chevron-down rotate icon"></span>
             </button>
             <ul class="dropdown-menu" role="menu">
-              <li><a onclick="changeHideCompletedItems(1)">Immediately</a></li>
-              <li><a onclick="changeHideCompletedItems(2)">1 day (24 hours)</a></li>
+              <li><a onclick="changeHideCompletedItems(0)">Immediately</a></li>
+              <li><a onclick="changeHideCompletedItems(1)">1 day (24 hours)</a></li>
               <li><a onclick="changeHideCompletedItems(3)">3 days</a></li>
-              <li><a onclick="changeHideCompletedItems(4)">5 days</a></li>
-              <li><a onclick="changeHideCompletedItems(5)">7 days</a></li>
-              <li><a onclick="changeHideCompletedItems(6)">10 days</a></li>
-              <li><a onclick="changeHideCompletedItems(7)">15 days</a></li>
-              <li><a onclick="changeHideCompletedItems(8)">30 days</a></li>
-              <li><a onclick="changeHideCompletedItems(9)">60 days</a></li>
-              <li><a onclick="changeHideCompletedItems(10)">90 days</a></li>
-              <li><a onclick="changeHideCompletedItems(11)">Never</a></li>
+              <li><a onclick="changeHideCompletedItems(5)">5 days</a></li>
+              <li><a onclick="changeHideCompletedItems(7)">7 days</a></li>
+              <li><a onclick="changeHideCompletedItems(10)">10 days</a></li>
+              <li><a onclick="changeHideCompletedItems(15)">15 days</a></li>
+              <li><a onclick="changeHideCompletedItems(30)">30 days</a></li>
+              <li><a onclick="changeHideCompletedItems(60)">60 days</a></li>
+              <li><a onclick="changeHideCompletedItems(90)">90 days</a></li>
+              <li><a onclick="changeHideCompletedItems(-1)">Never</a></li>
             </ul>
           </div>
         </div>
@@ -205,14 +205,14 @@
           <div class="btn-group" id="inAppPurchaseDropdown">
             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
               aria-expanded="false" onclick="openDropdown(event,'inAppPurchaseDropdown')">
-              <span id="inAppPurchaseDefaultDropdownTxt">Disabled</span>
+              <span id="activeIAPItem">Disabled</span>
               <span class="icon-chevron-down rotate icon"></span>
             </button>
             <ul class="dropdown-menu" role="menu" id="productsList">
               <li><a onclick="changeInAppPurchase({name:'Disabled', id: null, disabled: true})">Disabled</a></li>
             </ul>
           </div>
-          <span><a href="https://learn.appdocumentation.com/en/collections/571367-commerce-tab">Learn more about In-App Purchases</a></span>
+          <span><a href="https://learn.appdocumentation.com/en/collections/571367-commerce-tab" target="_blank">Learn more about In-App Purchases</a></span>
         </div>
       </div>
       <div class="row margin-bottom-sixteen hidden" id="votesNumberContainer">
