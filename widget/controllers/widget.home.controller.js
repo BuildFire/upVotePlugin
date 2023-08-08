@@ -527,7 +527,7 @@ var config = {};
                                     if ($rootScope.settings.productId) {
 										if (!blockIAP) {
 											buildfire.dialog.toast({
-												message: 'Getting your purchase ready, please wait...',
+												message: getString('mainScreen.preparingPurchaseMessage') || 'Getting your purchase ready, please wait...',
 												duration: 4000,
 												type: 'info',
 											});
@@ -754,12 +754,12 @@ var config = {};
 
 			const unvoteDialog = (callback) =>{
 				const dialogOptions = {
-					title:'Remove Vote',
-					message:'Removing your vote will not refund your voting credit. Voting again will deduct anther credit.',
+					title:getString('unvoteMessage.title') || 'Remove Vote',
+					message:getString('unvoteMessage.body') || 'Removing your vote will not refund your voting credit. Voting again will deduct anther credit.',
 					confirmButton:{
-						text:'Remove'
+						text:getString('unvoteMessage.remove') || 'Remove'
 					},
-					cancelButtonText:'Cancel',
+					cancelButtonText:getString('unvoteMessage.cancel') || 'Cancel',
 				}
 				buildfire.dialog.confirm(
 					dialogOptions,

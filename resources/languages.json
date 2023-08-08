@@ -43,6 +43,13 @@
                     "inputType": "text",
                     "toolTip": "This message will only be shown if you have enabled the In-App purchase system.",
                     "placeholder": "Thank you for your vote! You have ${context.plugin.remainingVotes} votes left."
+                },
+                "preparingPurchaseMessage": {
+                    "title": "Getting your purchase ready, please wait...",
+                    "defaultValue": "Getting your purchase ready, please wait...",
+                    "inputType": "text",
+                    "toolTip": "",
+                    "placeholder": "Getting your purchase ready, please wait..."
                 }
             }
         },
@@ -155,6 +162,40 @@
                     "inputType": "text",
                     "toolTip": "",
                     "placeholder": "Buy More"
+                }
+            }
+        },
+        "unvoteMessage": {
+            "title": "Unvote Message",
+            "info": "This message will only be shown if you have enabled In-App Purchases. It will appear when the user try to remove his vote",
+            "labels": {
+                "title": {
+                    "title": "Remove Vote",
+                    "defaultValue": "Remove Vote",
+                    "inputType": "text",
+                    "toolTip": "",
+                    "placeholder": "Remove Vote"
+                },
+                "body": {
+                    "title": "Removing your vote will not refund your voting credit. Voting again will deduct anther credit.",
+                    "defaultValue": "Removing your vote will not refund your voting credit. Voting again will deduct anther credit.",
+                    "inputType": "text",
+                    "toolTip": "",
+                    "placeholder": "Removing your vote will not refund your voting credit. Voting again will deduct anther credit."
+                },
+                "cancel": {
+                    "title": "Cancel",
+                    "defaultValue": "Cancel",
+                    "inputType": "text",
+                    "toolTip": "",
+                    "placeholder": "Cancel"
+                },
+                "remove": {
+                    "title": "Remove",
+                    "defaultValue": "Remove",
+                    "inputType": "text",
+                    "toolTip": "",
+                    "placeholder": "Remove"
                 }
             }
         }
