@@ -528,7 +528,7 @@ var config = {};
 										if (!blockIAP) {
 											buildfire.dialog.toast({
 												message: getString('mainScreen.preparingPurchaseMessage') || 'Getting your purchase ready, please wait...',
-												duration: 4000,
+												duration: 5000,
 												type: 'info',
 											});
                                             buildfire.services.commerce.inAppPurchase.purchase(
