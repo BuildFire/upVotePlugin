@@ -51,14 +51,9 @@ class UserCredit {
                 ) {
                     const data = new UserCredit();
                     this.save(data);
-                    results.id = 
-                    resolve(
-                        new UserCredit(results.data).toJSON()
-                    );
+                    results.id = resolve(new UserCredit(results.data).toJSON());
                 } else {
-                    resolve(
-                        new UserCredit(results.data).toJSON()
-                    );
+                    resolve(new UserCredit(results.data).toJSON());
                 }
             });
         });
@@ -74,11 +69,9 @@ class UserCredit {
             buildfire.userData.save(data, this.TAG, (err, results) => {
                 if (err) return reject(err);
                 if (results.data.$set && results.data.$set.credits) {
-                    let userCredit  = new UserCredit();
-                    userCredit .credits = results.data.$set.credits;
-                    resolve(
-                        new UserCredit(userCredit ).toJSON()
-                    );
+                    let userCredit = new UserCredit();
+                    userCredit.credits = results.data.$set.credits;
+                    resolve(new UserCredit(userCredit).toJSON());
                 } else {
                     resolve(new UserCredit(results).toJSON());
                 }

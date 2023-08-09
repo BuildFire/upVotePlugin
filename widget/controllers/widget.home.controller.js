@@ -469,93 +469,100 @@ var config = {};
 			}
 
 			const checkUserCredits = function () {
-                const firstTimePurchaseOptions = {
-                    title:
-                        getString('firstTimePurchaseMessage.title') ||
-                        'Buy Credit',
-                    message:
-                        getString('firstTimePurchaseMessage.body') ||
-                        'Upvoting items is a premium feature. To upvote items, you need to purchase voting credits.',
-                    confirmButton: {
-                        text:
-                            getString('firstTimePurchaseMessage.buy') || 'Buy',
-                    },
-                    cancelButtonText:
-                        getString('firstTimePurchaseMessage.cancel') ||
-                        'Cancel',
-                };
+				const firstTimePurchaseOptions = {
+					title:
+						getString('firstTimePurchaseMessage.title') ||
+						'Buy Credit',
+					message:
+						getString('firstTimePurchaseMessage.body') ||
+						'Upvoting items is a premium feature. To upvote items, you need to purchase voting credits.',
+					confirmButton: {
+						text:
+							getString('firstTimePurchaseMessage.buy') || 'Buy',
+					},
+					cancelButtonText:
+						getString('firstTimePurchaseMessage.cancel') ||
+						'Cancel',
+				};
 
-                const defaultOptions = {
-                    title:
-                        getString('votesDepletedMessage.title') ||
-                        'Get More Votes',
-                    message:
-                        getString('votesDepletedMessage.body') ||
-                        'You don\'t have enough credit to cast a vote. Please consider purchasing additional voting credit.$',
-                    confirmButton: {
-                        text:
-                            getString('votesDepletedMessage.buyMore') ||
-                            'Buy More',
-                    },
-                    cancelButtonText:
-                        getString('votesDepletedMessage.cancel') || 'Cancel',
-                };
-                if (!$rootScope.settings.productId) {
-                    return Promise.resolve({});
-                }
-                return UserCredit.get().then((result) => {
-                    let credits = Number(
-                        decryptCredit(result.credits, secretKey)
-                    );
-                    if (credits > 0) {
-                        return result;
-                    } else {
+				const defaultOptions = {
+					title:
+						getString('votesDepletedMessage.title') ||
+						'Get More Votes',
+					message:
+						getString('votesDepletedMessage.body') ||
+						"You don't have enough credit to cast a vote. Please consider purchasing additional voting credit.$",
+					confirmButton: {
+						text:
+							getString('votesDepletedMessage.buyMore') ||
+							'Buy More',
+					},
+					cancelButtonText:
+						getString('votesDepletedMessage.cancel') || 'Cancel',
+				};
+				if (!$rootScope.settings.productId) {
+					return Promise.resolve({});
+				}
+				return UserCredit.get().then((result) => {
+					let credits = Number(
+						decryptCredit(result.credits, secretKey)
+					);
+					if (credits > 0) {
+						return result;
+					} else {
 						$scope.blockVote = true;
 						$scope.$apply();
-                        buildfire.dialog.confirm(
-                            !result.firstTimePurchase
-                                ? defaultOptions
-                                : firstTimePurchaseOptions,
-                            (err, isConfirmed) => {
-                                if (err) {
+						buildfire.dialog.confirm(
+							!result.firstTimePurchase
+								? defaultOptions
+								: firstTimePurchaseOptions,
+							(err, isConfirmed) => {
+								if (err) {
 									$scope.blockVote = false;
 									$scope.$apply();
-									return console.error(err)
-								};
+									return console.error(err);
+								}
 
-                                if (isConfirmed) {
-                                    if ($rootScope.settings.productId) {
+								if (isConfirmed) {
+									if ($rootScope.settings.productId) {
 										if (!blockIAP) {
 											buildfire.dialog.toast({
-												message: getString('mainScreen.preparingPurchaseMessage') || 'Getting your purchase ready, please wait...',
+												message:
+													getString(
+														'mainScreen.preparingPurchaseMessage'
+													) ||
+													'Getting your purchase ready, please wait...',
 												duration: 5000,
 												type: 'info',
 											});
-                                            buildfire.services.commerce.inAppPurchase.purchase(
-                                                $rootScope.settings.productId,
-                                                (err, res) => {
-                                                    if (err){
+											buildfire.services.commerce.inAppPurchase.purchase(
+												$rootScope.settings.productId,
+												(err, res) => {
+													if (err) {
 														$scope.blockVote = false;
 														$scope.$apply();
-                                                        return console.error(
-                                                            err
-                                                        );
+														return console.error(
+															err
+														);
 													}
-													if(res.hasErrors){
+													if (res.hasErrors) {
 														$scope.blockVote = false;
 														$scope.$apply();
-														return console.error('Something went wrong, please try again')
+														return console.error(
+															'Something went wrong, please try again'
+														);
 													}
-													if(res.isCancelled){
+													if (res.isCancelled) {
 														$scope.blockVote = false;
 														$scope.$apply();
 														buildfire.dialog.toast({
-															message: 'The purchase was cancelled',
+															message:
+																'The purchase was cancelled',
 															type: 'warning',
 														});
 														return;
 													}
-													if(res.isApproved){
+													if (res.isApproved) {
 														return updateUserCredit().then(
 															() => {
 																$scope.blockVote = false;
@@ -564,31 +571,31 @@ var config = {};
 															}
 														);
 													}
-                                                }
-                                            );
-                                        } else {
+												}
+											);
+										} else {
 											$scope.blockVote = false;
 											$scope.$apply();
-                                            console.warn(
-                                                "Sorry, you can't purchase this item on a browser, use IOS or Android devices to purchase"
-                                            );
-                                            return null;
-                                        }
-                                    }
-                                }else{
+											console.warn(
+												"Sorry, you can't purchase this item on a browser, use IOS or Android devices to purchase"
+											);
+											return null;
+										}
+									}
+								} else {
 									$scope.blockVote = false;
 									$scope.$apply();
 								}
-                            }
+							}
 						);
-                    }
-                });
-            };
+					}
+				});
+			};
 
-			const updateUserCredit = function(){
-				let encrypted = encryptCredit($rootScope.settings.votesPerPurchase,secretKey);
+			const updateUserCredit = function () {
+				let encrypted = encryptCredit($rootScope.settings.votesPerPurchase, secretKey);
 				let payload = {
-					$set:{
+					$set: {
 						createdBy: _currentUser.userId,
 						credits: encrypted,
 						firstTimePurchase: true
@@ -892,22 +899,19 @@ var config = {};
 			function _addSuggestion(user, title, text) {
 				if (!user || !title || !text) return;
 				
-				let isIAPEnabled = $rootScope.settings.productId ? true: false;
 				var obj = {
 					title: title,
 					suggestion: text,
 					createdBy: user,
 					createdOn: new Date(),
-					upVoteCount: isIAPEnabled ? 0: 1,
+					upVoteCount: 1,
 					upVotedBy: {},
 					status: SUGGESTION_STATUS.BACKLOG
 				};
-				if(!$rootScope.settings.productId){
-					obj.upVotedBy[user._id] = {
-						votedOn: new Date(),
-						user: user, 
-					};
-				}
+				obj.upVotedBy[user._id] = {
+					votedOn: new Date(),
+					user: user, 
+				};
 		
 				Suggestion.insert(obj, (err, result) => {
 					buildfire.dialog.toast({
@@ -915,9 +919,9 @@ var config = {};
 						type: "info"
 					  });
 					const suggestion = new Suggestion(result)
-					suggestion.disableUpvote = isIAPEnabled ? false : true;
+					suggestion.disableUpvote = true;
 					suggestion.statusName = $rootScope.TextStatuses[0];
-					suggestion.upvoteByYou =  isIAPEnabled ? false : true;
+					suggestion.upvoteByYou = true;
 					$scope.suggestions.unshift(suggestion);
 					if($rootScope.settings){
 						const title = "A new item has been created";
