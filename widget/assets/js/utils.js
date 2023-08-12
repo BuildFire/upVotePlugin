@@ -1,50 +1,17 @@
-function sortArray(status, array) {
-    function sortByStatusAndDate(a, b) {
-        if (a.status === 3 && b.status !== 3) {
-            return -1;
-        } else if (a.status !== 3 && b.status === 3) {
-            return 1;
+function sortArray(inputArray) {
+    const completedItems = [];
+    const uncompletedItems = [];
+
+    inputArray.forEach(item => {
+        if (item.status === 3) {
+            completedItems.push(item);
         } else {
-            return new Date(b.createdOn) - new Date(a.createdOn);
+            uncompletedItems.push(item);
         }
-    }
+    });
 
-    function moveCompletedToBottom(arr) {
-        const status3Objects = arr.filter((obj) => obj.status === 3);
-        const nonStatus3Objects = arr.filter((obj) => obj.status !== 3);
-        return [...nonStatus3Objects, ...status3Objects];
-    }
-
-    let sortedArray = [];
-
-    switch (status) {
-        case DEFAULT_ITEM_SORTING_SEGMENT.NEWEST:
-            sortedArray = array.sort(sortByStatusAndDate);
-            sortedArray = moveCompletedToBottom(sortedArray);
-            break;
-        case DEFAULT_ITEM_SORTING_SEGMENT.OLDEST:
-            sortedArray = array.sort((a, b) => -sortByStatusAndDate(a, b));
-            sortedArray = moveCompletedToBottom(sortedArray);
-            break;
-        case DEFAULT_ITEM_SORTING_SEGMENT.MOST_VOTES:
-            sortedArray = array.sort((a, b) => {
-                if (a.status === 3 && b.status !== 3) {
-                    return -1;
-                } else if (a.status !== 3 && b.status === 3) {
-                    return 1;
-                } else {
-                    return b.upVoteCount - a.upVoteCount;
-                }
-            });
-            sortedArray = moveCompletedToBottom(sortedArray);
-            break;
-        default:
-            break;
-    }
-
-    return sortedArray;
+    return uncompletedItems.concat(completedItems);
 }
-
 function getStartDate(selectedDuration) {
     if (selectedDuration === -1) {
         return null; // Return null for "NEVER" case to indicate no date range filtering

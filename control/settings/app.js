@@ -10,7 +10,15 @@ const itemPushNotificationUsersWith = document.getElementById("pushNotificationU
 const userTagsContainer = document.getElementById("userTagsContainer")
 const itemPushNotificationTagsContainer = document.getElementById("itemPushNotificationTagsContainer")
 const votesNumberInput = document.getElementById('votesNumberInput');
+let activeDropdown = {dropdownElement: null, isOpen: false};
 
+const debounce = (func, delay) => {
+    let timerId;
+    return (...args) => {
+        clearTimeout(timerId);
+        timerId = setTimeout(() => func.apply(this, args), delay);
+    };
+};
 
 const statusUpdatetagsInputContainer = new buildfire.components.control.tagsInput("#statusUpdatetagsInputContainer", {
     languageSettings:{
@@ -57,18 +65,14 @@ const pushNotificationtagsInputContainer = new buildfire.components.control.tags
     }
 });
 
-const openDropdown = (e,dropdownFor) => {
+const openHideCompletedItemsDropdown = (e) => {
     e.stopPropagation();
-    let dropdown;
-    if(dropdownFor === 'inAppPurchaseDropdown'){
-        dropdown = document.querySelector('#inAppPurchaseDropdown');
-    }else{
-        dropdown = document.querySelector('#hideCompletedDropdown');
-    }
-    toggleDropdown(dropdown);
-    document.body.onclick = () => {
-        toggleDropdown(dropdown, true);
-    };
+    toggleDropdown(e.target.parentElement);
+};
+
+const openIAPDropdown = (e) => {
+    e.stopPropagation();
+    toggleDropdown(e.target.parentElement);
 };
 
 const toggleDropdown = (dropdownElement, forceClose) => {
@@ -78,7 +82,14 @@ const toggleDropdown = (dropdownElement, forceClose) => {
     if (dropdownElement.classList.contains('open') || forceClose) {
         dropdownElement.classList.remove('open');
     } else {
+        document.querySelectorAll('.open').forEach((dropdown) => {
+            dropdown.classList.remove('open');
+        });
         dropdownElement.classList.add('open');
+        activeDropdown = {
+            dropdownElement: dropdownElement,
+            isOpen: true,
+        };
     }
 };
 
@@ -97,6 +108,10 @@ var settings = {}
 
 
 const init = () => {
+    Settings.getProducts().then((products) => {
+        handelIAPproducts(products);
+    });
+    
     Settings.get((err, result)=>{
         settings = result;
         if(result.enableComments){
@@ -106,8 +121,8 @@ const init = () => {
         setCheckedInputItemPushNotification(result.pushNotificationUsersSegment)
         setCheckedInputDefaultItemSorting(result.defaultItemSorting)
         setDropdownCompletedItems(result.hideCompletedItems);
-        showVotesPerPurchaseInput(result.productId);
-        setVotesNumberInput(result.votesPerPurchase);
+        showVotesPerPurchaseInput(result.selectedPurchaseProductId);
+        setVotesNumberInput(result.votesCountPerPurchase);
         if(settings.statusUpdateTags && settings.statusUpdateTags.length){
             statusUpdatetagsInputContainer.set(settings.statusUpdateTags);
         }
@@ -116,18 +131,24 @@ const init = () => {
         }
         showUsersTagsContainer();
         showItemPushNotificationTagsContainer();
-    }).then(()=>{
-        Settings.getProducts().then(products =>{
-            let currentProduct = (products.find(product => product.id === settings.productId));
-            if(currentProduct && currentProduct.name && currentProduct.id !== null){
-                setDropdownInAppPurchase(currentProduct.name);
-            }else{
-                setDropdownInAppPurchase('Disabled');
-            }
-            buildInAppPurchaseDropdown(products)
-        }).catch(err => console.error(err));
     });
+
+    document.body.onclick = () => {
+        if (activeDropdown.isOpen) {
+            toggleDropdown(activeDropdown.dropdownElement, true);
+        }
+    };
 }
+
+const handelIAPproducts = (products) => {
+    let currentProduct = (products.find(product => product.id === settings.selectedPurchaseProductId));
+    if(currentProduct && currentProduct.name){
+        setDropdownInAppPurchase(currentProduct.name);
+    }else{
+        setDropdownInAppPurchase('Disabled');
+    }
+    buildInAppPurchaseDropdown(products)
+};
 
 const buildInAppPurchaseDropdown = (products) => {
     const productsList = document.getElementById('productsList');
@@ -261,7 +282,6 @@ const setDropdownInAppPurchase = (status) => {
 };
 
 const setVotesNumberInput = (number) => {
-    const votesNumberInput = document.getElementById('votesNumberInput');
     votesNumberInput.value = number;
 };
 
@@ -323,12 +343,11 @@ const changeInAppPurchase = (product) => {
 const handelIAPChange = (product) =>{
     showVotesPerPurchaseInput(product.id);
     setDropdownInAppPurchase(product.name);
-    settings.productId = product.id;
+    settings.selectedPurchaseProductId = product.id;
     save();
 };
 
 const changeVotesPerPurchase = () => {
-    const votesNumberInput = document.getElementById('votesNumberInput');
     const errMessage = document.getElementById('errMessage');
     const votesNumber = Number(votesNumberInput.value);
 
@@ -346,28 +365,17 @@ const changeVotesPerPurchase = () => {
         errMessage.classList.add('hidden');
     }
 
-    settings.votesPerPurchase = Number(votesNumberInput.value);
+    settings.votesCountPerPurchase = Number(votesNumberInput.value);
     save();
 };
 
-const save = () => {
-    Settings.save(settings,()=>{})
+const save = debounce(() => {
+    Settings.save(settings, () => {});
 
     buildfire.messaging.sendMessageToWidget({
         type: 'UpdateSettings',
-        data: settings
+        data: settings,
     });
-}
-
-const debounce = (func, delay) => {
-    let timerId;
-    return (...args) => {
-        clearTimeout(timerId);
-        timerId = setTimeout(() => func.apply(this, args), delay);
-    };
-};
-
-const debouncedChangeVotesPerPurchase = debounce(changeVotesPerPurchase, 400);
-votesNumberInput.addEventListener('input', debouncedChangeVotesPerPurchase);
+}, 400); 
 
 init();

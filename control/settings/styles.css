@@ -194,8 +194,8 @@ label {
     transition: 0.3s;
 }
 
-#hideCompletedDropdown,
-#inAppPurchaseDropdown {
+.hide-completed-items-dropdown,
+.in-app-purchase-dropdown {
     width: 100%;
 }
 

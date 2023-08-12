@@ -1,18 +1,18 @@
   const TAG = 'settings';
 
-  var STATUS_UPDATE_SEGMENT = Object.freeze({
+  const STATUS_UPDATE_SEGMENT = Object.freeze({
     ALL_USERS: 1,
     NO_USERS: 2,
     TAGS: 3,
   });
  
-  var PUSH_NOTIFICATIONS_SEGMENT = Object.freeze({
+  const PUSH_NOTIFICATIONS_SEGMENT = Object.freeze({
     ALL_USERS: 1,
     NO_USERS: 2,
     TAGS: 3,
   });
 
-  var DEFAULT_ITEM_SORTING_SEGMENT = Object.freeze({
+  const DEFAULT_ITEM_SORTING_SEGMENT = Object.freeze({
     NEWEST: 1,
     OLDEST: 2,
     MOST_VOTES: 3,
@@ -27,8 +27,8 @@
       this.pushNotificationTags = data.pushNotificationTags || [];
       this.defaultItemSorting = data.defaultItemSorting || DEFAULT_ITEM_SORTING_SEGMENT.NEWEST;
       this.hideCompletedItems = data.hideCompletedItems || 0;
-      this.productId = data.productId || null;
-      this.votesPerPurchase = data.votesPerPurchase || 1;
+      this.selectedPurchaseProductId = data.selectedPurchaseProductId || null;
+      this.votesCountPerPurchase = data.votesCountPerPurchase || 1;
       this.createdOn = data.createdOn || new Date();
       this.createdBy = data.createdBy || null;
       this.lastUpdatedOn = data.lastUpdatedOn || new Date();

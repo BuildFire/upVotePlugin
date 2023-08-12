@@ -74,7 +74,7 @@ var config = {};
 			let blockIAP = platform !== 'ios' && platform !== 'android';
 			$scope.blockVote = false;	
 			showSkeleton()
-			getSettings();
+
 			const suggestionId = getSuggestionIdOnNewNotification()
 			if(suggestionId != ''){
 				navigateToItemDetails(suggestionId)
@@ -187,12 +187,12 @@ var config = {};
 			}
 		
 			function getSettings() {
-				Settings.get((err, result)=>{
+				return Settings.get((err, result)=>{
 					$rootScope.settings = result;
 				})
 			}
 
-			function getString(stringkey){
+			function getLanguageString(stringkey){
 				let string = '';
 				buildfire.language.get({stringKey: stringkey}, (err, result) => {
 					if (err) return console.error(err);
@@ -203,13 +203,28 @@ var config = {};
 			}
 		
 			function init() {
-				let date = new Date();
-				date.setDate(date.getDate() - 1);
-		
-		
 				const options = {
-					sort: { createdOn: -1 }
-				}
+                    sort: { createdOn: -1 },
+                    filter: {},
+                };
+
+                if ($rootScope.settings.defaultItemSorting === 2) {
+                    options.sort.createdOn = 1;
+                } else if ($rootScope.settings.defaultItemSorting === 3) {
+                    options.sort = { upVoteCount: -1 };
+                }
+
+                if ($rootScope.settings.hideCompletedItems !== -1) {
+                    const startDate = getStartDate(
+                        $rootScope.settings.hideCompletedItems
+                    );
+                    options.filter = {
+                        $or: [
+                            { status: { $ne: 3 } },
+                            { status: 3, createdOn: { $gte: startDate } },
+                        ],
+                    };
+                }
 
 				buildfire.datastore.onUpdate(function (obj) {
 					if(obj && obj.tag === ''){
@@ -225,11 +240,10 @@ var config = {};
 					if (!$scope.$$phase) $scope.$apply();
 				});
 				
-				
+
 				Promise.all([callBacklogText, callInProgressText,callCompletedText]).then(result => {
 					$rootScope.TextStatuses = result;
 					Suggestion.search(options).then(results => {
-						results = results.filter(x => x.status != 3 || (x.status == 3 && new Date(x.createdOn) >= getStartDate($rootScope.settings.hideCompletedItems)))
 						if (!results || !results.length) return update([]);
 			
 						results = results.map(checkYear);
@@ -261,7 +275,7 @@ var config = {};
 							hideSkeleton();
 							UpVoteHome.isInitalized = true;
 							$scope.suggestions = data;
-							$scope.suggestions = sortArray($rootScope.settings.defaultItemSorting,$scope.suggestions);
+							$scope.suggestions = sortArray($scope.suggestions);
 							buildfire.spinner.hide();
 							if (!$scope.$$phase) $scope.$apply();
 						}
@@ -280,7 +294,9 @@ var config = {};
 				
 			}
 		
-			getUser(init);
+			getSettings().then(()=>{
+				getUser(init);
+			})
 		
 			buildfire.auth.onLogin(user => {
 				_currentUser = user;
@@ -476,39 +492,47 @@ var config = {};
 			
 			}
 
-			const checkUserCredits = function () {
-				const firstTimePurchaseOptions = {
-					title:
-						getString('firstTimePurchaseMessage.title') ||
-						'Buy Credit',
-					message:
-						getString('firstTimePurchaseMessage.body') ||
-						'Upvoting items is a premium feature. To upvote items, you need to purchase voting credits.',
-					confirmButton: {
-						text:
-							getString('firstTimePurchaseMessage.buy') || 'Buy',
-					},
-					cancelButtonText:
-						getString('firstTimePurchaseMessage.cancel') ||
-						'Cancel',
-				};
+			const getPurchaseDialogOption = function(firstTimePurchase) {
+				let options = {};
+				if(!firstTimePurchase){
+					options = {
+						title:
+							getLanguageString('firstTimePurchaseMessage.title') ||
+							'Buy Credit',
+						message:
+							getLanguageString('firstTimePurchaseMessage.body') ||
+							'Upvoting items is a premium feature. To upvote items, you need to purchase voting credits.',
+						confirmButton: {
+							text:
+								getLanguageString('firstTimePurchaseMessage.buy') || 'Buy',
+						},
+						cancelButtonText:
+							getLanguageString('firstTimePurchaseMessage.cancel') ||
+							'Cancel',
+					};
+				}else{
+					options = {
+						title:
+							getLanguageString('votesDepletedMessage.title') ||
+							'Get More Votes',
+						message:
+							getLanguageString('votesDepletedMessage.body') ||
+							"You don't have enough credit to cast a vote. Please consider purchasing additional voting credit.$",
+						confirmButton: {
+							text:
+								getLanguageString('votesDepletedMessage.buyMore') ||
+								'Buy More',
+						},
+						cancelButtonText:
+							getLanguageString('votesDepletedMessage.cancel') || 'Cancel',
+					};
+				}
 
-				const defaultOptions = {
-					title:
-						getString('votesDepletedMessage.title') ||
-						'Get More Votes',
-					message:
-						getString('votesDepletedMessage.body') ||
-						"You don't have enough credit to cast a vote. Please consider purchasing additional voting credit.$",
-					confirmButton: {
-						text:
-							getString('votesDepletedMessage.buyMore') ||
-							'Buy More',
-					},
-					cancelButtonText:
-						getString('votesDepletedMessage.cancel') || 'Cancel',
-				};
-				if (!$rootScope.settings.productId) {
+				return options;
+			}
+
+			const checkUserCredits = function () {
+				if (!$rootScope.settings.selectedPurchaseProductId) {
 					return Promise.resolve({});
 				}
 				return UserCredit.get().then((result) => {
@@ -519,70 +543,14 @@ var config = {};
 						return result;
 					} else {
 						buildfire.dialog.confirm(
-							!result.firstTimePurchase
-								? defaultOptions
-								: firstTimePurchaseOptions,
+							getPurchaseDialogOption(result.firstTimePurchase),
 							(err, isConfirmed) => {
 								if (err) {
 									return console.error(err);
 								}
 
 								if (isConfirmed) {
-									if ($rootScope.settings.productId) {
-										if (!blockIAP) {
-											$scope.blockVote = true;
-											$scope.$apply();
-											buildfire.dialog.toast({
-												message:
-													getString(
-														'mainScreen.preparingPurchaseMessage'
-													) ||
-													'Getting your purchase ready, please wait...',
-												duration: 5000,
-												type: 'info',
-											});
-											buildfire.services.commerce.inAppPurchase.purchase(
-												$rootScope.settings.productId,
-												(err, res) => {
-													if (err) {
-														return console.error(
-															err
-														);
-													}
-													if (res.hasErrors) {
-														return console.error(
-															'Something went wrong, please try again'
-														);
-													}
-													if (res.isCancelled) {
-														buildfire.dialog.toast({
-															message:
-																'The purchase was cancelled',
-															type: 'warning',
-														});
-														return;
-													}
-													if (res.isApproved) {
-														return updateUserCredit().then(
-															() => {
-																return result;
-															}
-														);
-													}
-												}
-											);
-										} else {
-											console.warn(
-												"Sorry, you can't purchase this item on a browser, use IOS or Android devices to purchase"
-											);
-											return null;
-										}
-									}
-
-									setTimeout(() => {
-										$scope.blockVote = false;
-										$scope.$apply();
-									}, 3000);
+									return purchaseHandler();
 								} else {
 									$scope.blockVote = false;
 									$scope.$apply();
@@ -593,8 +561,67 @@ var config = {};
 				});
 			};
 
+			const purchaseHandler = function() {
+				if ($rootScope.settings.selectedPurchaseProductId) {
+					if (!blockIAP) {
+						$scope.blockVote = true;
+						$scope.$apply();
+						buildfire.dialog.toast({
+							message:
+								getLanguageString(
+									'mainScreen.preparingPurchaseMessage'
+								) ||
+								'Getting your purchase ready, please wait...',
+							duration: 5000,
+							type: 'info',
+						});
+						buildfire.services.commerce.inAppPurchase.purchase(
+							$rootScope.settings.selectedPurchaseProductId,
+							(err, res) => {
+								if (err) {
+									return console.error(
+										err
+									);
+								}
+								if (res.hasErrors) {
+									buildfire.dialog.toast({
+										message:
+											'Something went wrong, please try again later.',
+										type: 'danger',
+									});
+								}
+								if (res.isCancelled) {
+									buildfire.dialog.toast({
+										message:
+											'The purchase was cancelled',
+										type: 'warning',
+									});
+									return;
+								}
+								if (res.isApproved) {
+									return updateUserCredit().then(
+										() => {
+											return result;
+										}
+									);
+								}
+							}
+						);
+					} else {
+						console.warn(
+							"Sorry, you can't purchase this item on a browser, use IOS or Android devices to purchase"
+						);
+						return null;
+					}
+				}
+				setTimeout(() => {
+					$scope.blockVote = false;
+					$scope.$apply();
+				}, 3000);
+			}
+
 			const updateUserCredit = function () {
-				let encrypted = encryptCredit($rootScope.settings.votesPerPurchase, secretKey);
+				let encrypted = encryptCredit($rootScope.settings.votesCountPerPurchase, secretKey);
 				let payload = {
 					$set: {
 						createdBy: _currentUser.userId,
@@ -647,7 +674,7 @@ var config = {};
 							);
 						}
 
-						if ($rootScope.settings.productId) {
+						if ($rootScope.settings.selectedPurchaseProductId) {
 							let credit = Number(
 								decryptCredit(
 									res.credits,
@@ -719,7 +746,7 @@ var config = {};
 						if (!suggestionObj.upVotedBy[user._id]) {
 							upVoteHandler(suggestionObj, user, isUserUpvoted);
 						} else {
-							if($rootScope.settings.productId){
+							if($rootScope.settings.selectedPurchaseProductId){
 								unvoteDialog((err, result) => {
 									if (err) return new Error(err);
 									if (result){
@@ -762,12 +789,12 @@ var config = {};
 
 			const unvoteDialog = (callback) =>{
 				const dialogOptions = {
-					title:getString('unvoteMessage.title') || 'Remove Vote',
-					message:getString('unvoteMessage.body') || 'Removing your vote will not refund your voting credit. Voting again will deduct anther credit.',
+					title:getLanguageString('unvoteMessage.title') || 'Remove Vote',
+					message:getLanguageString('unvoteMessage.body') || 'Removing your vote will not refund your voting credit. Voting again will deduct anther credit.',
 					confirmButton:{
-						text:getString('unvoteMessage.remove') || 'Remove'
+						text:getLanguageString('unvoteMessage.remove') || 'Remove'
 					},
-					cancelButtonText:getString('unvoteMessage.cancel') || 'Cancel',
+					cancelButtonText:getLanguageString('unvoteMessage.cancel') || 'Cancel',
 				}
 				buildfire.dialog.confirm(
 					dialogOptions,
@@ -785,18 +812,18 @@ var config = {};
 			window.openPopup = function() {
 				if(_currentUser){
 					const step1 = {
-						placeholder:getString('addNewItem.title') || "Enter short title*",
-						saveText:getString('addNewItem.next')  || "Next",
+						placeholder:getLanguageString('addNewItem.title') || "Enter short title*",
+						saveText:getLanguageString('addNewItem.next')  || "Next",
 						defaultValue: "",
-						cancelText: getString('addNewItem.cancel') || "Cancel",
+						cancelText: getLanguageString('addNewItem.cancel') || "Cancel",
 						required: true,
 						maxLength: 500
 					  }
 					const step2 = {
-						placeholder: getString('addNewItem.description') || "Add more details*",
-						saveText: getString('addNewItem.submit') || "Submit",
+						placeholder: getLanguageString('addNewItem.description') || "Add more details*",
+						saveText: getLanguageString('addNewItem.submit') || "Submit",
 						defaultValue: "",
-						cancelText: getString('addNewItem.cancel') || "Cancel",
+						cancelText: getLanguageString('addNewItem.cancel') || "Cancel",
 						attachments: {
 							images: { enable: true, multiple: false },
 						  },

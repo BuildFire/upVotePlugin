@@ -2,7 +2,7 @@ class UserCredit {
     constructor(data = {}) {
         this.id = data.id;
         this.credits = data.credits || '';
-        this.firsTimePurchase = data.firsTimePurchase || false;
+        this.firstTimePurchase = data.firstTimePurchase || false;
         this.createdOn = data.createdOn || new Date();
         this.createdBy = data.createdBy || null;
         this.lastUpdatedOn = data.lastUpdatedOn || new Date();
@@ -17,7 +17,7 @@ class UserCredit {
             id: this.id,
             credits: this.credits,
             createdOn: this.createdOn,
-            firsTimePurchase: this.firsTimePurchase,
+            firstTimePurchase: this.firstTimePurchase,
             createdBy: this.createdBy,
             lastUpdatedOn: this.lastUpdatedOn,
             lastUpdatedBy: this.lastUpdatedBy,
@@ -40,19 +40,20 @@ class UserCredit {
      */
     static get() {
         return new Promise((resolve, reject) => {
-            buildfire.userData.get(this.TAG, (e, results) => {
-                if (e) {
-                    reject(e);
+            buildfire.userData.get(this.TAG, (err, results) => {
+                if (err) {
+                    return reject(err);
                 }
                 if (
                     !results ||
                     !results.data ||
                     Object.keys(results.data).length === 0
-                ) {
-                    const data = new UserCredit();
-                    this.save(data);
-                    results.id = resolve(new UserCredit(results.data).toJSON());
+                    ) {
+                        const data = new UserCredit();
+                        this.save(data);
+                        resolve(new UserCredit(data).toJSON());
                 } else {
+                    results.data.id = results.id;
                     resolve(new UserCredit(results.data).toJSON());
                 }
             });
@@ -68,13 +69,7 @@ class UserCredit {
         return new Promise((resolve, reject) => {
             buildfire.userData.save(data, this.TAG, (err, results) => {
                 if (err) return reject(err);
-                if (results.data.$set && results.data.$set.credits) {
-                    let userCredit = new UserCredit();
-                    userCredit.credits = results.data.$set.credits;
-                    resolve(new UserCredit(userCredit).toJSON());
-                } else {
-                    resolve(new UserCredit(results).toJSON());
-                }
+                    resolve(results);
             });
         });
     }

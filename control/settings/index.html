@@ -174,9 +174,9 @@
           <span class="tip btn-info-icon btn-primary"><span class="cp-tooltip">Set the time interval for removing completed items from the list.</span>
         </div>
         <div class="main col-md-8 pull-right padding-lr-6">
-          <div class="btn-group" id="hideCompletedDropdown">
+          <div class="btn-group hide-completed-items-dropdown" id="hideCompletedDropdown">
             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
-              aria-expanded="false" onclick="openDropdown(event)">
+              aria-expanded="false" onclick="openHideCompletedItemsDropdown(event)">
               <span id="activeCompletedItem">Immediately</span>
               <span class="icon-chevron-down rotate icon"></span>
             </button>
@@ -202,9 +202,9 @@
           <span class="tip btn-info-icon btn-primary"><span class="cp-tooltip">If you intend to charge users for voting, please select a product to enable In-App Purchases. The PWA version is not supported, and voting will be disabled on the PWA.</span>
         </div>
         <div class="main col-md-8 pull-right padding-lr-6">
-          <div class="btn-group" id="inAppPurchaseDropdown">
+          <div class="btn-group in-app-purchase-dropdown" id="inAppPurchaseDropdown">
             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
-              aria-expanded="false" onclick="openDropdown(event,'inAppPurchaseDropdown')">
+              aria-expanded="false" onclick="openIAPDropdown(event)">
               <span id="activeIAPItem">Disabled</span>
               <span class="icon-chevron-down rotate icon"></span>
             </button>
@@ -221,7 +221,7 @@
           <span class="tip btn-info-icon btn-primary"><span class="cp-tooltip">Enter how many votes the user receives with every purchase.</span>
         </div>
         <div class="main col-md-8 pull-right padding-lr-6">
-            <input class="form-control" type="number"  id="votesNumberInput" value="1">
+            <input class="form-control" type="number" onkeyup="changeVotesPerPurchase()"  id="votesNumberInput" value="1">
             <span id="errMessage" class="text-danger hidden"></span>
         </div>
       </div>
