@@ -67,12 +67,12 @@ const pushNotificationtagsInputContainer = new buildfire.components.control.tags
 
 const openHideCompletedItemsDropdown = (e) => {
     e.stopPropagation();
-    toggleDropdown(e.target.parentElement);
+    toggleDropdown(document.getElementById('hideCompletedDropdown'));
 };
 
 const openIAPDropdown = (e) => {
     e.stopPropagation();
-    toggleDropdown(e.target.parentElement);
+    toggleDropdown(document.getElementById('inAppPurchaseDropdown'));
 };
 
 const toggleDropdown = (dropdownElement, forceClose) => {
@@ -104,11 +104,13 @@ pushNotificationtagsInputContainer.onUpdate = (data) => {
     save();
 }
 
-var settings = {}
+let settings = {}
+let products = [];
 
 
 const init = () => {
-    Settings.getProducts().then((products) => {
+    Settings.getProducts().then((result) => {
+        products = result;
         handelIAPproducts(products);
     });
     
@@ -131,6 +133,8 @@ const init = () => {
         }
         showUsersTagsContainer();
         showItemPushNotificationTagsContainer();
+    }).then(()=>{
+        handelIAPproducts(products);
     });
 
     document.body.onclick = () => {
@@ -152,7 +156,7 @@ const handelIAPproducts = (products) => {
 
 const buildInAppPurchaseDropdown = (products) => {
     const productsList = document.getElementById('productsList');
-
+    productsList.innerHTML = '';
     products.forEach((product) => {
         const productElement = document.createElement('li');
         const productContent = document.createElement('a');

@@ -3,6 +3,7 @@ class UserCredit {
         this.id = data.id;
         this.credits = data.credits || '';
         this.firstTimePurchase = data.firstTimePurchase || false;
+        this.userId = data.userId || null;
         this.createdOn = data.createdOn || new Date();
         this.createdBy = data.createdBy || null;
         this.lastUpdatedOn = data.lastUpdatedOn || new Date();
@@ -18,12 +19,19 @@ class UserCredit {
             credits: this.credits,
             createdOn: this.createdOn,
             firstTimePurchase: this.firstTimePurchase,
+            userId: this.userId,
             createdBy: this.createdBy,
             lastUpdatedOn: this.lastUpdatedOn,
             lastUpdatedBy: this.lastUpdatedBy,
             deletedOn: this.deletedOn,
             deletedBy: this.deletedBy,
             isActive: this.isActive,
+            _buildfire: {
+                index: {
+                    string1: this.userId,
+                    date1: this.createdOn,
+                },
+            },
         };
     }
 
@@ -36,40 +44,61 @@ class UserCredit {
 
     /**
      *
-     * @returns user credit data
+     * @param {string} userId
+     * @returns {Promise}
      */
-    static get() {
+    static get(userId) {
         return new Promise((resolve, reject) => {
-            buildfire.userData.get(this.TAG, (err, results) => {
-                if (err) {
-                    return reject(err);
+            buildfire.appData.search(
+                {
+                    filter: {
+                        '$json._buildfire.index.string1': userId,
+                    },
+                },
+                this.TAG,
+                (err, results) => {
+                    if (err) return reject(err);
+
+                    if (!results || !results.length) {
+                        const data = new UserCredit({
+                            userId: userId,
+                        }).toJSON();
+                        this.insert(data).then((res) => {
+                            res.data.id = res.id;
+                            resolve(new UserCredit(res.data).toJSON());
+                        });
+                    } else {
+                        results[0].data.id = results[0].id;
+                        resolve(new UserCredit(results[0].data).toJSON());
+                    }
                 }
-                if (
-                    !results ||
-                    !results.data ||
-                    Object.keys(results.data).length === 0
-                    ) {
-                        const data = new UserCredit();
-                        this.save(data);
-                        resolve(new UserCredit(data).toJSON());
-                } else {
-                    results.data.id = results.id;
-                    resolve(new UserCredit(results.data).toJSON());
-                }
+            );
+        });
+    }
+
+    /**
+     * @param {object} data
+     * @returns {Promise}
+     */
+    static insert(data) {
+        return new Promise((resolve, reject) => {
+            buildfire.appData.insert(data, this.TAG, (err, result) => {
+                if (err) return reject(err);
+                resolve(result);
             });
         });
     }
 
     /**
-     *
+     * @param {string} userId
      * @param {object} data
-     * @returns return user credit data
+     * @param {Promise}
      */
-    static save(data) {
+    static update(userId, data) {
         return new Promise((resolve, reject) => {
-            buildfire.userData.save(data, this.TAG, (err, results) => {
+            buildfire.appData.update(userId, data, this.TAG, (err, result) => {
                 if (err) return reject(err);
-                    resolve(results);
+                resolve(result);
             });
         });
     }

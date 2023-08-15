@@ -42,7 +42,21 @@ const Analytics = {
       );
   
       Analytics.registerEvent(
-       analyticKeys.SUGGESTIONS_NUMBER,
+        analyticKeys.SUGGESTIONS_NUMBER,
+        { silentNotification: true },
+        (err, res) => {
+          if (err) console.error(err);
+        }
+      );
+      Analytics.registerEvent(
+        analyticKeys.CHARGING_CREDITS,
+        { silentNotification: true },
+        (err, res) => {
+          if (err) console.error(err);
+        }
+      );
+      Analytics.registerEvent(
+        analyticKeys.CONSUMING_CREDITS,
         { silentNotification: true },
         (err, res) => {
           if (err) console.error(err);

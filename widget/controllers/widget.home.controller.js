@@ -73,6 +73,7 @@ var config = {};
 			const platform = buildfire.context.device.platform.toLowerCase();
 			let blockIAP = platform !== 'ios' && platform !== 'android';
 			$scope.blockVote = false;	
+			$scope.currentUserCreditData = null;
 			showSkeleton()
 
 			const suggestionId = getSuggestionIdOnNewNotification()
@@ -535,7 +536,10 @@ var config = {};
 				if (!$rootScope.settings.selectedPurchaseProductId) {
 					return Promise.resolve({});
 				}
-				return UserCredit.get().then((result) => {
+				let userId = '';
+				getUser((user)=> {userId = user.userId; });				
+				return UserCredit.get(userId).then((result) => {
+					$scope.currentUserCreditData = result;
 					let credits = Number(
 						decryptCredit(result.credits, secretKey)
 					);
@@ -629,7 +633,9 @@ var config = {};
 						firstTimePurchase: true
 					}
 				}
-				return UserCredit.save(payload);
+				return UserCredit.update($scope.currentUserCreditData.id, payload).then(()=>{
+					Analytics.trackAction(analyticKeys.CHARGING_CREDITS.key);
+				});
 			}
 			
 
@@ -693,7 +699,7 @@ var config = {};
 							};
 
 							remainingVotesExpressionOptions.plugin.remainingVotes = credit
-							return UserCredit.save(payload).then(
+							return UserCredit.update($scope.currentUserCreditData.id,payload).then(
 								() => {
 									buildfire.language.get({stringKey: 'mainScreen.voteConfirmed'}, (err, result) => {
 										if (err) return console.error(err);
@@ -702,6 +708,7 @@ var config = {};
 											type: 'info',
 										});
 									});
+									Analytics.trackAction(analyticKeys.CONSUMING_CREDITS.key);
 									return res;
 								}
 							);

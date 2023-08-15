@@ -54,8 +54,7 @@
             }
         },
         "addNewItem": {
-            "title": "First Time Purchase Message",
-            "info": "This message will only be shown if you have enabled In-App Purchases. It will appear when the user upvotes an item for the first time.",
+            "title": "Add New Item",
             "labels": {
                 "title": {
                     "title": "Enter Short Title",
@@ -167,7 +166,7 @@
         },
         "unvoteMessage": {
             "title": "Unvote Message",
-            "info": "This message will only be shown if you have enabled In-App Purchases. It will appear when the user try to remove his vote",
+            "info": "This message will only be shown if you have enabled In-App Purchases. It will appear when the user tries to remove a vote.",
             "labels": {
                 "title": {
                     "title": "Remove Vote",
@@ -177,11 +176,11 @@
                     "placeholder": "Remove Vote"
                 },
                 "body": {
-                    "title": "Removing Your Vote Will Not Refund Your Voting Credit. Voting Again Will Deduct Anther Credit.",
-                    "defaultValue": "Removing your vote will not refund your voting credit. Voting again will deduct anther credit.",
+                    "title": "Removing Your Vote Will Not Refund Your Voting Credit. Voting Again Will Deduct Another Credit.",
+                    "defaultValue": "Removing your vote will not refund your voting credit. Voting again will deduct Another credit.",
                     "inputType": "text",
                     "toolTip": "",
-                    "placeholder": "Removing your vote will not refund your voting credit. Voting again will deduct anther credit."
+                    "placeholder": "Removing your vote will not refund your voting credit. Voting again will deduct Another credit."
                 },
                 "cancel": {
                     "title": "Cancel",
