@@ -708,7 +708,9 @@ var config = {};
 											type: 'info',
 										});
 									});
-									Analytics.trackAction(analyticKeys.CONSUMING_CREDITS.key);
+									if(credit === 0){
+										Analytics.trackAction(analyticKeys.CONSUMING_CREDITS.key);
+									}
 									return res;
 								}
 							);

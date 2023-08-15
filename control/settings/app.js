@@ -111,7 +111,6 @@ let products = [];
 const init = () => {
     Settings.getProducts().then((result) => {
         products = result;
-        handelIAPproducts(products);
     });
     
     Settings.get((err, result)=>{
@@ -151,12 +150,13 @@ const handelIAPproducts = (products) => {
     }else{
         setDropdownInAppPurchase('Disabled');
     }
-    buildInAppPurchaseDropdown(products)
+    if(products.length){
+        buildInAppPurchaseDropdown(products);
+    }
 };
 
 const buildInAppPurchaseDropdown = (products) => {
     const productsList = document.getElementById('productsList');
-    productsList.innerHTML = '';
     products.forEach((product) => {
         const productElement = document.createElement('li');
         const productContent = document.createElement('a');
