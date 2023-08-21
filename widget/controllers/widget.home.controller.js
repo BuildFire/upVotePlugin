@@ -6,12 +6,12 @@ var appThemeColors = null;
 var isCardClicked = false;
 buildfire.appearance.titlebar.show();
 
-const callBacklogText = getLanguageValue("mainScreen.backlog") 
-const callInProgressText = getLanguageValue("mainScreen.inProgress") 
+const callBacklogText = getLanguageValue("mainScreen.backlog")
+const callInProgressText = getLanguageValue("mainScreen.inProgress")
 const callCompletedText = getLanguageValue("mainScreen.completed")
-const voteConfirmedText = getLanguageValue("mainScreen.voteConfirmed")	
+const voteConfirmedText = getLanguageValue("mainScreen.voteConfirmed")
 
-// secret key for user credit encoding 
+// secret key for user credit encoding
 const secretKey = 'upvote';
 
 function getLanguageValue(stringkey) {
@@ -72,7 +72,7 @@ var config = {};
 			UpVoteHome.text;
 			const platform = buildfire.context.device.platform.toLowerCase();
 			let blockIAP = platform !== 'ios' && platform !== 'android';
-			$scope.blockVote = false;	
+			$scope.blockVote = false;
 			$scope.currentUserCreditData = null;
 			showSkeleton()
 
@@ -98,11 +98,11 @@ var config = {};
 					remainingVotes: 0,
 				}
 			}
-			
+
 			buildfire.dynamic.expressions.getContext = (options, callback) => {
 				callback(null, remainingVotesExpressionOptions)
-			}	
-			
+			}
+
 			UpVoteHome.goToItemDetails = function (selectedItem) {
 				if($scope.blockVote) return;
 
@@ -142,7 +142,7 @@ var config = {};
 						_suggestion.imgUrl = getUserImage(_suggestion.createdBy);
 						_suggestion._createdOn = getCurrentDate(_suggestion.createdOn);
 						_suggestion._displayName = getUserName(_suggestion.createdBy);
-					
+
 						ViewStack.push({
 							template: 'Item_details',
 							item: _suggestion
@@ -151,7 +151,7 @@ var config = {};
 
 						buildfire.history.push('Item_details', { elementToShow: 'Item_details' })
 					})
-				
+
 				})
 			}
 
@@ -171,7 +171,7 @@ var config = {};
                 }
             }
 
-			
+
 			function showSkeleton() {
 				let skeleton = document.getElementById("skeleton")
 				for(let i=0;i<=2;i++){
@@ -181,12 +181,12 @@ var config = {};
 					skeleton.append(div);
 				}
 			}
-		
+
 			function hideSkeleton() {
 				let skeleton = document.getElementById("skeleton")
 				skeleton.style.display = "none";
 			}
-		
+
 			function getSettings() {
 				return Settings.get((err, result)=>{
 					$rootScope.settings = result;
@@ -202,7 +202,7 @@ var config = {};
 
 				  return string;
 			}
-		
+
 			function init() {
 				const options = {
                     sort: { createdOn: -1 },
@@ -233,20 +233,20 @@ var config = {};
 						UpVoteHome.text = config.text;
 						if (!$scope.$$phase) $scope.$apply();
 					}
-					
+
 				});
 				buildfire.datastore.get(function (err, obj) {
 					if (obj) config = obj.data;
 					UpVoteHome.text = config.text;
 					if (!$scope.$$phase) $scope.$apply();
 				});
-				
+
 
 				Promise.all([callBacklogText, callInProgressText,callCompletedText]).then(result => {
 					$rootScope.TextStatuses = result;
 					Suggestion.search(options).then(results => {
 						if (!results || !results.length) return update([]);
-			
+
 						results = results.map(checkYear);
 						const promises = results.map(suggestion => {
 							return new Promise(resolve => {
@@ -255,23 +255,23 @@ var config = {};
 										console.warn('failed to update user profile:', suggestion.createdBy);
 										return resolve(suggestion);
 									}
-			
+
 									const hasUpdate = suggestion.createdBy.displayName !== updatedUser.displayName;
-			
+
 									suggestion.createdBy = updatedUser;
 									resolve(suggestion);
-			
+
 									if (!hasUpdate) return;
 									// update suggestion out of sync for next time
 									Suggestion.update(suggestion).then(()=>{})
 								});
 							});
 						});
-			
+
 						Promise.all(promises)
 							.then(update)
 							.catch(console.error);
-			
+
 						function update(data) {
 							hideSkeleton();
 							UpVoteHome.isInitalized = true;
@@ -280,7 +280,7 @@ var config = {};
 							buildfire.spinner.hide();
 							if (!$scope.$$phase) $scope.$apply();
 						}
-			
+
 						function checkYear(item) {
 							item._createdOn = getCurrentDate(item.createdOn);
 							item._displayName = getUserName(item.createdBy)
@@ -292,23 +292,23 @@ var config = {};
 						}
 					}).catch(err => console.log(err))
 				})
-				
+
 			}
-		
+
 			getSettings().then(()=>{
 				getUser(init);
 			})
-		
+
 			buildfire.auth.onLogin(user => {
 				_currentUser = user;
 				init();
 			});
-		
+
 			buildfire.auth.onLogout(() => {
 				_currentUser = null;
 				init();
 			});
-		
+
 			function getUserImage(user){
 				var url = './avatar.png';
 				if (user) {
@@ -318,16 +318,16 @@ var config = {};
 				}
 				return url;
 			}
-		
+
 			function renderStatusItem(text, index){
 				const element = `
 				<div style='display:flex;color:'${appThemeColors.headerText}';font-weight:500;font-size:16px;line-height:24px'>
 						<span style='width: 24px;height: 24px;border-radius: 50%;margin-right: 16px;background-color:
 						   ${getStatusColor(index)}'></span> ${text} </div>`
-		
+
 				return element;
 			}
-		
+
 			function getStatusColor(index){
 				switch (index) {
 					case 1:
@@ -340,7 +340,7 @@ var config = {};
 			}
 
 			function buildHeaderContentHtml(title, description){
-				
+
 				const div = document.createElement("div")
 				const titleParagraph = document.createElement("p")
 				titleParagraph.style.color = appThemeColors.bodyText;
@@ -360,11 +360,11 @@ var config = {};
 
 				return div.innerHTML;
 			}
-		
+
 			$rootScope.goSocial = (suggestion = {}) => {
 				isCardClicked = true;
 				if (!suggestion || !$rootScope.settings.enableComments) return;
-		
+
 				const { title, createdOn, createdBy} = suggestion;
 
 				const navigateToCwByDefault = (
@@ -390,7 +390,7 @@ var config = {};
 					pluginTypeOrder: navigateToCwByDefault ? ['community', 'premium_social', 'social'] : ['premium_social', 'social', 'community']
 				}, () => { });
 			};
-		
+
 			$rootScope.showVoterModal = function (suggestion) {
 				isCardClicked = true;
 				var voterIds = Object.keys(suggestion.upVotedBy);
@@ -408,16 +408,16 @@ var config = {};
 					for(let i=0;i<users.length;i++){
 						if(users[i]){
 							listItems.push({
-								text: getUserName(users[i]), imageUrl:buildfire.auth.getUserPictureUrl({ userId: users[i]._id }) 
+								text: getUserName(users[i]), imageUrl:buildfire.auth.getUserPictureUrl({ userId: users[i]._id })
 							})
 						}
-						
+
 					}
 					buildfire.components.drawer.open(
 						{
 						  content: '<b>Upvotes</b>',
 						  isHTML: true,
-						  triggerCallbackOnUIDismiss: false,   
+						  triggerCallbackOnUIDismiss: false,
 						  autoUseImageCdn: true,
 						  listItems: listItems
 						},
@@ -460,12 +460,12 @@ var config = {};
 						{
 							content: '<b>Update Status</b>',
 							isHTML: true,
-							triggerCallbackOnUIDismiss: false,   
+							triggerCallbackOnUIDismiss: false,
 							listItems: listItems
 						},
 						(err, result) => {
 							if(suggestion.status != result.id){
-								suggestion.status = parseInt(result.id) 
+								suggestion.status = parseInt(result.id)
 								Suggestion.update(suggestion).then(()=>{
 									suggestion.statusName = $rootScope.TextStatuses[suggestion.status-1]
 									const voterIds = Object.keys(suggestion.upVotedBy);
@@ -490,7 +490,7 @@ var config = {};
 							buildfire.components.drawer.closeDrawer();
 						}
 					);
-			
+
 			}
 
 			const getPurchaseDialogOption = function(firstTimePurchase) {
@@ -537,7 +537,7 @@ var config = {};
 					return Promise.resolve({});
 				}
 				let userId = '';
-				getUser((user)=> {userId = user.userId; });				
+				getUser((user)=> {userId = user.userId; });
 				return UserCredit.get(userId).then((result) => {
 					$scope.currentUserCreditData = result;
 					let credits = Number(
@@ -637,7 +637,7 @@ var config = {};
 					Analytics.trackAction(analyticKeys.CHARGING_CREDITS.key);
 				});
 			}
-			
+
 
 			const upVoteHandler = (suggestionObj, user, isUserUpvoted)=>{
 				checkUserCredits()
@@ -742,7 +742,7 @@ var config = {};
                         delete suggestionObj.upVotedBy[user._id];
                         updateSuggestion(suggestionObj, user, isUserUpvoted);
 			};
-			
+
 			$rootScope.upVote = function (suggestionObj) {
 				isCardClicked = true;
                 getUser(function (user) {
@@ -751,7 +751,7 @@ var config = {};
                     if (!suggestionObj.hasOwnProperty('upVoteCount'))
                         suggestionObj.upVoteCount = 1;
                     let isUserUpvoted = false;
-					
+
 						if (!suggestionObj.upVotedBy[user._id]) {
 							upVoteHandler(suggestionObj, user, isUserUpvoted);
 						} else {
@@ -817,7 +817,7 @@ var config = {};
 					}
 				);
 			}
-		
+
 			window.openPopup = function() {
 				if(_currentUser){
 					const step1 = {
@@ -852,90 +852,32 @@ var config = {};
 									paragraph.append(imgEl);
 								}
 							}
-	
+
 							const title = response.results[0].textValue;
 							const description = paragraph.innerHTML;
 							addSuggestion(title, description)
 						}
-						
-   
+
+
 					})
-					
+
 				} else {
 					enforceLogin();
 				}
 			};
-		
+
 			function addSuggestion(title, description) {
-		
+
 				getUser(function (user) {
 					_addSuggestion(user, title, description);
 					Analytics.trackAction(analyticKeys.SUGGESTIONS_NUMBER.key, { _buildfire: { aggregationValue: 1 } });
 					if (!$scope.$$phase) $scope.$apply();
 				});
 			};
-			
-			// ! for demo purposes only
-			$rootScope.insertDummySuggestion = function(dayBefore, title , text){
-				let customDay = document.getElementById('dummyDayInput').value;
-				if(!dayBefore) {
-					dayBefore = Number(customDay);
-					title = `before ${dayBefore} days`;
-				}
-				getUser(function (user) {
-					if (!user || !title || !text) return;
-					
-					var obj = {
-						title: title,
-						suggestion: text,
-						createdBy: user,
-						createdOn: new Date(Date.now() - dayBefore * 24 * 60 * 60 * 1000).toISOString(),
-						upVoteCount: 1,
-						upVotedBy: {},
-						status: SUGGESTION_STATUS.BACKLOG
-					};
-					obj.upVotedBy[user._id] = {
-						votedOn: new Date(),
-						user: user, 
-					};
-			
-					Suggestion.insert(obj, (err, result) => {
-						buildfire.dialog.toast({
-							message: "Your suggestion has been successfully added.",
-							type: "info"
-						  });
-						const suggestion = new Suggestion(result)
-						suggestion.disableUpvote = true;
-						suggestion.statusName = $rootScope.TextStatuses[0];
-						suggestion.upvoteByYou = true;
-						$scope.suggestions.unshift(suggestion);
-						if($rootScope.settings){
-							const title = "A new item has been created";
-							const message = `A "${suggestion.title}" has been created`;
-							if($rootScope.settings.pushNotificationUsersSegment === PUSH_NOTIFICATIONS_SEGMENT.ALL_USERS){
-								PushNotification.sendToAll(title, message, suggestion.id);
-							} else if($rootScope.settings.pushNotificationUsersSegment === PUSH_NOTIFICATIONS_SEGMENT.TAGS){
-								const userTags = $rootScope.settings.pushNotificationTags.map(tag=> tag.tagName);
-								if(userTags.length > 0){
-									PushNotification.sendToUserSegment(title, message, suggestion.id, userTags)
-								}
-							}
-						}
-						suggestion._createdOn = getCurrentDate(suggestion.createdOn);
-						suggestion.createdBy = _currentUser
-						suggestion._displayName = getUserName(suggestion.createdBy);
-						suggestion.imgUrl = getUserImage(suggestion.createdBy);
-	
-						if (!$scope.$$phase) $scope.$apply();
-					})
-				});
-
-			}
-			// !---------
 
 			function _addSuggestion(user, title, text) {
 				if (!user || !title || !text) return;
-				
+
 				var obj = {
 					title: title,
 					suggestion: text,
@@ -947,9 +889,9 @@ var config = {};
 				};
 				obj.upVotedBy[user._id] = {
 					votedOn: new Date(),
-					user: user, 
+					user: user,
 				};
-		
+
 				Suggestion.insert(obj, (err, result) => {
 					buildfire.dialog.toast({
 						message: "Your suggestion has been successfully added.",
@@ -984,7 +926,7 @@ var config = {};
 			function getCurrentDate(createdon){
 				const createdDate = new Date(createdon);
 				const currentDate = new Date();
-				
+
 				const timeDifference = currentDate.getTime() - createdDate.getTime();
 				const minutesDifference = Math.floor(timeDifference / (1000 * 60));
 				const hoursDifference = Math.floor(timeDifference / (1000 * 60 * 60));
