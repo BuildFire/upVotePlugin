@@ -155,21 +155,13 @@ var config = {};
 				})
 			}
 
-			function getUserName(user) {
-                if (user) {
-                    if (user.displayName) {
-                        return user.displayName;
-                    } else if ((user.firstName || user.lastName) && (user.firstName.trim() !=='' || user.lastName.trim() !=='')) {
-                        return (
-                            (user.firstName ? user.firstName : '') +
-                            ' ' +
-                            (user.lastName ? user.lastName : '')
-                        );
-                    } else {
-                        return 'Someone';
-                    }
-                }
-            }
+			function getUserName(user){
+				if(user){
+					if(user.displayName) return user.displayName;
+					else return user.firstName + " " + user.lastName
+				}
+				return "Someone";
+			}
 
 
 			function showSkeleton() {
@@ -188,7 +180,7 @@ var config = {};
 			}
 
 			function getSettings() {
-				return Settings.get((err, result)=>{
+				Settings.get((err, result)=>{
 					$rootScope.settings = result;
 				})
 			}
@@ -204,28 +196,13 @@ var config = {};
 			}
 
 			function init() {
+				let date = new Date();
+				date.setDate(date.getDate() - 1);
+
+
 				const options = {
-                    sort: { createdOn: -1 },
-                    filter: {},
-                };
-
-                if ($rootScope.settings.defaultItemSorting === 2) {
-                    options.sort.createdOn = 1;
-                } else if ($rootScope.settings.defaultItemSorting === 3) {
-                    options.sort = { upVoteCount: -1 };
-                }
-
-                if ($rootScope.settings.hideCompletedItems !== -1) {
-                    const startDate = getStartDate(
-                        $rootScope.settings.hideCompletedItems
-                    );
-                    options.filter = {
-                        $or: [
-                            { status: { $ne: 3 } },
-                            { status: 3, createdOn: { $gte: startDate } },
-                        ],
-                    };
-                }
+					sort: { createdOn: -1 }
+				}
 
 				buildfire.datastore.onUpdate(function (obj) {
 					if(obj && obj.tag === ''){
@@ -245,6 +222,7 @@ var config = {};
 				Promise.all([callBacklogText, callInProgressText,callCompletedText]).then(result => {
 					$rootScope.TextStatuses = result;
 					Suggestion.search(options).then(results => {
+						results = results.filter(x => x.status != 3 || (x.status == 3 && new Date(x.createdOn) >= date))
 						if (!results || !results.length) return update([]);
 
 						results = results.map(checkYear);
@@ -276,7 +254,6 @@ var config = {};
 							hideSkeleton();
 							UpVoteHome.isInitalized = true;
 							$scope.suggestions = data;
-							$scope.suggestions = sortArray($scope.suggestions);
 							buildfire.spinner.hide();
 							if (!$scope.$$phase) $scope.$apply();
 						}
@@ -645,77 +622,26 @@ var config = {};
 					if (res) {
 						isUserUpvoted = true;
 						// vote
-						Analytics.trackAction(
-							analyticKeys.VOTE_NUMBER.key,
-							{
-								votes: 1,
-								_buildfire: { aggregationValue: 1 },
-							}
-						);
+						Analytics.trackAction(analyticKeys.VOTE_NUMBER.key, { votes: 1, _buildfire: { aggregationValue: 1 } });
 
 						suggestionObj.upVoteCount++;
 						suggestionObj.disableUpvote = true;
 						suggestionObj.upVotedBy[user._id] = {
 							votedOn: new Date(),
-							user: user,
+							user: user
 						};
 
-						if (
-							suggestionObj.createdBy._id != user._id
-						) {
+						if (suggestionObj.createdBy._id != user._id) {
 							buildfire.notifications.pushNotification.schedule(
 								{
 									title: 'You got an upvote!',
-									text:
-										getUserName(user) +
-										' upvoted your suggestion ' +
-										suggestionObj.title,
-									users: [
-										suggestionObj.createdBy._id,
-									],
+									text: getUserName(user) + ' upvoted your suggestion ' + suggestionObj.title,
+									users: [suggestionObj.createdBy._id]
 								},
 								function (err) {
 									if (err) console.error(err);
 								}
 							);
-						}
-
-						if ($rootScope.settings.selectedPurchaseProductId) {
-							let credit = Number(
-								decryptCredit(
-									res.credits,
-									secretKey
-								)
-							);
-							credit -= 1;
-							let payload = {
-								$set: {
-									updatedBy: _currentUser.userId,
-									credits: encryptCredit(
-										credit,
-										secretKey
-									),
-								},
-							};
-
-							remainingVotesExpressionOptions.plugin.remainingVotes = credit
-							return UserCredit.update($scope.currentUserCreditData.id,payload).then(
-								() => {
-									buildfire.language.get({stringKey: 'mainScreen.voteConfirmed'}, (err, result) => {
-										if (err) return console.error(err);
-										buildfire.dialog.toast({
-											message: result,
-											type: 'info',
-										});
-									});
-									if(credit === 0){
-										Analytics.trackAction(analyticKeys.CONSUMING_CREDITS.key);
-									}
-									return res;
-								}
-							);
-						} else {
-							return res;
 						}
 					} else {
 						return null;
@@ -821,18 +747,16 @@ var config = {};
 			window.openPopup = function() {
 				if(_currentUser){
 					const step1 = {
-						placeholder:getLanguageString('addNewItem.title') || "Enter short title*",
-						saveText:getLanguageString('addNewItem.next')  || "Next",
+						placeholder: "Enter short title*",
+						saveText: "Next",
 						defaultValue: "",
-						cancelText: getLanguageString('addNewItem.cancel') || "Cancel",
 						required: true,
 						maxLength: 500
 					  }
 					const step2 = {
-						placeholder: getLanguageString('addNewItem.description') || "Add more details*",
-						saveText: getLanguageString('addNewItem.submit') || "Submit",
+						placeholder: "Add more details*",
+						saveText: "Submit",
 						defaultValue: "",
-						cancelText: getLanguageString('addNewItem.cancel') || "Cancel",
 						attachments: {
 							images: { enable: true, multiple: false },
 						  },
@@ -957,7 +881,6 @@ var config = {};
 
 			UpVoteHome.listeners['SETTINGS_UPDATED'] = $rootScope.$on('SETTINGS_UPDATED', function (e, item) {
 				$rootScope.settings = item;
-				init();
 			});
 
 			UpVoteHome.listeners['BEFORE_POP'] = $rootScope.$on('BEFORE_POP', function (e, item) {

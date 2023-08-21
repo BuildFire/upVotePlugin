@@ -92,16 +92,4 @@ class Suggestion {
     });
   }
 
-  static delete(id){
-    return new Promise((resolve, reject) => {
-      buildfire.publicData.delete(id, DBTAG, (e, r) => {
-        if (e) {
-          reject(e);
-        }else{
-          resolve(r);
-        }
-      });
-    });
-  }
-
 }
