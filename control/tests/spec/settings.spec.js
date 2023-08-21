@@ -8,7 +8,8 @@
         statusUpdateUsersSegment: STATUS_UPDATE_SEGMENT.ALL_USERS,
         statusUpdateTags: [],
         pushNotificationUsersSegment: PUSH_NOTIFICATIONS_SEGMENT.NO_USERS,
-        pushNotificationTags: [{tagName: "Pierre", id:1}]
+        pushNotificationTags: [{tagName: "Pierre", id:1}],
+        defaultItemSorting:DEFAULT_ITEM_SORTING_SEGMENT.NEWEST
       };
       Settings.save(testSettings, (err, result) => {
         const settings = result.data;

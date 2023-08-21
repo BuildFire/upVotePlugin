@@ -1,39 +1,202 @@
 {
-	"sections": {
-		"mainScreen": {
-			"title": "General",
-			"info": "",
-			"labels": {
-				"commentButton": {
-					"title": "Comment Button",
-					"defaultValue": "Comment",
-					"required": true,
-					"inputType": "text",
-					"maxLength": 15,
-					"toolTip": "The word Comment in the comment button"
-				},
-				"backlog": {
-					"title": "Backlog",
-					"defaultValue": "Backlog",
-					"inputType": "text",
-					"maxLength": 20,
-					"toolTip": ""
-				},
-				"inProgress": {
-					"title": "In Progress",
-					"defaultValue": "In Progress",
-					"inputType": "text",
-					"maxLength": 20,
-					"toolTip": ""
-				},
-				"completed": {
-					"title": "Completed",
-					"defaultValue": "Completed",
-					"inputType": "text",
-					"maxLength": 20,
-					"toolTip": ""
-				}
-			}
-		}
-	}
+    "sections": {
+        "mainScreen": {
+            "title": "General",
+            "info": "",
+            "labels": {
+                "commentButton": {
+                    "title": "Comment",
+                    "defaultValue": "Comment",
+                    "required": true,
+                    "inputType": "text",
+                    "maxLength": 15,
+                    "toolTip": "The word Comment in the comment button",
+                    "placeholder": "Comment"
+                },
+                "backlog": {
+                    "title": "Backlog",
+                    "defaultValue": "Backlog",
+                    "inputType": "text",
+                    "maxLength": 20,
+                    "toolTip": "",
+                    "placeholder": "Backlog"
+                },
+                "inProgress": {
+                    "title": "In Progress",
+                    "defaultValue": "In Progress",
+                    "inputType": "text",
+                    "maxLength": 20,
+                    "toolTip": "",
+                    "placeholder": "In Progress"
+                },
+                "completed": {
+                    "title": "Completed",
+                    "defaultValue": "Completed",
+                    "inputType": "text",
+                    "maxLength": 20,
+                    "toolTip": "",
+                    "placeholder": "Completed"
+                },
+                "voteConfirmed": {
+                    "title": "Thank You for Your Vote! You Have [Votes Left] Votes Left.",
+                    "defaultValue": "Thank you for your vote! You have ${context.plugin.remainingVotes} votes left.",
+                    "inputType": "text",
+                    "toolTip": "This message will only be shown if you have enabled the In-App purchase system.",
+                    "placeholder": "Thank you for your vote! You have ${context.plugin.remainingVotes} votes left."
+                },
+                "preparingPurchaseMessage": {
+                    "title": "Getting Your Purchase Ready, Please Wait…",
+                    "defaultValue": "Getting your purchase ready, please wait...",
+                    "inputType": "text",
+                    "toolTip": "",
+                    "placeholder": "Getting your purchase ready, please wait..."
+                }
+            }
+        },
+        "addNewItem": {
+            "title": "Add New Item",
+            "labels": {
+                "title": {
+                    "title": "Enter Short Title",
+                    "defaultValue": "Enter short title",
+                    "inputType": "text",
+                    "toolTip": "",
+                    "placeholder": "Enter short title"
+                },
+                "description": {
+                    "title": "Add More Details",
+                    "defaultValue": "Add more details",
+                    "inputType": "text",
+                    "toolTip": "",
+                    "placeholder": "Add more details"
+                },
+                "cancel": {
+                    "title": "Cancel",
+                    "defaultValue": "Cancel",
+                    "inputType": "text",
+                    "toolTip": "",
+                    "maxLength": 9,
+                    "placeholder": "Cancel"
+                },
+                "next": {
+                    "title": "Next",
+                    "defaultValue": "Next",
+                    "inputType": "text",
+                    "toolTip": "",
+                    "maxLength": 9,
+                    "placeholder": "Next"
+                },
+                "submit": {
+                    "title": "Submit",
+                    "defaultValue": "Submit",
+                    "inputType": "text",
+                    "toolTip": "",
+                    "maxLength": 9,
+                    "placeholder": "Submit"
+                }
+            }
+        },
+        "firstTimePurchaseMessage": {
+            "title": "First Time Purchase Message",
+            "info": "This message will only be shown if you have enabled In-App Purchases. It will appear when the user upvotes an item for the first time.",
+            "labels": {
+                "title": {
+                    "title": "Buy Credit",
+                    "defaultValue": "Buy Credit",
+                    "inputType": "text",
+                    "toolTip": "",
+                    "placeholder": "Buy Credit"
+                },
+                "body": {
+                    "title": "Upvoting Items Is a Premium Feature. To Upvote Items, You Need To Purchase Voting Credits.",
+                    "defaultValue": "Upvoting items is a premium feature. To upvote items, you need to purchase voting credits.",
+                    "inputType": "text",
+                    "toolTip": "",
+                    "placeholder": "Upvoting items is a premium feature. To upvote items, you need to purchase voting credits."
+                },
+                "cancel": {
+                    "title": "Cancel",
+                    "defaultValue": "Cancel",
+                    "inputType": "text",
+                    "toolTip": "",
+                    "placeholder": "Cancel"
+                },
+                "buy": {
+                    "title": "Buy",
+                    "defaultValue": "Buy",
+                    "inputType": "text",
+                    "toolTip": "",
+                    "placeholder": "Buy"
+                }
+            }
+        },
+        "votesDepletedMessage": {
+            "title": "Votes Depleted Message",
+            "info": "This message will only be shown if you have enabled In-App Purchases. It will appear when the user, who has no votes left, upvotes an item.",
+            "labels": {
+                "title": {
+                    "title": "Get More Votes",
+                    "defaultValue": "Get More Votes",
+                    "inputType": "text",
+                    "toolTip": "",
+                    "placeholder": "Get More Votes"
+                },
+                "body": {
+                    "title": "You Don't Have Enough Credit To Cast a Vote. Please Consider Purchasing Additional Voting Credit.",
+                    "defaultValue": "You don't have enough credit to cast a vote. Please consider purchasing additional voting credit.",
+                    "inputType": "text",
+                    "toolTip": "",
+                    "placeholder": "You don't have enough credit to cast a vote. Please consider purchasing additional voting credit."
+                },
+                "cancel": {
+                    "title": "Cancel",
+                    "defaultValue": "Cancel",
+                    "inputType": "text",
+                    "toolTip": "",
+                    "placeholder": "Cancel"
+                },
+                "buyMore": {
+                    "title": "Buy More",
+                    "defaultValue": "Buy More",
+                    "inputType": "text",
+                    "toolTip": "",
+                    "placeholder": "Buy More"
+                }
+            }
+        },
+        "unvoteMessage": {
+            "title": "Unvote Message",
+            "info": "This message will only be shown if you have enabled In-App Purchases. It will appear when the user tries to remove a vote.",
+            "labels": {
+                "title": {
+                    "title": "Remove Vote",
+                    "defaultValue": "Remove Vote",
+                    "inputType": "text",
+                    "toolTip": "",
+                    "placeholder": "Remove Vote"
+                },
+                "body": {
+                    "title": "Removing Your Vote Will Not Refund Your Voting Credit. Voting Again Will Deduct Another Credit.",
+                    "defaultValue": "Removing your vote will not refund your voting credit. Voting again will deduct Another credit.",
+                    "inputType": "text",
+                    "toolTip": "",
+                    "placeholder": "Removing your vote will not refund your voting credit. Voting again will deduct Another credit."
+                },
+                "cancel": {
+                    "title": "Cancel",
+                    "defaultValue": "Cancel",
+                    "inputType": "text",
+                    "toolTip": "",
+                    "placeholder": "Cancel"
+                },
+                "remove": {
+                    "title": "Remove",
+                    "defaultValue": "Remove",
+                    "inputType": "text",
+                    "toolTip": "",
+                    "placeholder": "Remove"
+                }
+            }
+        }
+    }
 }
