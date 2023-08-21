@@ -188,27 +188,3 @@ label {
 .padding-lr-6 {
     padding: 0 6px !important
 }
-
-.open .rotate {
-    transform: rotate(180deg);
-    transition: 0.3s;
-}
-
-.hide-completed-items-dropdown,
-.in-app-purchase-dropdown {
-    width: 100%;
-}
-
-.dropdown-toggle {
-    display: flex !important;
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: center;
-    position: relative !important;
-}
-
-.dropdown-toggle .icon {
-    position: absolute;
-    right: 16px;
-    top: 12px;
-}

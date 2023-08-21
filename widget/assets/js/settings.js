@@ -1,22 +1,17 @@
   const TAG = 'settings';
 
-  const STATUS_UPDATE_SEGMENT = Object.freeze({
+  var STATUS_UPDATE_SEGMENT = Object.freeze({
     ALL_USERS: 1,
     NO_USERS: 2,
     TAGS: 3,
   });
  
-  const PUSH_NOTIFICATIONS_SEGMENT = Object.freeze({
+  var PUSH_NOTIFICATIONS_SEGMENT = Object.freeze({
     ALL_USERS: 1,
     NO_USERS: 2,
     TAGS: 3,
   });
-
-  const DEFAULT_ITEM_SORTING_SEGMENT = Object.freeze({
-    NEWEST: 1,
-    OLDEST: 2,
-    MOST_VOTES: 3,
-  });
+ 
 
   class Settings {
     constructor(data = {}){
@@ -25,10 +20,6 @@
       this.statusUpdateTags = data.statusUpdateTags || [];
       this.pushNotificationUsersSegment = data.pushNotificationUsersSegment || PUSH_NOTIFICATIONS_SEGMENT.NO_USERS;
       this.pushNotificationTags = data.pushNotificationTags || [];
-      this.defaultItemSorting = data.defaultItemSorting || DEFAULT_ITEM_SORTING_SEGMENT.NEWEST;
-      this.hideCompletedItems = data.hideCompletedItems || 0;
-      this.selectedPurchaseProductId = data.selectedPurchaseProductId || null;
-      this.votesCountPerPurchase = data.votesCountPerPurchase || 1;
       this.createdOn = data.createdOn || new Date();
       this.createdBy = data.createdBy || null;
       this.lastUpdatedOn = data.lastUpdatedOn || new Date();
@@ -66,15 +57,6 @@
             resolve(r);
             if (callback) callback(null, r);
           }
-        });
-      });
-    }
-
-    static getProducts(){
-      return new Promise((resolve, reject) => {
-        buildfire.services.commerce.inAppPurchase.getProducts((err, products) => {
-          if (err) return reject(err);
-          resolve(products);
         });
       });
     }
