@@ -875,61 +875,53 @@ var config = {};
 				});
 			};
 			
-			// ! for demo purposes only
-			$rootScope.insertDummySuggestion = function(dayBefore, title , text){
-				let customDay = document.getElementById('dummyDayInput').value;
-				if(!dayBefore) {
-					dayBefore = Number(customDay);
-					title = `before ${dayBefore} days`;
-				}
-				getUser(function (user) {
-					if (!user || !title || !text) return;
-					
-					var obj = {
-						title: title,
-						suggestion: text,
-						createdBy: user,
-						createdOn: new Date(Date.now() - dayBefore * 24 * 60 * 60 * 1000).toISOString(),
-						upVoteCount: 1,
-						upVotedBy: {},
-						status: SUGGESTION_STATUS.BACKLOG
-					};
-					obj.upVotedBy[user._id] = {
-						votedOn: new Date(),
-						user: user, 
-					};
-			
-					Suggestion.insert(obj, (err, result) => {
-						buildfire.dialog.toast({
-							message: "Your suggestion has been successfully added.",
-							type: "info"
-						  });
-						const suggestion = new Suggestion(result)
-						suggestion.disableUpvote = true;
-						suggestion.statusName = $rootScope.TextStatuses[0];
-						suggestion.upvoteByYou = true;
-						$scope.suggestions.unshift(suggestion);
-						if($rootScope.settings){
-							const title = "A new item has been created";
-							const message = `A "${suggestion.title}" has been created`;
-							if($rootScope.settings.pushNotificationUsersSegment === PUSH_NOTIFICATIONS_SEGMENT.ALL_USERS){
-								PushNotification.sendToAll(title, message, suggestion.id);
-							} else if($rootScope.settings.pushNotificationUsersSegment === PUSH_NOTIFICATIONS_SEGMENT.TAGS){
-								const userTags = $rootScope.settings.pushNotificationTags.map(tag=> tag.tagName);
-								if(userTags.length > 0){
-									PushNotification.sendToUserSegment(title, message, suggestion.id, userTags)
-								}
+
+			function _addSuggestion(user, title, text) {
+				if (!user || !title || !text) return;
+				
+				var obj = {
+					title: title,
+					suggestion: text,
+					createdBy: user,
+					createdOn: new Date(),
+					upVoteCount: 1,
+					upVotedBy: {},
+					status: SUGGESTION_STATUS.BACKLOG
+				};
+				obj.upVotedBy[user._id] = {
+					votedOn: new Date(),
+					user: user, 
+				};
+		
+				Suggestion.insert(obj, (err, result) => {
+					buildfire.dialog.toast({
+						message: "Your suggestion has been successfully added.",
+						type: "info"
+					  });
+					const suggestion = new Suggestion(result)
+					suggestion.disableUpvote = true;
+					suggestion.statusName = $rootScope.TextStatuses[0];
+					suggestion.upvoteByYou = true;
+					$scope.suggestions.unshift(suggestion);
+					if($rootScope.settings){
+						const title = "A new item has been created";
+						const message = `A "${suggestion.title}" has been created`;
+						if($rootScope.settings.pushNotificationUsersSegment === PUSH_NOTIFICATIONS_SEGMENT.ALL_USERS){
+							PushNotification.sendToAll(title, message, suggestion.id);
+						} else if($rootScope.settings.pushNotificationUsersSegment === PUSH_NOTIFICATIONS_SEGMENT.TAGS){
+							const userTags = $rootScope.settings.pushNotificationTags.map(tag=> tag.tagName);
+							if(userTags.length > 0){
+								PushNotification.sendToUserSegment(title, message, suggestion.id, userTags)
 							}
 						}
-						suggestion._createdOn = getCurrentDate(suggestion.createdOn);
-						suggestion.createdBy = _currentUser
-						suggestion._displayName = getUserName(suggestion.createdBy);
-						suggestion.imgUrl = getUserImage(suggestion.createdBy);
-	
-						if (!$scope.$$phase) $scope.$apply();
-					})
-				});
+					}
+					suggestion._createdOn = getCurrentDate(suggestion.createdOn);
+					suggestion.createdBy = _currentUser
+					suggestion._displayName = getUserName(suggestion.createdBy);
+					suggestion.imgUrl = getUserImage(suggestion.createdBy);
 
+					if (!$scope.$$phase) $scope.$apply();
+				})
 			}
 
 			function getCurrentDate(createdon){
