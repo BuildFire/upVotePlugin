@@ -13,18 +13,15 @@
     <script src="../../../scripts/angular/angular.min.js"></script>
     <script src="../../../scripts/buildfire/services/notifications/pushNotifications.js"></script>
     <script src="../../../scripts/buildfire/components/drawer/drawer.js"></script>
-    <script src="../../../scripts/buildfire/services/commerce/inAppPurchase.js"></script>
 
     <!-- build:bundleJSFiles  -->
     <script src="app.js"></script>
     <script src="app.services.js"></script>
     <script src="assets/js/settings.js"></script>
     <script src="assets/js/suggestions.js"></script>
-    <script src="assets/js/userCredit.js"></script>
     <script src="assets/js/analyticsKeys.js"></script>
     <script src="assets/js/Analytics.js"></script>
     <script src="assets/js/PushNotifications.js"></script>
-    <script src="assets/js/utils.js"></script>
     <script src="controllers/widget.home.controller.js"></script>
     <script src="controllers/widget.item.controller.js"></script>
     <!-- endbuild -->
@@ -94,7 +91,7 @@
                                     </span>
                                 <span id="comment-message" class="margin--0"  bfString="mainScreen.commentButton"></span>
                             </button>
-                            <button ng-if="s.status != 3" id="upvote_icon" class="voteButton btn btn--icon--text ml-24" ng-disabled="blockVote" ng-click="upVote(s)"
+                            <button ng-if="s.status != 3" id="upvote_icon" class="voteButton btn btn--icon--text ml-24" ng-click="upVote(s)"
                             >
                                 <span ng-if="!s.upvoteByYou" id="unactive-arrow" class="material-icons "
                                 >arrow_upward</span>
