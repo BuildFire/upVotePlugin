@@ -55,7 +55,7 @@ cssTasks.forEach(function(task){
 });
 
 const jsTasks=[
-    {name:"widgetJS",src:["widget/assets/**/*.js", "widget/*.js" ,"widget/controllers/*.js"],dest:"/widget"}
+    {name:"widgetJS",src:["!widget/assets/**/*.js", "widget/*.js" ,"widget/controllers/*.js"],dest:"/widget"}
     ,{name:"controlContentJS",src:"control/content/**/*.js",dest:"/control/content"}
     ,{name:"controlDesignJS",src:"control/design/**/*.js",dest:"/control/design"}
     ,{name:"controlSettingsJS",src:"control/settings/**/*.js",dest:"/control/settings"}
@@ -115,7 +115,7 @@ gulp.task('Controlhtml', function(){
     /// replace all the <!-- build:bundleJSFiles  --> comment bodies
     /// with scripts.min.js with cache buster
         .pipe(htmlReplace({
-            bundleJSFiles:"../../widget/scripts.min.js?v=" + (new Date().getTime())
+            bundleJSFiles:"./scripts.min.js?v=" + (new Date().getTime())
             ,bundleCSSFiles:"styles.min.css?v=" + (new Date().getTime())
         }))
 
@@ -143,6 +143,16 @@ gulp.task('fonts', function(){
         .pipe(gulp.dest(destinationFolder));
 });
 
+gulp.task('assets', function(){
+    return gulp.src(['widget/assets/**/**', 'control/assets/**'],{base: '.'})
+        .pipe(gulp.dest(destinationFolder));
+});
+
+gulp.task('tests', function(){
+    return gulp.src(['control/tests/**'],{base: '.'})
+        .pipe(gulp.dest(destinationFolder));
+});
+
 gulp.task('icons', function(){
     return gulp.src(['widget/css/fonts/**/*.{ttf,woff,eot,svg}'])
         .pipe(gulp.dest(destinationFolder + '/widget/fonts'));
@@ -155,7 +165,7 @@ gulp.task('zip', function () {
         .pipe(gulp.dest('..'));
 });
 
-var buildTasksToRun=['html', 'Controlhtml','resources','images','fonts','icons'];
+var buildTasksToRun=['html', 'Controlhtml','resources','images','fonts','icons', 'assets', 'tests'];
 
 cssTasks.forEach(function(task){  buildTasksToRun.push(task.name)});
 jsTasks.forEach(function(task){  buildTasksToRun.push(task.name)});
