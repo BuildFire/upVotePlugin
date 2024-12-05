@@ -13,6 +13,14 @@
                     "toolTip": "The word Comment in the comment button",
                     "placeholder": "Comment"
                 },
+                "updateStatus": {
+                    "title": "Update Status",
+                    "defaultValue": "Update Status",
+                    "inputType": "text",
+                    "maxLength": 20,
+                    "toolTip": "",
+                    "placeholder": "Update Status"
+                },
                 "backlog": {
                     "title": "Backlog",
                     "defaultValue": "Backlog",
@@ -50,6 +58,41 @@
                     "inputType": "text",
                     "toolTip": "",
                     "placeholder": "Getting your purchase ready, please wait..."
+                },
+                "suggestionSuccessfullyAdded": {
+                    "title": "Suggestion Successfully Added",
+                    "defaultValue": "Your suggestion has been successfully added.",
+                    "inputType": "text",
+                    "toolTip": "",
+                    "placeholder": "Your suggestion has been successfully added."
+                },
+                "somethingWentWrong": {
+                    "title": "Something went wrong",
+                    "defaultValue": "Something went wrong, please try again later.",
+                    "inputType": "text",
+                    "toolTip": "",
+                    "placeholder": "Something went wrong, please try again later."
+                },
+                "purchaseWasCancelled": {
+                    "title": "Purchase Was Cancelled",
+                    "defaultValue": "The purchase was cancelled",
+                    "inputType": "text",
+                    "toolTip": "",
+                    "placeholder": "The purchase was cancelled"
+                },
+                "upvotes": {
+                    "title": "Upvotes",
+                    "defaultValue": "Upvotes",
+                    "inputType": "text",
+                    "toolTip": "",
+                    "placeholder": "Upvotes"
+                },
+                "purchaseNotAvailable": {
+                    "title": "Purchase Not Available",
+                    "defaultValue": "Purchase Not Available On Browser",
+                    "inputType": "text",
+                    "toolTip": "",
+                    "placeholder": "Purchase Not Available On Browser"
                 }
             }
         },
@@ -195,6 +238,94 @@
                     "inputType": "text",
                     "toolTip": "",
                     "placeholder": "Remove"
+                }
+            }
+        },
+        "notifications": {
+            "title": "Notifications",
+            "labels": {
+                "newItemTitle": {
+                    "title": "New Item Created Title",
+                    "defaultValue": "A new item has been created",
+                    "inputType": "text",
+                    "toolTip": "",
+                    "maxLength": 50,
+                    "placeholder": "A new item has been created"
+                },
+                "newItemBody": {
+                    "title": "New Item Created Message",
+                    "defaultValue": "A ${context.plugin.title} has been created",
+                    "inputType": "text",
+                    "toolTip": "",
+                    "maxLength": 150,
+                    "placeholder": "A ${context.plugin.title} has been created"
+                },
+
+                "backlogItemTitle": {
+                    "title": "Task in Backlog Title",
+                    "defaultValue": "Task in Backlog",
+                    "inputType": "text",
+                    "toolTip": "",
+                    "maxLength": 50,
+                    "placeholder": "Task in Backlog"
+                },
+                "backlogItemBody": {
+                    "title": "Task in Backlog Message",
+                    "defaultValue": "${context.plugin.title} has been marked as in backlog",
+                    "inputType": "text",
+                    "toolTip": "",
+                    "maxLength": 150,
+                    "placeholder": "${context.plugin.title} has been marked as in backlog"
+                },
+
+                "inProgressItemTitle": {
+                    "title": "Task in Progress Title",
+                    "defaultValue": "Task in Progress",
+                    "inputType": "text",
+                    "toolTip": "",
+                    "maxLength": 50,
+                    "placeholder": "Task in Progress"
+                },
+                "inProgressItemBody": {
+                    "title": "Task in Progress Message",
+                    "defaultValue": "${context.plugin.title} has been marked as in Progress",
+                    "inputType": "text",
+                    "toolTip": "",
+                    "maxLength": 150,
+                    "placeholder": "${context.plugin.title} has been marked as in Progress"
+                },
+
+                "completedItemBody": {
+                    "title": "Task Completed",
+                    "defaultValue": "Task Completed",
+                    "inputType": "text",
+                    "toolTip": "",
+                    "maxLength": 50,
+                    "placeholder": "Task Completed"
+                },
+                "completedItemMessageInputPlaceholder": {
+                    "title": "Completed Task Message Input",
+                    "defaultValue": "${context.plugin.title} has been marked as completed",
+                    "inputType": "text",
+                    "toolTip": "",
+                    "maxLength": 150,
+                    "placeholder": "${context.plugin.title} has been marked as completed"
+                },
+                "completedItemMessageSendText": {
+                    "title": "Completed Task Message Send Text",
+                    "defaultValue": "Send",
+                    "inputType": "text",
+                    "toolTip": "",
+                    "maxLength": 9,
+                    "placeholder": "Send"
+                },
+                "completedItemMessageCancelText": {
+                    "title": "Completed Task Message Cancel Text",
+                    "defaultValue": "Cancel",
+                    "inputType": "text",
+                    "toolTip": "",
+                    "maxLength": 9,
+                    "placeholder": "Cancel"
                 }
             }
         }

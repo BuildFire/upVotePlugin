@@ -8,8 +8,18 @@
         var WidgetItem = this;
         WidgetItem.listeners = {}
         $scope.selectedSuggestion = ViewStack.getCurrentView().item
+        $scope.selectedSuggestion.imageInProgress = true;
 
-       
+        const ownerImage = buildfire.auth.getUserPictureUrl({ userId: $scope.selectedSuggestion.createdBy._id });
+
+        validateImage(ownerImage).then((isValid) => {
+            if (isValid) {
+                $scope.selectedSuggestion.imgUrl = ownerImage;
+            }
+            $scope.selectedSuggestion.imageInProgress = false;
+            if (!$scope.$$phase) $scope.$apply();
+        });
+
 
       }
 

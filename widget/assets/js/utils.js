@@ -22,9 +22,9 @@ function getStartDate(selectedDuration) {
 }
 
 /**
- * 
- * @param {string} credit 
- * @param {string} key 
+ *
+ * @param {string} credit
+ * @param {string} key
  * @returns Base64 encoding value
  */
 function encryptCredit(credit, key) {
@@ -39,9 +39,9 @@ function encryptCredit(credit, key) {
 }
 
 /**
- * 
- * @param {string} encryptedCredit 
- * @param {string} key 
+ *
+ * @param {string} encryptedCredit
+ * @param {string} key
  * @returns Base64 decoding value
  */
 function decryptCredit(encryptedCredit, key) {
@@ -53,4 +53,13 @@ function decryptCredit(encryptedCredit, key) {
         decryptedCredit += String.fromCharCode(charCode);
     }
     return decryptedCredit;
+}
+
+function validateImage(imgUrl) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve(true);
+        img.onerror = () => resolve(false);
+        img.src = imgUrl;
+    });
 }
