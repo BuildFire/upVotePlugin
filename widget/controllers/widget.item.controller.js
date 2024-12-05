@@ -14,7 +14,7 @@
 
         validateImage(ownerImage).then((isValid) => {
             if (isValid) {
-                $scope.selectedSuggestion.imgUrl = ownerImage;
+				$scope.selectedSuggestion.imgUrl = buildfire.imageLib.cropImage(ownerImage, { size: 'm', aspect: '1:1' });
             }
             $scope.selectedSuggestion.imageInProgress = false;
             if (!$scope.$$phase) $scope.$apply();

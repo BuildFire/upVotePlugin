@@ -989,8 +989,18 @@ var config = {};
 							})
 						}
 						suggestion._createdOn = getCurrentDate(suggestion.createdOn);
-						suggestion.createdBy = _currentUser
 						suggestion._displayName = getUserName(suggestion.createdBy);
+
+						suggestion.imgUrl = 'assets/images/avatar.png';
+						suggestion.imageInProgress = true;
+						const ownerImage = buildfire.auth.getUserPictureUrl({ userId: suggestion.createdBy._id });
+						validateImage(ownerImage).then((isValid) => {
+							if (isValid) {
+								suggestion.imgUrl = buildfire.imageLib.cropImage(ownerImage, { size: 'm', aspect: '1:1' });
+							}
+							suggestion.imageInProgress = false;
+							if (!$scope.$$phase) $scope.$apply();
+						});
 
 						if (!$scope.$$phase) $scope.$apply();
 					});

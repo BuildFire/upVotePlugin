@@ -56,6 +56,7 @@ cssTasks.forEach(function(task){
 
 const jsTasks=[
     {name:"widgetJS",src:["!widget/assets/**/*.js", "widget/*.js" ,"widget/controllers/*.js"],dest:"/widget"}
+    ,{name:"sharedJS",src:["widget/assets/**/*.js"],dest:"/widget/shared"}
     ,{name:"controlContentJS",src:"control/content/**/*.js",dest:"/control/content"}
     ,{name:"controlDesignJS",src:"control/design/**/*.js",dest:"/control/design"}
     ,{name:"controlSettingsJS",src:"control/settings/**/*.js",dest:"/control/settings"}
@@ -101,6 +102,7 @@ gulp.task('html', function(){
         .pipe(htmlReplace({
             bundleJSFiles:"scripts.min.js?v=" + (new Date().getTime())
             ,bundleCSSFiles:"styles.min.css?v=" + (new Date().getTime())
+            ,bundleSharedJSFiles:"./shared/scripts.min.js?v=" + (new Date().getTime())
         }))
 
         /// then strip the html from any comments
@@ -116,6 +118,7 @@ gulp.task('Controlhtml', function(){
     /// with scripts.min.js with cache buster
         .pipe(htmlReplace({
             bundleJSFiles:"./scripts.min.js?v=" + (new Date().getTime())
+            ,bundleSharedJSFiles:"../../widget/shared/scripts.min.js?v=" + (new Date().getTime())
             ,bundleCSSFiles:"styles.min.css?v=" + (new Date().getTime())
         }))
 
@@ -144,7 +147,7 @@ gulp.task('fonts', function(){
 });
 
 gulp.task('assets', function(){
-    return gulp.src(['widget/assets/**/**', 'control/assets/**'],{base: '.'})
+    return gulp.src(['widget/assets/**/*.{css,png,svg}', 'control/assets/**'],{base: '.'})
         .pipe(gulp.dest(destinationFolder));
 });
 
