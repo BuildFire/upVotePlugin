@@ -981,7 +981,7 @@ var config = {};
 								if($rootScope.settings.pushNotificationUsersSegment === PUSH_NOTIFICATIONS_SEGMENT.ALL_USERS){
 									PushNotification.sendToAll(title, message, suggestion.id);
 								} else if($rootScope.settings.pushNotificationUsersSegment === PUSH_NOTIFICATIONS_SEGMENT.TAGS){
-									const userTags = $rootScope.settings.pushNotificationTags.map(tag=> tag.tagName);
+									const userTags = $rootScope.settings.pushNotificationTags.map(tag=> (tag.tagName ? tag.tagName : tag.value));
 									if(userTags.length > 0){
 										PushNotification.sendToUserSegment(title, message, suggestion.id, userTags)
 									}
