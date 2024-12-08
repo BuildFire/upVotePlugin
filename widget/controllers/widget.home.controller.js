@@ -493,7 +493,7 @@ var config = {};
 										suggestion.statusName = $rootScope.TextStatuses[suggestion.status-1]
 										const voterIds = Object.keys(suggestion.upVotedBy);
 
-										votesExpressionOptions.plugin.title = suggestion.title;
+										votesExpressionOptions.plugin.itemTitle = suggestion.title;
 										Promise.all([
 											getLanguageValue("notifications.backlogItemTitle"),
 											getLanguageValue("notifications.backlogItemBody"),
@@ -975,7 +975,7 @@ var config = {};
 						suggestion.upvoteByYou = true;
 						$scope.suggestions.unshift(suggestion);
 						if($rootScope.settings){
-							votesExpressionOptions.plugin.title = suggestion.title;
+							votesExpressionOptions.plugin.itemTitle = suggestion.title;
 							Promise.all([getLanguageValue("notifications.newItemTitle"), getLanguageValue("notifications.newItemBody")])
 							.then(([title, message]) => {
 								if($rootScope.settings.pushNotificationUsersSegment === PUSH_NOTIFICATIONS_SEGMENT.ALL_USERS){

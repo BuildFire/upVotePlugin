@@ -254,45 +254,45 @@
                 },
                 "newItemBody": {
                     "title": "New Item Created Message",
-                    "defaultValue": "A ${context.plugin.title} has been created",
+                    "defaultValue": "A ${context.plugin.itemTitle} has been created",
                     "inputType": "text",
                     "toolTip": "",
                     "maxLength": 150,
-                    "placeholder": "A ${context.plugin.title} has been created"
+                    "placeholder": "A ${context.plugin.itemTitle} has been created"
                 },
 
                 "backlogItemTitle": {
-                    "title": "Task in Backlog Title",
-                    "defaultValue": "Task in Backlog",
+                    "title": "Task In Backlog Title",
+                    "defaultValue": "Task In Backlog",
                     "inputType": "text",
                     "toolTip": "",
                     "maxLength": 50,
-                    "placeholder": "Task in Backlog"
+                    "placeholder": "Task In Backlog"
                 },
                 "backlogItemBody": {
-                    "title": "Task in Backlog Message",
-                    "defaultValue": "${context.plugin.title} has been marked as in backlog",
+                    "title": "Task In Backlog Message",
+                    "defaultValue": "${context.plugin.itemTitle} has been marked as In Backlog",
                     "inputType": "text",
                     "toolTip": "",
                     "maxLength": 150,
-                    "placeholder": "${context.plugin.title} has been marked as in backlog"
+                    "placeholder": "${context.plugin.itemTitle} has been marked as In Backlog"
                 },
 
                 "inProgressItemTitle": {
-                    "title": "Task in Progress Title",
-                    "defaultValue": "Task in Progress",
+                    "title": "Task In Progress Title",
+                    "defaultValue": "Task In Progress",
                     "inputType": "text",
                     "toolTip": "",
                     "maxLength": 50,
-                    "placeholder": "Task in Progress"
+                    "placeholder": "Task In Progress"
                 },
                 "inProgressItemBody": {
-                    "title": "Task in Progress Message",
-                    "defaultValue": "${context.plugin.title} has been marked as in Progress",
+                    "title": "Task In Progress Message",
+                    "defaultValue": "${context.plugin.itemTitle} has been marked as In Progress",
                     "inputType": "text",
                     "toolTip": "",
                     "maxLength": 150,
-                    "placeholder": "${context.plugin.title} has been marked as in Progress"
+                    "placeholder": "${context.plugin.itemTitle} has been marked as In Progress"
                 },
 
                 "completedItemBody": {
@@ -305,11 +305,11 @@
                 },
                 "completedItemMessageInputPlaceholder": {
                     "title": "Completed Task Message Input",
-                    "defaultValue": "${context.plugin.title} has been marked as completed",
+                    "defaultValue": "${context.plugin.itemTitle} has been marked as completed",
                     "inputType": "text",
                     "toolTip": "",
                     "maxLength": 150,
-                    "placeholder": "${context.plugin.title} has been marked as completed"
+                    "placeholder": "${context.plugin.itemTitle} has been marked as completed"
                 },
                 "completedItemMessageSendText": {
                     "title": "Completed Task Message Send Text",
