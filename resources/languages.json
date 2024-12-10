@@ -93,6 +93,14 @@
                     "inputType": "text",
                     "toolTip": "",
                     "placeholder": "Purchase Not Available On Browser"
+                },
+                "unknownUser": {
+                    "title": "Unknown User",
+                    "defaultValue": "Someone",
+                    "inputType": "text",
+                    "maxLength": 20,
+                    "toolTip": "",
+                    "placeholder": "Someone"
                 }
             }
         },

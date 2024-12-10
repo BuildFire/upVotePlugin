@@ -165,7 +165,7 @@ var config = {};
                             (user.lastName ? user.lastName : '')
                         );
                     } else {
-                        return 'Someone';
+                        return getLanguageString('mainScreen.unknownUser') || 'Someone';
                     }
                 }
             }
