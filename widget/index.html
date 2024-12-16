@@ -18,6 +18,11 @@
     <!-- build:bundleJSFiles  -->
     <script src="app.js"></script>
     <script src="app.services.js"></script>
+    <script src="controllers/widget.home.controller.js"></script>
+    <script src="controllers/widget.item.controller.js"></script>
+    <!-- endbuild -->
+
+    <!-- build:bundleSharedJSFiles  -->
     <script src="assets/js/settings.js"></script>
     <script src="assets/js/suggestions.js"></script>
     <script src="assets/js/userCredit.js"></script>
@@ -25,8 +30,6 @@
     <script src="assets/js/Analytics.js"></script>
     <script src="assets/js/PushNotifications.js"></script>
     <script src="assets/js/utils.js"></script>
-    <script src="controllers/widget.home.controller.js"></script>
-    <script src="controllers/widget.item.controller.js"></script>
     <!-- endbuild -->
 
     <link rel="stylesheet" href="../../../styles/transitionAnimation.css">
@@ -64,9 +67,10 @@
 
                     <div class="card suggestionCard" ng-cloak ng-repeat="s in suggestions track by $index" ng-click="_listCtrl.goToItemDetails(s)">
                         <div class="card__header padded padded-l margin-bottom--sm" >
-                            <img alt="{{s.createdBy.displayName}} profile image"  class="avatar"
-                            onerror="this.src='assets/images/avatar.png'"
-                            src="{{s.imgUrl}}">
+                            <div class="user-image-container" ng-class="{'loading-image': s.imageInProgress}">
+                                <img alt="{{s.createdBy.displayName}} profile image"  class="avatar"
+                                 src="{{s.imgUrl}}">
+                            </div>
                             <div class="ellipsis padded padded--x padded--sm suggestion__name">
                                 <p class="margin--0 ellipsis header-text">{{s._displayName}}</p>
                                 <h6 ng-if="s._createdOn" class="pull-left caption margin--0 text--secondary">{{s._createdOn}}</h6>

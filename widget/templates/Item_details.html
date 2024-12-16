@@ -2,14 +2,16 @@
 <div ng-controller="WidgetItemCtrl as WidgetItem" class="container--responsive animated fadeInRight" >
     <div  class="suggestionCard" >
         <div class="card__header padded padded-l margin-bottom--sm">
-            <img alt="{{selectedSuggestion.createdBy.displayName}} profile image"  class="avatar"
-             onerror="this.src='assets/images/avatar.png'" ng-src="{{selectedSuggestion.imgUrl}}">
+            <div class="user-image-container" ng-class="{'loading-image': selectedSuggestion.imageInProgress}">
+                <img alt="{{selectedSuggestion.createdBy.displayName}} profile image"  class="avatar"
+                 src="{{selectedSuggestion.imgUrl}}">
+            </div>
             <div class="ellipsis padded padded--x padded--sm suggestion__name">
                 <p class="margin--0 ellipsis header-text">{{selectedSuggestion._displayName}}</p>
                 <h6 ng-if="selectedSuggestion._createdOn" class="pull-left caption margin--0 text--secondary">{{selectedSuggestion._createdOn}}</h6>
                 <h6 ng-if="!selectedSuggestion._createdOn" class="pull-left caption margin--0 text--secondary">{{selectedSuggestion.createdOn | date:'MMM dd, y'}}</h6>
             </div>
-    
+
             <p ng-if="selectedSuggestion.status == 1" class="pill shrink--0 pill-body-theme"  ng-click="openChangeStatusModal(selectedSuggestion)">
                 <span class="margin--0">{{selectedSuggestion.statusName}}</span>
             </p>
@@ -31,9 +33,9 @@
             </button>
             <button ng-if="selectedSuggestion.status != 3" id="upvote_icon" class="voteButton btn btn--icon--text ml-24" ng-click="upVote(selectedSuggestion)"
             >
-                <span ng-if="!selectedSuggestion.upvoteByYou" id="unactive-arrow" class="material-icons " 
+                <span ng-if="!selectedSuggestion.upvoteByYou" id="unactive-arrow" class="material-icons "
                 >arrow_upward</span>
-                <span ng-if="selectedSuggestion.upvoteByYou" id="active-arrow" class="material-icons" 
+                <span ng-if="selectedSuggestion.upvoteByYou" id="active-arrow" class="material-icons"
                 >arrow_upward</span>
             </button>
             <p class="pill-count shrink--0" ng-click="showVoterModal(selectedSuggestion)">
