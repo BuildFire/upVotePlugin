@@ -93,14 +93,14 @@ var config = {};
 				appThemeColors = result.colors
 			  });
 
-			let remainingVotesExpressionOptions = {
+			let votesExpressionOptions = {
 				plugin: {
 					remainingVotes: 0,
 				}
 			}
 
 			buildfire.dynamic.expressions.getContext = (options, callback) => {
-				callback(null, remainingVotesExpressionOptions)
+				callback(null, votesExpressionOptions)
 			}
 
 			UpVoteHome.goToItemDetails = function (selectedItem) {
@@ -139,7 +139,6 @@ var config = {};
 					Promise.all([callBacklogText, callInProgressText,callCompletedText]).then(result => {
 						$rootScope.TextStatuses = result;
 						_suggestion.statusName = $rootScope.TextStatuses[_suggestion.status - 1]
-						_suggestion.imgUrl = getUserImage(_suggestion.createdBy);
 						_suggestion._createdOn = getCurrentDate(_suggestion.createdOn);
 						_suggestion._displayName = getUserName(_suggestion.createdBy);
 
@@ -166,7 +165,7 @@ var config = {};
                             (user.lastName ? user.lastName : '')
                         );
                     } else {
-                        return 'Someone';
+                        return getLanguageString('mainScreen.unknownUser') || 'Someone';
                     }
                 }
             }
@@ -275,8 +274,22 @@ var config = {};
 						function update(data) {
 							hideSkeleton();
 							UpVoteHome.isInitalized = true;
-							$scope.suggestions = data;
+							$scope.suggestions = data.map((suggestion) => {
+								suggestion.imgUrl = 'assets/images/avatar.png';
+								suggestion.imageInProgress = true;
+								return suggestion;
+							})
 							$scope.suggestions = sortArray($scope.suggestions);
+							$scope.suggestions.forEach((suggestion) => {
+								const ownerImage = buildfire.auth.getUserPictureUrl({ userId: suggestion.createdBy._id });
+								validateImage(ownerImage).then((isValid) => {
+									if (isValid) {
+										suggestion.imgUrl = buildfire.imageLib.cropImage(ownerImage, { size: 'm', aspect: '1:1' });
+									}
+									suggestion.imageInProgress = false;
+									if (!$scope.$$phase) $scope.$apply();
+								});
+							})
 							buildfire.spinner.hide();
 							if (!$scope.$$phase) $scope.$apply();
 						}
@@ -287,7 +300,6 @@ var config = {};
 							item.disableUpvote = _currentUser ? !item || !item.upVotedBy || item.upVotedBy[_currentUser._id] : false;
 							item.upvoteByYou = item.upVotedBy && _currentUser && item.upVotedBy[_currentUser._id] != null;
 							item.statusName = $rootScope.TextStatuses[item.status - 1]
-							item.imgUrl = getUserImage(item.createdBy);
 							return item;
 						}
 					}).catch(err => console.log(err))
@@ -309,21 +321,16 @@ var config = {};
 				init();
 			});
 
-			function getUserImage(user){
-				var url = './avatar.png';
-				if (user) {
-				  url = buildfire.auth.getUserPictureUrl({ userId: user._id });
-				  url = buildfire.imageLib.cropImage(url,{ size: "xs", aspect: "1:1" });
-				  return url;
-				}
-				return url;
-			}
-
 			function renderStatusItem(text, index){
 				const element = `
-				<div style='display:flex;color:'${appThemeColors.headerText}';font-weight:500;font-size:16px;line-height:24px'>
-						<span style='width: 24px;height: 24px;border-radius: 50%;margin-right: 16px;background-color:
-						   ${getStatusColor(index)}'></span> ${text} </div>`
+					<span style="margin: 0px;font-weight: 400;color: ${appThemeColors.headerText};display: flex;align-items: center;gap: 10px;">
+					    <span style="
+					    display: inline-block;
+					    width: 25px;
+					    aspect-ratio: 1;
+					    margin: 0;
+					    background: ${getStatusColor(index)};
+					    border-radius: 100%;"></span>${text}</span>`
 
 				return element;
 			}
@@ -407,22 +414,28 @@ var config = {};
 					const listItems = [];
 					for(let i=0;i<users.length;i++){
 						if(users[i]){
+							const userImage = buildfire.auth.getUserPictureUrl({ userId: users[i]._id });
+							const croppedUserImage = buildfire.imageLib.cropImage(userImage, { size: 'm', aspect: '1:1' });
+
 							listItems.push({
-								text: getUserName(users[i]), imageUrl:buildfire.auth.getUserPictureUrl({ userId: users[i]._id })
+								text: getUserName(users[i]),
+								imageUrl: croppedUserImage,
 							})
 						}
 
 					}
-					buildfire.components.drawer.open(
-						{
-						  content: '<b>Upvotes</b>',
-						  isHTML: true,
-						  triggerCallbackOnUIDismiss: false,
-						  autoUseImageCdn: true,
-						  listItems: listItems
-						},
-						() => {}
-					  );
+					getLanguageValue('mainScreen.upvotes').then((upvotesText) => {
+						buildfire.components.drawer.open(
+							{
+							  content: `<b>${upvotesText}</b>`,
+							  isHTML: true,
+							  triggerCallbackOnUIDismiss: false,
+							  autoUseImageCdn: true,
+							  listItems: listItems
+							},
+							() => {}
+						  );
+					});
 				});
 			};
 
@@ -441,7 +454,7 @@ var config = {};
 						if(_currentUser.tags && _currentUser.tags[buildfire.context.appId] && $rootScope.settings.statusUpdateTags.length > 0){
 							_currentUser.tags[buildfire.context.appId].forEach(tag => {
 							 $rootScope.settings.statusUpdateTags.forEach(settingTag => {
-								if(settingTag.tagName == tag.tagName){
+								if(settingTag.value == tag.tagName || settingTag.tagName == tag.tagName){
 									userContainAnyStatusTags = true;
 								}
 							  })
@@ -453,43 +466,79 @@ var config = {};
 					for(let i=1;i<=$rootScope.TextStatuses.length;i++){
 						listItems.push({
 							id: i,
-							text: renderStatusItem($rootScope.TextStatuses[i-1], i)
-						})
+							text: renderStatusItem($rootScope.TextStatuses[i-1], i),
+							selected: suggestion.status === i
+						});
 					}
-					buildfire.components.drawer.open(
-						{
-							content: '<b>Update Status</b>',
-							isHTML: true,
-							triggerCallbackOnUIDismiss: false,
-							listItems: listItems
-						},
-						(err, result) => {
-							if(suggestion.status != result.id){
-								suggestion.status = parseInt(result.id)
-								Suggestion.update(suggestion).then(()=>{
-									suggestion.statusName = $rootScope.TextStatuses[suggestion.status-1]
-									const voterIds = Object.keys(suggestion.upVotedBy);
-									if(suggestion.status == SUGGESTION_STATUS.COMPLETED){
-										buildfire.input.showTextDialog({
-											placeholder: `"${suggestion.title}" has been marked as completed`,
-											saveText: "Post",
-											defaultValue: `"${suggestion.title}" has been marked as completed`,
-											required: true
-										}, (err, response)=>{
-											//$rootScope.goSocial(suggestion);
-											PushNotification.sendToCustomUsers("Task Completed", response.results[0].textValue, suggestion.id, voterIds);
-										})
-									} else if(suggestion.status === SUGGESTION_STATUS.INPROGRESS){
-										PushNotification.sendToCustomUsers("Task in Progress", `"${suggestion.title}" has been marked as in progress`,suggestion.id, voterIds);
-									} else if(suggestion.status === SUGGESTION_STATUS.BACKLOG){
-										PushNotification.sendToCustomUsers("Task in Backlog", `"${suggestion.title}" has been marked as in backlog`,suggestion.id, voterIds);
-									}
-									if (!$scope.$$phase) $scope.$apply();
-								})
+
+					const _appThemeColors = buildfire.getContext().appTheme.colors;
+					getLanguageValue('mainScreen.updateStatus').then((headerText) => {
+						buildfire.components.drawer.open(
+							{
+								multiSelection: false,
+								allowSelectAll : false,
+								content: `<div style="color:${_appThemeColors.headerText};font-weight: bold;">${headerText}</div>`,
+								isHTML: true,
+								triggerCallbackOnUIDismiss: false,
+								listItems: listItems
+							},
+							(err, result) => {
+								buildfire.components.drawer.closeDrawer();
+
+								if (err) return console.error(err);
+
+								if(suggestion.status != result.id){
+									suggestion.status = parseInt(result.id)
+									Suggestion.update(suggestion).then(()=>{
+										suggestion.statusName = $rootScope.TextStatuses[suggestion.status-1]
+										const voterIds = Object.keys(suggestion.upVotedBy);
+
+										votesExpressionOptions.plugin.itemTitle = suggestion.title;
+										Promise.all([
+											getLanguageValue("notifications.backlogItemTitle"),
+											getLanguageValue("notifications.backlogItemBody"),
+											getLanguageValue("notifications.inProgressItemTitle"),
+											getLanguageValue("notifications.inProgressItemBody"),
+											getLanguageValue("notifications.completedItemBody"),
+											getLanguageValue("notifications.completedItemMessageInputPlaceholder"),
+											getLanguageValue("notifications.completedItemMessageSendText"),
+											getLanguageValue("notifications.completedItemMessageCancelText"),
+										])
+										.then(([
+											backlogItemTitle,
+											backlogItemBody,
+											inProgressItemTitle,
+											inProgressItemBody,
+											completedItemBody,
+											completedItemMessageInputPlaceholder,
+											completedItemMessageSendText,
+											completedItemMessageCancelText,
+										]) => {
+											if(suggestion.status == SUGGESTION_STATUS.COMPLETED){
+												buildfire.input.showTextDialog({
+													placeholder: completedItemMessageInputPlaceholder,
+													saveText: completedItemMessageSendText,
+													defaultValue: completedItemMessageInputPlaceholder,
+													required: true,
+													cancelText: completedItemMessageCancelText
+												}, (err, response)=>{
+													if (err) console.error(err);
+													if (response && response.results && response.results[0]) {
+														PushNotification.sendToCustomUsers(completedItemBody, response.results[0].textValue, suggestion.id, voterIds);
+													}
+												})
+											} else if(suggestion.status === SUGGESTION_STATUS.INPROGRESS){
+												PushNotification.sendToCustomUsers(inProgressItemTitle, inProgressItemBody,suggestion.id, voterIds);
+											} else if(suggestion.status === SUGGESTION_STATUS.BACKLOG){
+												PushNotification.sendToCustomUsers(backlogItemTitle, backlogItemBody,suggestion.id, voterIds);
+											}
+											if (!$scope.$$phase) $scope.$apply();
+										});
+									});
+								}
 							}
-							buildfire.components.drawer.closeDrawer();
-						}
-					);
+						);
+					})
 
 			}
 
@@ -566,6 +615,16 @@ var config = {};
 			};
 
 			const purchaseHandler = function() {
+				const platform = buildfire.getContext().device.platform;
+				if (platform === 'web') {
+					getLanguageValue('mainScreen.purchaseNotAvailable').then((toastMessage) => {
+						buildfire.dialog.toast({
+							message: toastMessage,
+							type: 'danger',
+						});
+					});
+					return;
+				}
 				if ($rootScope.settings.selectedPurchaseProductId) {
 					if (!blockIAP) {
 						$scope.blockVote = true;
@@ -580,26 +639,26 @@ var config = {};
 							type: 'info',
 						});
 						buildfire.services.commerce.inAppPurchase.purchase(
-							$rootScope.settings.selectedPurchaseProductId,
-							(err, res) => {
-								if (err) {
-									return console.error(
-										err
-									);
-								}
-								if (res.hasErrors) {
-									buildfire.dialog.toast({
-										message:
-											'Something went wrong, please try again later.',
-										type: 'danger',
+							$rootScope.settings.selectedPurchaseProductId, (err, res) => {
+								if (err || !res || res.hasErrors) {
+									getLanguageValue('mainScreen.somethingWentWrong').then((toastMessage) => {
+										buildfire.dialog.toast({
+											message: toastMessage,
+											type: 'danger',
+										});
+
+										if (err) console.error(err);
+										return;
 									});
 								}
+
 								if (res.isCancelled) {
-									buildfire.dialog.toast({
-										message:
-											'The purchase was cancelled',
-										type: 'warning',
-									});
+									getLanguageValue('mainScreen.purchaseWasCancelled').then((toastMessage) => {
+										buildfire.dialog.toast({
+											message: toastMessage,
+											type: 'warning',
+										});
+									})
 									return;
 								}
 								if (res.isApproved) {
@@ -698,7 +757,7 @@ var config = {};
 								},
 							};
 
-							remainingVotesExpressionOptions.plugin.remainingVotes = credit
+							votesExpressionOptions.plugin.remainingVotes = credit
 							return UserCredit.update($scope.currentUserCreditData.id,payload).then(
 								() => {
 									buildfire.language.get({stringKey: 'mainScreen.voteConfirmed'}, (err, result) => {
@@ -881,7 +940,13 @@ var config = {};
 				var obj = {
 					title: title,
 					suggestion: text,
-					createdBy: user,
+					createdBy: {
+						_id: user._id,
+						displayName: user.displayName,
+						email: user.email,
+						firstName: user.firstName,
+						lastName: user.lastName,
+					},
 					createdOn: new Date(),
 					upVoteCount: 1,
 					upVotedBy: {},
@@ -893,33 +958,52 @@ var config = {};
 				};
 
 				Suggestion.insert(obj, (err, result) => {
-					buildfire.dialog.toast({
-						message: "Your suggestion has been successfully added.",
-						type: "info"
-					  });
-					const suggestion = new Suggestion(result)
-					suggestion.disableUpvote = true;
-					suggestion.statusName = $rootScope.TextStatuses[0];
-					suggestion.upvoteByYou = true;
-					$scope.suggestions.unshift(suggestion);
-					if($rootScope.settings){
-						const title = "A new item has been created";
-						const message = `A "${suggestion.title}" has been created`;
-						if($rootScope.settings.pushNotificationUsersSegment === PUSH_NOTIFICATIONS_SEGMENT.ALL_USERS){
-							PushNotification.sendToAll(title, message, suggestion.id);
-						} else if($rootScope.settings.pushNotificationUsersSegment === PUSH_NOTIFICATIONS_SEGMENT.TAGS){
-							const userTags = $rootScope.settings.pushNotificationTags.map(tag=> tag.tagName);
-							if(userTags.length > 0){
-								PushNotification.sendToUserSegment(title, message, suggestion.id, userTags)
-							}
-						}
-					}
-					suggestion._createdOn = getCurrentDate(suggestion.createdOn);
-					suggestion.createdBy = _currentUser
-					suggestion._displayName = getUserName(suggestion.createdBy);
-					suggestion.imgUrl = getUserImage(suggestion.createdBy);
+					let languageKey = 'mainScreen.suggestionSuccessfullyAdded';
+					if (err) languageKey = 'mainScreen.somethingWentWrong';
 
-					if (!$scope.$$phase) $scope.$apply();
+					getLanguageValue(languageKey).then((toastMessage) => {
+						buildfire.dialog.toast({
+							message: toastMessage,
+							type: "info"
+						});
+
+						if (err) return console.error(err);
+
+						const suggestion = new Suggestion(result)
+						suggestion.disableUpvote = true;
+						suggestion.statusName = $rootScope.TextStatuses[0];
+						suggestion.upvoteByYou = true;
+						$scope.suggestions.unshift(suggestion);
+						if($rootScope.settings){
+							votesExpressionOptions.plugin.itemTitle = suggestion.title;
+							Promise.all([getLanguageValue("notifications.newItemTitle"), getLanguageValue("notifications.newItemBody")])
+							.then(([title, message]) => {
+								if($rootScope.settings.pushNotificationUsersSegment === PUSH_NOTIFICATIONS_SEGMENT.ALL_USERS){
+									PushNotification.sendToAll(title, message, suggestion.id);
+								} else if($rootScope.settings.pushNotificationUsersSegment === PUSH_NOTIFICATIONS_SEGMENT.TAGS){
+									const userTags = $rootScope.settings.pushNotificationTags.map(tag=> (tag.tagName ? tag.tagName : tag.value));
+									if(userTags.length > 0){
+										PushNotification.sendToUserSegment(title, message, suggestion.id, userTags)
+									}
+								}
+							})
+						}
+						suggestion._createdOn = getCurrentDate(suggestion.createdOn);
+						suggestion._displayName = getUserName(suggestion.createdBy);
+
+						suggestion.imgUrl = 'assets/images/avatar.png';
+						suggestion.imageInProgress = true;
+						const ownerImage = buildfire.auth.getUserPictureUrl({ userId: suggestion.createdBy._id });
+						validateImage(ownerImage).then((isValid) => {
+							if (isValid) {
+								suggestion.imgUrl = buildfire.imageLib.cropImage(ownerImage, { size: 'm', aspect: '1:1' });
+							}
+							suggestion.imageInProgress = false;
+							if (!$scope.$$phase) $scope.$apply();
+						});
+
+						if (!$scope.$$phase) $scope.$apply();
+					});
 				})
 			}
 

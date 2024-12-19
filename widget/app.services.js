@@ -41,15 +41,4 @@
         }
       };
     }])
-    .filter('getUserImage', function () {
-      return function (user) {
-        var url = './assets/images/avatar.png';
-        if (user) {
-          url = buildfire.auth.getUserPictureUrl({ userId: user._id });
-          url = buildfire.imageLib.cropImage(url,{ size: "xs", aspect: "1:1" });
-          return url;
-        }
-        return url;
-      };
-    })
 })(window.angular, window.buildfire);
