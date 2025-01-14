@@ -75,12 +75,14 @@ var config = {};
 
 			getSettings().then(()=>{
 				const suggestionId = getSuggestionIdOnNewNotification()
-				if(suggestionId != ''){
-					getUser(navigateToItemDetails(suggestionId))
-				}
-				else {
-					getUser(init);
-				}
+					getUser(()=>{
+						if (suggestionId != ''){
+							navigateToItemDetails(suggestionId)
+						}
+						else {
+							init();
+						}
+					})
 			})
 
 			buildfire.auth.onLogin(user => {
