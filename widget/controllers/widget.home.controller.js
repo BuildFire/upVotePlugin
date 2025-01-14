@@ -1,6 +1,3 @@
-
-
-
 var _currentUser = null;
 var appThemeColors = null;
 var isCardClicked = false;
@@ -76,13 +73,31 @@ var config = {};
 			$scope.currentUserCreditData = null;
 			showSkeleton()
 
-			const suggestionId = getSuggestionIdOnNewNotification()
-			if(suggestionId != ''){
-				navigateToItemDetails(suggestionId)
-			}
+			getSettings().then(()=>{
+				const suggestionId = getSuggestionIdOnNewNotification()
+				getUser(()=>{
+					if (suggestionId != ''){
+						navigateToItemDetails(suggestionId)
+					}
+					else {
+						init();
+					}
+					})
+			})
+
+			buildfire.auth.onLogin(user => {
+				_currentUser = user;
+				init();
+			});
+
+			buildfire.auth.onLogout(() => {
+				_currentUser = null;
+				init();
+			});
 
 			buildfire.deeplink.onUpdate((deeplinkData) => {
 				if(deeplinkData){
+					buildfire.history.pop();
 					var id = deeplinkData.split("=")[1]
 					navigateToItemDetails(id)
 				}
@@ -306,20 +321,6 @@ var config = {};
 				})
 
 			}
-
-			getSettings().then(()=>{
-				getUser(init);
-			})
-
-			buildfire.auth.onLogin(user => {
-				_currentUser = user;
-				init();
-			});
-
-			buildfire.auth.onLogout(() => {
-				_currentUser = null;
-				init();
-			});
 
 			function renderStatusItem(text, index){
 				const element = `
