@@ -75,13 +75,13 @@ var config = {};
 
 			getSettings().then(()=>{
 				const suggestionId = getSuggestionIdOnNewNotification()
-					getUser(()=>{
-						if (suggestionId != ''){
-							navigateToItemDetails(suggestionId)
-						}
-						else {
-							init();
-						}
+				getUser(()=>{
+					if (suggestionId != ''){
+						navigateToItemDetails(suggestionId)
+					}
+					else {
+						init();
+					}
 					})
 			})
 
