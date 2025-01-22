@@ -101,6 +101,38 @@
                     "maxLength": 20,
                     "toolTip": "",
                     "placeholder": "Someone"
+                },
+                "day": {
+                    "title": "Day",
+                    "defaultValue": "Day",
+                    "inputType": "text",
+                    "maxLength": 15,
+                    "toolTip": "",
+                    "placeholder": "Day"
+                },
+                "hour": {
+                    "title": "Hour",
+                    "defaultValue": "Hour",
+                    "inputType": "text",
+                    "maxLength": 15,
+                    "toolTip": "",
+                    "placeholder": "Hour"
+                },
+                "hours": {
+                    "title": "Hours",
+                    "defaultValue": "Hours",
+                    "inputType": "text",
+                    "maxLength": 15,
+                    "toolTip": "",
+                    "placeholder": "Hours"
+                },
+                "min": {
+                    "title": "Min",
+                    "defaultValue": "Min",
+                    "inputType": "text",
+                    "maxLength": 15,
+                    "toolTip": "",
+                    "placeholder": "Min"
                 }
             }
         },
@@ -334,6 +366,22 @@
                     "toolTip": "",
                     "maxLength": 9,
                     "placeholder": "Cancel"
+                },
+                "youGotAnUpVoteTitle": {
+                    "title": "You Got An Upvote Title",
+                    "defaultValue": "You got an upvote",
+                    "inputType": "text",
+                    "toolTip": "",
+                    "maxLength": 100,
+                    "placeholder": "You got an upvote"
+                },
+                "youGotAnUpVoteBody": {
+                    "title": "You Got An Upvote Body",
+                    "defaultValue": "${context.plugin.userName} upvoted your suggestion ${context.plugin.itemTitle}",
+                    "inputType": "text",
+                    "toolTip": "",
+                    "maxLength": 100,
+                    "placeholder": "You got an upvote"
                 }
             }
         }

@@ -699,96 +699,98 @@ var config = {};
 			}
 
 
-			const upVoteHandler = (suggestionObj, user, isUserUpvoted)=>{
+			const upVoteHandler = (suggestionObj, user, isUserUpvoted) => {
 				checkUserCredits()
-				.then((res) => {
-					if (res) {
-						isUserUpvoted = true;
+					.then((res) => {
+						if (res) {
+							isUserUpvoted = true;
 						// vote
-						Analytics.trackAction(
-							analyticKeys.VOTE_NUMBER.key,
-							{
-								votes: 1,
-								_buildfire: { aggregationValue: 1 },
-							}
-						);
-
-						suggestionObj.upVoteCount++;
-						suggestionObj.disableUpvote = true;
-						suggestionObj.upVotedBy[user._id] = {
-							votedOn: new Date(),
-							user: user,
-						};
-
-						if (
-							suggestionObj.createdBy._id != user._id
-						) {
-							buildfire.notifications.pushNotification.schedule(
+							Analytics.trackAction(
+								analyticKeys.VOTE_NUMBER.key,
 								{
-									title: 'You got an upvote!',
-									text:
-										getUserName(user) +
-										' upvoted your suggestion ' +
-										suggestionObj.title,
-									users: [
-										suggestionObj.createdBy._id,
-									],
-								},
-								function (err) {
-									if (err) console.error(err);
+									votes: 1,
+									_buildfire: { aggregationValue: 1 },
 								}
 							);
-						}
 
-						if ($rootScope.settings.selectedPurchaseProductId) {
-							let credit = Number(
+							suggestionObj.upVoteCount++;
+							suggestionObj.disableUpvote = true;
+							suggestionObj.upVotedBy[user._id] = {
+								votedOn: new Date(),
+								user: user,
+							};
+
+							if (suggestionObj.createdBy._id !== user._id) {
+								votesExpressionOptions.plugin.userName = getUserName(user);
+								votesExpressionOptions.plugin.itemTitle = suggestionObj.title;
+
+								Promise.all([
+									getLanguageValue('notifications.youGotAnUpVoteTitle'),
+									getLanguageValue('notifications.youGotAnUpVoteBody')
+								]).then(([title, text]) => {
+									buildfire.notifications.pushNotification.schedule(
+										{
+											title,
+											text,
+											users: [suggestionObj.createdBy._id],
+										},
+										function (err) {
+											if (err) console.error(err);
+										}
+									);
+								}).catch((err) => {
+									console.error('Error fetching language strings:', err);
+								});
+							}
+
+							if ($rootScope.settings.selectedPurchaseProductId) {
+								let credit = Number(
 								decryptCredit(
 									res.credits,
 									secretKey
 								)
-							);
-							credit -= 1;
-							let payload = {
-								$set: {
-									updatedBy: _currentUser.userId,
+								);
+								credit -= 1;
+								let payload = {
+									$set: {
+										updatedBy: _currentUser.userId,
 									credits: encryptCredit(
 										credit,
 										secretKey
 									),
-								},
-							};
+									},
+								};
 
 							votesExpressionOptions.plugin.remainingVotes = credit
 							return UserCredit.update($scope.currentUserCreditData.id,payload).then(
 								() => {
-									buildfire.language.get({stringKey: 'mainScreen.voteConfirmed'}, (err, result) => {
+									buildfire.language.get({ stringKey: 'mainScreen.voteConfirmed' }, (err, result) => {
 										if (err) return console.error(err);
 										buildfire.dialog.toast({
 											message: result,
 											type: 'info',
 										});
 									});
-									if(credit === 0){
+									if (credit === 0) {
 										Analytics.trackAction(analyticKeys.CONSUMING_CREDITS.key);
 									}
 									return res;
-								}
-							);
+								});
+							} else {
+								return res;
+							}
 						} else {
-							return res;
+							return null;
 						}
-					} else {
-						return null;
-					}
-				})
-				.then((res) => {
+					})
+					.then((res) => {
 					if (res)
 						updateSuggestion(
 							suggestionObj,
 							user,
 							isUserUpvoted
 						);
-				});
+					});
 			};
 
 			const downVoteHandler = (suggestionObj, user, isUserUpvoted)=>{
@@ -1018,11 +1020,20 @@ var config = {};
 				const daysDifference = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
 
 				if(hoursDifference < 24 && hoursDifference != 0){
-				  return hoursDifference + "hour";
+					if (hoursDifference == 1) {
+						const hourText = getLanguageString("mainScreen.hour");
+					  return hoursDifference + hourText;
+					}
+					else {
+						const hoursText = getLanguageString("mainScreen.hours");
+						return hoursDifference + hoursText;
+					}
 				} else if(hoursDifference == 0){
-				  return minutesDifference + "min"
+					const minutesText = getLanguageString("mainScreen.min");
+				  return minutesDifference + minutesText
 				} else if(daysDifference == 1) {
-				  return "1day"
+					const dayText = getLanguageString("mainScreen.day");
+				  return daysDifference + dayText;
 				} else {
 				  return null;
 				}
