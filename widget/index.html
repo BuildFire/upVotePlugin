@@ -98,7 +98,7 @@
                                     </span>
                                 <span id="comment-message" class="margin--0"  bfString="mainScreen.commentButton"></span>
                             </button>
-                            <button ng-if="s.status != 3" id="upvote_icon" class="voteButton btn btn--icon--text ml-24" ng-disabled="blockVote" ng-click="upVote(s)"
+                            <button ng-if="s.status != 3" id="upvote_icon" class="voteButton btn btn--icon--text ml-24" ng-disabled="isButtonDisabled" ng-click="upVote(s)"
                             >
                                 <span ng-if="!s.upvoteByYou" id="unactive-arrow" class="material-icons "
                                 >arrow_upward</span>
@@ -106,7 +106,7 @@
                                 >arrow_upward</span>
                             </button>
                             <p class="pill-count shrink--0" ng-click="showVoterModal(s)">
-                                <span class="margin--0 body-text">{{s.upVoteCount}}</span>
+                                <span class="margin--0 body-text">{{upVoteCount(s)}}</span>
                             </p>
                         </div>
                     </div>

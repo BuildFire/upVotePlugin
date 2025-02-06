@@ -25,7 +25,7 @@
     "gulp-imagemin": "^6.1.0",
     "gulp-sequence": "^0.4.6",
     "gulp-strip-comments": "^2.5.1",
-    "gulp-uglify": "^3.0.2",
+    "gulp-terser": "^2.1.0",
     "gulp-zip": "^3.2.0"
   },
   "resolutions": {

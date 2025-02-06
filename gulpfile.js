@@ -5,7 +5,7 @@ const minifyCSS = require('gulp-csso');
 const concat = require('gulp-concat');
 const strip = require('gulp-strip-comments');
 const htmlReplace = require('gulp-html-replace');
-const uglify = require('gulp-uglify');
+const terser = require('gulp-terser');
 const eslint = require('gulp-eslint');
 const imagemin = require('gulp-imagemin');
 const gulpSequence = require('gulp-sequence');
@@ -72,7 +72,7 @@ jsTasks.forEach(function(task){
                 presets: ['es2015']
             }))
              /// obfuscate and minify the JS files
-            .pipe(uglify())
+            .pipe(terser())
 
             /// merge all the JS files together. If the
             /// order matters you can pass each file to the function
