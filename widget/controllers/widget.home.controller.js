@@ -789,11 +789,11 @@ var config = {};
 							}
 						};
 
-						$rootScope.isButtonDisabled = false; // Initialize in $rootScope
+						$rootScope.disableVoteButton = false; // Initialize in $rootScope
 
 						$rootScope.upVote = function (suggestionObj) {
-							if ($rootScope.isButtonDisabled) return; // Check on $rootScope
-							$rootScope.isButtonDisabled = true; // Disable the button globally
+							if ($rootScope.disableVoteButton) return; // Check on $rootScope
+							$rootScope.disableVoteButton = true; // Disable the button globally
 							$rootScope.$applyAsync();
 
 							isCardClicked = true;
@@ -809,22 +809,22 @@ var config = {};
 
 						if (!suggestionObj.upVotedBy[user._id]) {
 									await upVoteHandler(suggestionObj, user, isUserUpvoted);
-							$rootScope.isButtonDisabled = false; // Re-enable the button globally
+							$rootScope.disableVoteButton = false; // Re-enable the button globally
 									$rootScope.$applyAsync();
 								} else {
 									if ($rootScope.settings.selectedPurchaseProductId) {
 										unvoteDialog(async (err, result) => {
 									if (err) return new Error(err);
 									if (result) {
-												await downVoteHandler(suggestionObj, user, isUserUpvoted);
+										await downVoteHandler(suggestionObj, user, isUserUpvoted);
 									}
 
-							$rootScope.isButtonDisabled = false; // Re-enable the button globally
+							$rootScope.disableVoteButton = false; // Re-enable the button globally
 									$rootScope.$applyAsync();
 								});
 							} else {
 										await downVoteHandler(suggestionObj, user, isUserUpvoted);
-										$rootScope.isButtonDisabled = false; // Re-enable the button globally
+										$rootScope.disableVoteButton = false; // Re-enable the button globally
 										$rootScope.$applyAsync();
 							}
 						}
