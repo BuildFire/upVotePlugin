@@ -700,7 +700,7 @@ var config = {};
 
 			const upVoteHandler = async (suggestionObj, user, isUserUpvoted) => {
 			try {
-						const res = await checkUserCredits();
+				const res = await checkUserCredits();
 						if (res) {
 							isUserUpvoted = true;
 						// vote
@@ -723,7 +723,7 @@ var config = {};
 								votesExpressionOptions.plugin.userName = getUserName(user);
 								votesExpressionOptions.plugin.itemTitle = suggestionObj.title;
 
-										const [title, text] = await Promise.all([
+								const [title, text] = await Promise.all([
 								getLanguageValue('notifications.youGotAnUpVoteTitle'),
 								getLanguageValue('notifications.youGotAnUpVoteBody')
 								]);
@@ -766,10 +766,10 @@ var config = {};
 									}
 								}
 							}
-								await updateSuggestion(suggestionObj, user, isUserUpvoted);
+							await updateSuggestion(suggestionObj, user, isUserUpvoted);
 							} catch (err) {
-						console.error(err);
-					}
+								console.error(err);
+							}
 			};
 
 						const downVoteHandler = async (suggestionObj, user, isUserUpvoted) => {
@@ -815,16 +815,16 @@ var config = {};
 										unvoteDialog(async (err, result) => {
 									if (err) return new Error(err);
 									if (result) {
-												await downVoteHandler(suggestionObj, user, isUserUpvoted);
+										await downVoteHandler(suggestionObj, user, isUserUpvoted);
 									}
 
 							$rootScope.isButtonDisabled = false; // Re-enable the button globally
 									$rootScope.$applyAsync();
 								});
 							} else {
-										await downVoteHandler(suggestionObj, user, isUserUpvoted);
-										$rootScope.isButtonDisabled = false; // Re-enable the button globally
-										$rootScope.$applyAsync();
+								await downVoteHandler(suggestionObj, user, isUserUpvoted);
+								$rootScope.isButtonDisabled = false; // Re-enable the button globally
+								$rootScope.$applyAsync();
 							}
 						}
 							});
@@ -853,7 +853,7 @@ var config = {};
 						suggestionObj.upVoteCount = _suggestion.upVoteCount;
 						suggestionObj.upVotedBy = _suggestion.upVotedBy;
 						if (!$scope.$$phase) $scope.$apply();
-									await Suggestion.update(_suggestion);
+						await Suggestion.update(_suggestion);
 								}
 					} catch (err) {
 							console.error(err);
@@ -883,8 +883,8 @@ var config = {};
 			}
 
 			$rootScope.upVoteCount = function  (selectedSuggestion) {
-							return Object.keys(selectedSuggestion.upVotedBy).length;
-						}
+				return Object.keys(selectedSuggestion.upVotedBy).length;
+			}
 
 			window.openPopup = function() {
 				if(_currentUser){
