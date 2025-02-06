@@ -809,7 +809,7 @@ var config = {};
 						if (!suggestionObj.upVotedBy[user._id]) {
 									await upVoteHandler(suggestionObj, user, isUserUpvoted);
 							$rootScope.isButtonDisabled = false; // Re-enable the button globally
-									$rootScope.$applyAsync();
+							$rootScope.$applyAsync();
 								} else {
 									if ($rootScope.settings.selectedPurchaseProductId) {
 										unvoteDialog(async (err, result) => {
@@ -819,7 +819,7 @@ var config = {};
 									}
 
 							$rootScope.isButtonDisabled = false; // Re-enable the button globally
-									$rootScope.$applyAsync();
+							$rootScope.$applyAsync();
 								});
 							} else {
 								await downVoteHandler(suggestionObj, user, isUserUpvoted);
@@ -856,8 +856,8 @@ var config = {};
 						await Suggestion.update(_suggestion);
 								}
 					} catch (err) {
-							console.error(err);
-				}
+						console.error(err);
+					}
 			};
 
 			const unvoteDialog = (callback) =>{
