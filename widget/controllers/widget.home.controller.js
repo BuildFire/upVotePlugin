@@ -86,6 +86,7 @@ var config = {};
 			})
 
 			buildfire.auth.onLogin(user => {
+				$rootScope.upvotesInProgress = [];
 				_currentUser = user;
 				init();
 			});
@@ -789,17 +790,17 @@ var config = {};
 							}
 						};
 
-						$rootScope.isButtonDisabled = false; // Initialize in $rootScope
+						$rootScope.upvotesInProgress = []; // Initialize in $rootScope
 
 						$rootScope.upVote = function (suggestionObj) {
-							if ($rootScope.isButtonDisabled) return; // Check on $rootScope
-							$rootScope.isButtonDisabled = true; // Disable the button globally
-							$rootScope.$applyAsync();
 
 							isCardClicked = true;
 
 							getUser(async function (user) {
-								if (!user) enforceLogin();
+								if (!user) {
+									enforceLogin();
+									return ;
+								}
 
 								if (!suggestionObj.upVotedBy) suggestionObj.upVotedBy = {};
 								if (!suggestionObj.hasOwnProperty('upVoteCount'))
@@ -807,9 +808,13 @@ var config = {};
 
 								let isUserUpvoted = false;
 
+								if ($rootScope.upvotesInProgress.includes(suggestionObj.id)) return;
+								$rootScope.upvotesInProgress.push(suggestionObj.id); // Disable the button globally
+								$rootScope.$applyAsync();
+
 						if (!suggestionObj.upVotedBy[user._id]) {
 									await upVoteHandler(suggestionObj, user, isUserUpvoted);
-							$rootScope.isButtonDisabled = false; // Re-enable the button globally
+							$rootScope.upvotesInProgress	= $rootScope.upvotesInProgress.filter((id) => id !== suggestionObj.id); // Re-enable the button globally
 									$rootScope.$applyAsync();
 								} else {
 									if ($rootScope.settings.selectedPurchaseProductId) {
@@ -819,17 +824,21 @@ var config = {};
 												await downVoteHandler(suggestionObj, user, isUserUpvoted);
 									}
 
-							$rootScope.isButtonDisabled = false; // Re-enable the button globally
+											$rootScope.upvotesInProgress	= $rootScope.upvotesInProgress.filter((id) => id !== suggestionObj.id); // Re-enable the button globally
 									$rootScope.$applyAsync();
 								});
 							} else {
 										await downVoteHandler(suggestionObj, user, isUserUpvoted);
-										$rootScope.isButtonDisabled = false; // Re-enable the button globally
+										$rootScope.upvotesInProgress	= $rootScope.upvotesInProgress.filter((id) => id !== suggestionObj.id); // Re-enable the button globally
 										$rootScope.$applyAsync();
 							}
 						}
 							});
 						};
+
+						$rootScope.isUpVoteDisabled = function (suggestionObj) {
+							return $rootScope.upvotesInProgress.includes(suggestionObj.id);
+						}
 
 			const updateSuggestion = async (suggestionObj, user, isUserUpvoted) => {
 			try {
@@ -854,10 +863,10 @@ var config = {};
 						suggestionObj.upVoteCount = _suggestion.upVoteCount;
 						suggestionObj.upVotedBy = _suggestion.upVotedBy;
 						if (!$scope.$$phase) $scope.$apply();
-									await Suggestion.update(_suggestion);
+							await Suggestion.update(_suggestion);
 								}
 					} catch (err) {
-							console.error(err);
+						console.error(err);
 				}
 			};
 
@@ -884,8 +893,9 @@ var config = {};
 			}
 
 			$rootScope.upVoteCount = function  (selectedSuggestion) {
-							return Object.keys(selectedSuggestion.upVotedBy).length;
-						}
+				// this function is needed since the upVoteCount is not correct in old instances
+				return Object.keys(selectedSuggestion.upVotedBy).length;
+					}
 
 			window.openPopup = function() {
 				if(_currentUser){
