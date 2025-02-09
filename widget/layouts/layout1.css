@@ -539,6 +539,10 @@ textarea{
 	align-self: center;
 }
 
+.white-space-pre-line {
+	white-space: pre-line;
+}
+
 #comment-icon {
 	margin-right: 6px;
 	font-size:20px !important
@@ -551,7 +555,7 @@ textarea{
 
 #comment-icon, #comment-message {
 	color: var( --bf-theme-body-text) !important;
-	
+
 }
 
 #active-arrow {
