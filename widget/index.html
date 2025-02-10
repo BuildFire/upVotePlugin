@@ -89,7 +89,7 @@
                         </div>
                         <div class="suggestion">
                             <h4 class="word--break body-text font-weight-500" ng-show="s.title">{{s.title}}</h4>
-                            <p class="word--break margin-bottom--m body-text" ng-bind-html="safeHtml(s.suggestion)">{{s.suggestion}}</p>
+                            <p class="white-space-pre-line margin-bottom--m body-text" ng-bind-html="safeHtml(s.suggestion)">{{s.suggestion}}</p>
                         </div>
                         <div class="button__panel shrink--0 padded padded--sm padded--x padding-right-zero">
                             <button ng-if="settings && settings.enableComments" class="voteButton btn btn--icon--text " ng-click="goSocial(s)">
