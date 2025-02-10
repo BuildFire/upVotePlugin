@@ -86,6 +86,7 @@ var config = {};
 			})
 
 			buildfire.auth.onLogin(user => {
+				$rootScope.upvotesInProgress = [];
 				_currentUser = user;
 				init();
 			});
@@ -699,9 +700,9 @@ var config = {};
 			}
 
 
-			const upVoteHandler = (suggestionObj, user, isUserUpvoted) => {
-				checkUserCredits()
-					.then((res) => {
+			const upVoteHandler = async (suggestionObj, user, isUserUpvoted) => {
+			try {
+						const res = await checkUserCredits();
 						if (res) {
 							isUserUpvoted = true;
 						// vote
@@ -724,23 +725,18 @@ var config = {};
 								votesExpressionOptions.plugin.userName = getUserName(user);
 								votesExpressionOptions.plugin.itemTitle = suggestionObj.title;
 
-								Promise.all([
-									getLanguageValue('notifications.youGotAnUpVoteTitle'),
-									getLanguageValue('notifications.youGotAnUpVoteBody')
-								]).then(([title, text]) => {
-									buildfire.notifications.pushNotification.schedule(
+										const [title, text] = await Promise.all([
+								getLanguageValue('notifications.youGotAnUpVoteTitle'),
+								getLanguageValue('notifications.youGotAnUpVoteBody')
+								]);
+
+								await buildfire.notifications.pushNotification.schedule(
 										{
 											title,
 											text,
 											users: [suggestionObj.createdBy._id],
-										},
-										function (err) {
-											if (err) console.error(err);
 										}
 									);
-								}).catch((err) => {
-									console.error('Error fetching language strings:', err);
-								});
 							}
 
 							if ($rootScope.settings.selectedPurchaseProductId) {
@@ -761,88 +757,102 @@ var config = {};
 									},
 								};
 
-							votesExpressionOptions.plugin.remainingVotes = credit
-							return UserCredit.update($scope.currentUserCreditData.id,payload).then(
-								() => {
-									buildfire.language.get({ stringKey: 'mainScreen.voteConfirmed' }, (err, result) => {
-										if (err) return console.error(err);
-										buildfire.dialog.toast({
-											message: result,
-											type: 'info',
-										});
-									});
-									if (credit === 0) {
-										Analytics.trackAction(analyticKeys.CONSUMING_CREDITS.key);
+							votesExpressionOptions.plugin.remainingVotes = credit;
+							await UserCredit.update($scope.currentUserCreditData.id, payload);
+
+							const result = await buildfire.language.get({ stringKey: 'mainScreen.voteConfirmed' });
+							buildfire.dialog.toast({message: result, type: 'info',});
+
+							if (credit === 0) {
+								Analytics.trackAction(analyticKeys.CONSUMING_CREDITS.key);
 									}
-									return res;
-								});
-							} else {
-								return res;
+								}
 							}
-						} else {
-							return null;
-						}
-					})
-					.then((res) => {
-					if (res)
-						updateSuggestion(
-							suggestionObj,
-							user,
-							isUserUpvoted
-						);
-					});
+								await updateSuggestion(suggestionObj, user, isUserUpvoted);
+							} catch (err) {
+						console.error(err);
+					}
 			};
 
-			const downVoteHandler = (suggestionObj, user, isUserUpvoted)=>{
-                        // unvote
-                        Analytics.trackAction(analyticKeys.VOTE_NUMBER.key, {
-                            votes: -1,
-                            _buildfire: { aggregationValue: -1 },
-                        });
-                        suggestionObj.upVoteCount--;
-                        suggestionObj.disableUpvote = false;
-                        delete suggestionObj.upVotedBy[user._id];
-                        updateSuggestion(suggestionObj, user, isUserUpvoted);
-			};
+						const downVoteHandler = async (suggestionObj, user, isUserUpvoted) => {
+							try {
+								// unvote
+								Analytics.trackAction(analyticKeys.VOTE_NUMBER.key, {
+									votes: -1,
+									_buildfire: { aggregationValue: -1 },
+								});
+								suggestionObj.upVoteCount--;
+								suggestionObj.disableUpvote = false;
+								delete suggestionObj.upVotedBy[user._id];
+								await updateSuggestion(suggestionObj, user, isUserUpvoted);
+							} catch (err) {
+								console.error(err);
+							}
+						};
 
-			$rootScope.upVote = function (suggestionObj) {
-				isCardClicked = true;
-                getUser(function (user) {
-                    if (!user) enforceLogin();
-                    if (!suggestionObj.upVotedBy) suggestionObj.upVotedBy = {};
-                    if (!suggestionObj.hasOwnProperty('upVoteCount'))
-                        suggestionObj.upVoteCount = 1;
-                    let isUserUpvoted = false;
+						$rootScope.upvotesInProgress = []; // Initialize in $rootScope
+
+						$rootScope.upVote = function (suggestionObj) {
+
+							isCardClicked = true;
+
+							getUser(async function (user) {
+								if (!user) {
+									enforceLogin();
+									return ;
+								}
+
+								if (!suggestionObj.upVotedBy) suggestionObj.upVotedBy = {};
+								if (!suggestionObj.hasOwnProperty('upVoteCount'))
+									suggestionObj.upVoteCount = 1;
+
+								let isUserUpvoted = false;
+
+								if ($rootScope.upvotesInProgress.includes(suggestionObj.id)) return;
+								$rootScope.upvotesInProgress.push(suggestionObj.id); // Disable the button globally
+								$rootScope.$applyAsync();
 
 						if (!suggestionObj.upVotedBy[user._id]) {
-							upVoteHandler(suggestionObj, user, isUserUpvoted);
-						} else {
-							if($rootScope.settings.selectedPurchaseProductId){
-								unvoteDialog((err, result) => {
+									await upVoteHandler(suggestionObj, user, isUserUpvoted);
+							$rootScope.upvotesInProgress	= $rootScope.upvotesInProgress.filter((id) => id !== suggestionObj.id); // Re-enable the button globally
+									$rootScope.$applyAsync();
+								} else {
+									if ($rootScope.settings.selectedPurchaseProductId) {
+										unvoteDialog(async (err, result) => {
 									if (err) return new Error(err);
-									if (result){
-										downVoteHandler(suggestionObj, user, isUserUpvoted);
+									if (result) {
+												await downVoteHandler(suggestionObj, user, isUserUpvoted);
 									}
-								})
-							}else{
-								downVoteHandler(suggestionObj, user, isUserUpvoted);
+
+											$rootScope.upvotesInProgress	= $rootScope.upvotesInProgress.filter((id) => id !== suggestionObj.id); // Re-enable the button globally
+									$rootScope.$applyAsync();
+								});
+							} else {
+										await downVoteHandler(suggestionObj, user, isUserUpvoted);
+										$rootScope.upvotesInProgress	= $rootScope.upvotesInProgress.filter((id) => id !== suggestionObj.id); // Re-enable the button globally
+										$rootScope.$applyAsync();
 							}
 						}
-                });
-            };
+							});
+						};
 
-			const updateSuggestion =(suggestionObj,user, isUserUpvoted)=>{
+						$rootScope.isUpVoteDisabled = function (suggestionObj) {
+							return $rootScope.upvotesInProgress.includes(suggestionObj.id);
+						}
+
+			const updateSuggestion = async (suggestionObj, user, isUserUpvoted) => {
+			try {
 				if (suggestionObj.upVoteCount < 10) {
-					/// then just to a hard count just in case
+					// then just do a hard count just in case
 					suggestionObj.upVoteCount = Object.keys(suggestionObj.upVotedBy).length;
 				}
 				suggestionObj.upvoteByYou = suggestionObj.upVotedBy[user._id] != null
 				if (!$scope.$$phase) $scope.$apply();
 
-				Suggestion.getById(suggestionObj.id).then(_suggestion => {
-					if(_suggestion){
-						_suggestion.upVoteCount = isUserUpvoted ? _suggestion.upVoteCount + 1 : _suggestion.upVoteCount - 1
-						if(!isUserUpvoted){
+				const _suggestion = await Suggestion.getById(suggestionObj.id);
+					if (_suggestion) {
+						_suggestion.upVoteCount = isUserUpvoted ? _suggestion.upVoteCount + 1 : _suggestion.upVoteCount - 1;
+						if (!isUserUpvoted) {
 							delete _suggestion.upVotedBy[user._id];
 						} else {
 							_suggestion.upVotedBy[user._id] = {
@@ -853,10 +863,12 @@ var config = {};
 						suggestionObj.upVoteCount = _suggestion.upVoteCount;
 						suggestionObj.upVotedBy = _suggestion.upVotedBy;
 						if (!$scope.$$phase) $scope.$apply();
-						Suggestion.update(_suggestion).then(()=>{})
-					}
-				})
-			}
+							await Suggestion.update(_suggestion);
+								}
+					} catch (err) {
+						console.error(err);
+				}
+			};
 
 			const unvoteDialog = (callback) =>{
 				const dialogOptions = {
@@ -879,6 +891,11 @@ var config = {};
 					}
 				);
 			}
+
+			$rootScope.upVoteCount = function  (selectedSuggestion) {
+				// this function is needed since the upVoteCount is not correct in old instances
+				return Object.keys(selectedSuggestion.upVotedBy).length;
+					}
 
 			window.openPopup = function() {
 				if(_currentUser){
