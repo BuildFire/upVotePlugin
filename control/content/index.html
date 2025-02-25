@@ -12,96 +12,26 @@
     <script src="../../../../scripts/buildfire.min.js"></script>
 
     <!-- build:bundleSharedJSFiles  -->
+    <script src="../../widget/global/js/constants/index.js"></script>
+    <script src="../../widget/global/js/models/Setting.js"></script>
+    <script src="../../widget/global/js/repositories/Settings.js"></script>
     <script src="../../widget/assets/js/Analytics.js"></script>
     <script src="../../widget/assets/js/analyticsKeys.js"></script>
-    <!-- endbuild -->
+	<!-- endbuild -->
 
-    <!-- WYSIWYG -->
-    <script src="../../../../scripts/tinymce/tinymce.min.js"></script>
-
-
+	<script src="../../../../scripts/tinymce/tinymce.min.js"></script>
     <link href="../../../../styles/control/bf-base.css" rel="stylesheet">
-    <script>
-        Analytics.init();
-
-        const debounce = (func, wait) => {
-            let timeout;
-            function executedFunction(...args) {
-                const later = () => {
-                    clearTimeout(timeout);
-                    func(...args);
-                };
-
-                clearTimeout(timeout);
-                timeout = setTimeout(later, wait);
-            };
-            executedFunction();
-        };
-
-        tinymce.init({
-            selector: "#text",
-            max_chars: 800,
-            toolbar: "",
-            plugins: "",
-            setup: function (editor) {
-                var data = {};
-                editor.on("load", function () {
-                    buildfire.datastore.get(function (err, obj) {
-                        if (!obj || !obj.data) return;
-                        // This way, we will keep old instances to use PSW navigate by default (so we don't break backward compatibility) and new instances to navigate to CW by default.
-                        if (!Object.keys(obj.data).length) obj.data.navigateToCwByDefault = true;
-                        if (!obj.data.text) obj.data.text = '';
-
-                        data = obj.data;
-                        tinymce.activeEditor.setContent(obj.data.text);
-                    });
-                });
-                editor.on("keyup", function (saveWithDelay) {
-                    debounce(function () {
-                        data.text = tinymce.activeEditor.getContent();
-                        save(data);
-                    }, 500);
-                });
-                editor.on("keydown", function (e) {
-                    var whitelistedKeys = [8, 37, 38, 39, 40, 46];
-                    if (whitelistedKeys.indexOf(e.keyCode) > -1) return true;
-                    if (tinymce_getContentLength() + 1 > this.settings.max_chars) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        return false;
-                    }
-                    return true;
-                })
-                editor.on("change", function (saveWithDelay) {
-                    debounce(function () {
-                        data.text = tinymce.activeEditor.getContent();
-                        save(data);
-                    }, 500);
-                });
-                function tinymce_getContentLength() {
-                    return tinymce.get(tinymce.activeEditor.id).contentDocument.body.innerText.length;
-                }
-            }
-        });
-    </script>
 </head>
 
 <body>
     <div>
         <h1>Introduction</h1>
-        <textarea id="text" ui-tinymce="editorOptions" class="form-control" rows="5" width="100%" height="300px"></textarea>
-
+        <textarea id="introduction" class="form-control"></textarea>
     </div>
-
-
-        <script>
-            function save(data) {
-                buildfire.datastore.save(data, function (err) {
-                    if (err) console.error(err);
-                });
-            }
-        </script>
-
 </body>
+
+<script src="js/content.controller.js"></script>
+<script src="js/state.js"></script>
+<script src="js/index.js"></script>
 
 </html>

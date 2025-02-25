@@ -11,7 +11,8 @@ class Setting {
     this.introduction = data.introduction || ''; // wysiwyg content migrated from primary
 
     this.enableComments = typeof data.enableComments === 'boolean' ? data.enableComments : false;
-    this.enablePrivateMessage = typeof data.enablePrivateMessage === 'boolean' ? data.enableComments : false;
+    this.messagingFeatureInstance = data.messagingFeatureInstance || {};
+    this.enableUserProfile = typeof data.enableUserProfile === 'boolean' ? data.enableComments : false;
     this.enableDirectoryBadges = typeof data.enableDirectoryBadges === 'boolean' ? data.enableComments : false;
 
     this.defaultItemSorting = data.defaultItemSorting || ENUMS.SUGGESTIONS_SORTING.NEWEST;

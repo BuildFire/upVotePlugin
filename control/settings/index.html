@@ -60,18 +60,44 @@
         </div>
       </div>
     </div>
-    <div class="row margin-bottom-sixteen">
+    <div class="row margin-bottom-sixteen hidden" id="directoryBadgesRow">
       <div class="item clearfix row flex-center">
-        <label class="tooltip-container col-md-4">Private Message
+        <label class="tooltip-container col-md-4">Show Badges from Directory
           <span class="btn-info-icon btn-primary">
             <span class="cp-tooltip">
-              Allow users to message each other privately.
+              If you have the Directory plugin and allow users to collect badges, you can display their
+              badge collection here.
             </span>
           </span>
         </label>
         <div class="main col-md-8 button-switch padding-right-zero">
-          <input id="enablePrivateMessage" type="checkbox" />
-          <label for="enablePrivateMessage" class="label-success"></label>
+          <input id="enableDirectoryBadges" type="checkbox" />
+          <label for="enableDirectoryBadges" class="label-success"></label>
+        </div>
+      </div>
+    </div>
+    <div class="row margin-bottom-sixteen" id="chatMessagingRow">
+      <div class="item clearfix row flex flex-align-start">
+        <label class="tooltip-container col-md-4">Allow Private Messaging
+          <span class="btn-info-icon btn-primary">
+            <span class="cp-tooltip">
+              To enable users to send direct messages, you need to connect the Community Wall plugin,
+              which will handle message delivery.
+            </span>
+          </span>
+        </label>
+        <div class="main col-md-8 padding-right-zero padding-left-zero">
+          <button id="addChatInstance" class="btn btn-info pull-right">Select Feature</button>
+          <div id="chatInstanceRowContainer" class="flex-auto flex border-grey border-radius-four padding-bottom-five padding-top-five padding-left-ten padding-right-ten hidden">
+            <div class="flex flex-auto flex-align-center">
+              <img id="chatInstanceIcon" class="border-radius-four chat-instance-icon" src="">
+              <h5 id="chatInstanceTitle" class="blackTheme chat-instance-title margin-bottom-zero margin-top-zero">sss</h5>
+            </div>
+            <div class="flex action-item-actions">
+              <button id="editChatInstance" class="btn btn--icon icon primary icon-pencil margin-left-five"></button>
+              <button id="deleteChatInstance" class="btn btn--icon icon danger icon-cross2 margin-left-five"></button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -224,12 +250,14 @@
           </ul>
         </div>
         <span>
-			<a class="margin-left-ten" href="https://learn.appdocumentation.com/en/collections/571367-commerce-tab" target="_blank">Learn more about In-App Purchases</a>
-		</span>
+          <a class="margin-left-ten"
+            href="https://learn.appdocumentation.com/en/collections/571367-commerce-tab"
+            target="_blank">Learn more about In-App Purchases</a>
+        </span>
       </div>
     </div>
     <div class="flex flex-align-start row margin-bottom-sixteen hidden" id="votesNumberContainer">
-      <label class="tooltip-container col-md-4">Votes Per Purchase
+      <label class="tooltip-container col-md-4"><span class="required-field">Votes Per Purchase</span>
         <span class="btn-info-icon btn-primary">
           <span class="cp-tooltip">
             Enter how many votes the user receives with every purchase.
@@ -238,7 +266,8 @@
       </label>
       <div class="main col-md-8 pull-right padding-lr-6">
         <input class="form-control" type="number" id="votesNumberInput" value="1">
-        <span id="votesNumberErrorMessage" class="margin-left-ten small text-danger hidden">This field is required</span>
+        <span id="votesNumberErrorMessage" class="margin-left-ten small text-danger hidden">This field is
+          required</span>
       </div>
     </div>
   </div>
@@ -246,7 +275,7 @@
 <!-- build:bundleJSFiles  -->
 <!-- <script src="./app.js"></script> -->
 <script src="js/utils.js"></script>
-<script src="js/content.controller.js"></script>
+<script src="js/settings.controller.js"></script>
 <script src="js/index.js"></script>
 <script src="js/state.js"></script>
 <!-- endbuild -->

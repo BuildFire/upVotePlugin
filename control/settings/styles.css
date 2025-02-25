@@ -167,6 +167,56 @@ label {
   border: 1px solid var(--c-danger) !important;
 }
 
+.action-item-actions .btn {
+  aspect-ratio: 1;
+  font-size: 18px;
+  background: unset;
+}
+
+.action-item-actions .btn.primary:hover {
+  background-color: var(--c-gray1);
+  color: var(--c-primary);
+}
+
+.action-item-actions .btn.danger:hover {
+  background-color: var(--c-gray1);
+  color: var(--c-danger);
+}
+
+.chat-instance-icon {
+  width: 40px;
+  height: 40px;
+  overflow: hidden;
+  background-color: #DDDDDD;
+  margin-right: 10px;
+}
+
+.chat-instance-title {
+  color: var(--c-gray6);
+}
+
+.btn.btn-primary-add {
+  padding-left: 2.25rem;
+  position: relative;
+}
+
+.btn.btn-primary-add::before,
+.btn.btn-primary-add::after {
+  content: "";
+  width: 0.75rem;
+  top: 50%;
+  left: 1rem;
+  display: inline-block;
+  height: 1px;
+  background-color: var(--c-primary);
+  margin-right: 0.5rem;
+  position: absolute;
+}
+
+.btn.btn-primary-add::after {
+  transform: translateY(-50%) rotate(90deg);
+}
+
 /* tooltip */
 .tooltip-container {
   display: flex;

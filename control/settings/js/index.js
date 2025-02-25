@@ -1,4 +1,4 @@
-const content = {
+const settingsPage = {
   saveTimer: null,
   hideCompletedItemsList: [
     { text: 'Immediately', value: 0 },
@@ -18,10 +18,19 @@ const content = {
 
   initSelectors() {
     this.selectors = {
+      directoryBadgesRow: document.getElementById('directoryBadgesRow'),
+      chatMessagingRow: document.getElementById('chatMessagingRow'),
+
       // toggles
       enableComments: document.getElementById('enableComments'),
       enableUserProfile: document.getElementById('enableUserProfile'),
-      enablePrivateMessage: document.getElementById('enablePrivateMessage'),
+      enableDirectoryBadges: document.getElementById('enableDirectoryBadges'),
+      addChatInstance: document.getElementById('addChatInstance'),
+      chatInstanceRowContainer: document.getElementById('chatInstanceRowContainer'),
+      editChatInstance: document.getElementById('editChatInstance'),
+      deleteChatInstance: document.getElementById('deleteChatInstance'),
+      chatInstanceIcon: document.getElementById('chatInstanceIcon'),
+      chatInstanceTitle: document.getElementById('chatInstanceTitle'),
 
       // radios
       postCreationAllUsers: document.getElementById('postCreationAllUsers'),
@@ -50,16 +59,23 @@ const content = {
   },
 
   initListeners() {
+    this.selectors.addChatInstance.onclick = this.addEditChatInstance.bind(this);
+    this.selectors.editChatInstance.onclick = this.addEditChatInstance.bind(this);
+    this.selectors.deleteChatInstance.onclick = () => {
+      state.settings.messagingFeatureInstance = {};
+      this.saveWithDelay();
+    }
+
     this.selectors.enableComments.onchange = (event) => {
       state.settings.enableComments = event.target.checked;
       this.saveWithDelay();
     };
     this.selectors.enableUserProfile.onchange = (event) => {
-      state.settings.enableDirectoryBadges = event.target.checked;
+      state.settings.enableUserProfile = event.target.checked;
       this.saveWithDelay();
     };
-    this.selectors.enablePrivateMessage.onchange = (event) => {
-      state.settings.enablePrivateMessage = event.target.checked;
+    this.selectors.enableDirectoryBadges.onchange = (event) => {
+      state.settings.enableDirectoryBadges = event.target.checked;
       this.saveWithDelay();
     };
 
@@ -94,7 +110,7 @@ const content = {
     });
 
     this.selectors.votesNumberInput.oninput = (event) => {
-      if (!event.target.value) {
+      if (!event.target.value || Number(event.target.value) < 1) {
         this.selectors.votesNumberInput.classList.add('border-danger');
         this.selectors.votesNumberErrorMessage.classList.remove('hidden');
       } else {
@@ -104,6 +120,22 @@ const content = {
         this.saveWithDelay();
       }
     }
+  },
+
+  addEditChatInstance() {
+
+    buildfire.pluginInstance.showDialog({}, (error, instances) => {
+      if (!error && instances.length > 0) {
+        state.settings.messagingFeatureInstance = instances[0];
+        this.saveWithDelay();
+      } else if (error) {
+        console.error(error);
+        buildfire.dialog.toast({
+          message: "Something went wrong.",
+          type: 'danger',
+        });
+      }
+    });
   },
 
   getDeepSettingValue(settingKey) {
@@ -182,48 +214,71 @@ const content = {
   },
 
   updateUI() {
+    const settings = state.settings;
+    const selectors = this.selectors;
+
     // update toggles
-    this.selectors.enableComments.checked = state.settings.enableComments;
-    this.selectors.enableUserProfile.checked = state.settings.enableDirectoryBadges;
-    this.selectors.enablePrivateMessage.checked = state.settings.enablePrivateMessage;
+    selectors.enableComments.checked = settings.enableComments;
+    selectors.enableDirectoryBadges.checked = settings.enableDirectoryBadges;
+    selectors.enableUserProfile.checked = settings.enableUserProfile;
 
     // update radios
-    this.selectors.postCreationAllUsers.checked = state.settings.permissions.createPosts.value === ENUMS.USERS_PERMISSIONS.ALL_USERS;
-    this.selectors.postCreationNoUsers.checked = state.settings.permissions.createPosts.value === ENUMS.USERS_PERMISSIONS.NO_USERS;
-    this.selectors.postCreationUsersWith.checked = state.settings.permissions.createPosts.value === ENUMS.USERS_PERMISSIONS.USERS_WITH;
+    selectors.postCreationAllUsers.checked = settings.permissions.createPosts.value === ENUMS.USERS_PERMISSIONS.ALL_USERS;
+    selectors.postCreationNoUsers.checked = settings.permissions.createPosts.value === ENUMS.USERS_PERMISSIONS.NO_USERS;
+    selectors.postCreationUsersWith.checked = settings.permissions.createPosts.value === ENUMS.USERS_PERMISSIONS.USERS_WITH;
 
-    this.selectors.statusUpdateAllUsers.checked = state.settings.permissions.updateStatus.value === ENUMS.USERS_PERMISSIONS.ALL_USERS;
-    this.selectors.statusUpdateNoUsers.checked = state.settings.permissions.updateStatus.value === ENUMS.USERS_PERMISSIONS.NO_USERS;
-    this.selectors.statusUpdateUsersWith.checked = state.settings.permissions.updateStatus.value === ENUMS.USERS_PERMISSIONS.USERS_WITH;
+    selectors.statusUpdateAllUsers.checked = settings.permissions.updateStatus.value === ENUMS.USERS_PERMISSIONS.ALL_USERS;
+    selectors.statusUpdateNoUsers.checked = settings.permissions.updateStatus.value === ENUMS.USERS_PERMISSIONS.NO_USERS;
+    selectors.statusUpdateUsersWith.checked = settings.permissions.updateStatus.value === ENUMS.USERS_PERMISSIONS.USERS_WITH;
 
-    this.selectors.pushNotificationAllUsers.checked = state.settings.permissions.receiveNotifications.value === ENUMS.USERS_PERMISSIONS.ALL_USERS;
-    this.selectors.pushNotificationNoUsers.checked = state.settings.permissions.receiveNotifications.value === ENUMS.USERS_PERMISSIONS.NO_USERS;
-    this.selectors.pushNotificationUsersWith.checked = state.settings.permissions.receiveNotifications.value === ENUMS.USERS_PERMISSIONS.USERS_WITH;
+    selectors.pushNotificationAllUsers.checked = settings.permissions.receiveNotifications.value === ENUMS.USERS_PERMISSIONS.ALL_USERS;
+    selectors.pushNotificationNoUsers.checked = settings.permissions.receiveNotifications.value === ENUMS.USERS_PERMISSIONS.NO_USERS;
+    selectors.pushNotificationUsersWith.checked = settings.permissions.receiveNotifications.value === ENUMS.USERS_PERMISSIONS.USERS_WITH;
 
-    this.selectors.newestSorting.checked = state.settings.defaultItemSorting === ENUMS.SUGGESTIONS_SORTING.NEWEST;
-    this.selectors.oldestSorting.checked = state.settings.defaultItemSorting === ENUMS.SUGGESTIONS_SORTING.OLDEST;
-    this.selectors.mostVotesSorting.checked = state.settings.defaultItemSorting === ENUMS.SUGGESTIONS_SORTING.MOST_VOTES;
+    selectors.newestSorting.checked = settings.defaultItemSorting === ENUMS.SUGGESTIONS_SORTING.NEWEST;
+    selectors.oldestSorting.checked = settings.defaultItemSorting === ENUMS.SUGGESTIONS_SORTING.OLDEST;
+    selectors.mostVotesSorting.checked = settings.defaultItemSorting === ENUMS.SUGGESTIONS_SORTING.MOST_VOTES;
 
-    if (state.settings.permissions.createPosts.value === ENUMS.USERS_PERMISSIONS.USERS_WITH) {
-      this.selectors.postCreationTagsInput.classList.remove('hidden');
+    if (settings.permissions.createPosts.value === ENUMS.USERS_PERMISSIONS.USERS_WITH) {
+      selectors.postCreationTagsInput.classList.remove('hidden');
     } else {
-      this.selectors.postCreationTagsInput.classList.add('hidden');
+      selectors.postCreationTagsInput.classList.add('hidden');
     }
-    if (state.settings.permissions.updateStatus.value === ENUMS.USERS_PERMISSIONS.USERS_WITH) {
-      this.selectors.statusUpdateUserTags.classList.remove('hidden');
+    if (settings.permissions.updateStatus.value === ENUMS.USERS_PERMISSIONS.USERS_WITH) {
+      selectors.statusUpdateUserTags.classList.remove('hidden');
     } else {
-      this.selectors.statusUpdateUserTags.classList.add('hidden');
+      selectors.statusUpdateUserTags.classList.add('hidden');
     }
-    if (state.settings.permissions.receiveNotifications.value === ENUMS.USERS_PERMISSIONS.USERS_WITH) {
-      this.selectors.pushNotificationUserTags.classList.remove('hidden');
+    if (settings.permissions.receiveNotifications.value === ENUMS.USERS_PERMISSIONS.USERS_WITH) {
+      selectors.pushNotificationUserTags.classList.remove('hidden');
     } else {
-      this.selectors.pushNotificationUserTags.classList.add('hidden');
+      selectors.pushNotificationUserTags.classList.add('hidden');
     }
 
-    if (state.settings.inAppPurchase.enabled && state.settings.inAppPurchase.planId) {
-      this.selectors.votesNumberContainer.classList.remove('hidden');
+    if (settings.inAppPurchase.enabled && settings.inAppPurchase.planId) {
+      selectors.votesNumberContainer.classList.remove('hidden');
     } else {
-      this.selectors.votesNumberContainer.classList.add('hidden');
+      selectors.votesNumberContainer.classList.add('hidden');
+    }
+
+    if (settings.messagingFeatureInstance && settings.messagingFeatureInstance.instanceId) {
+      selectors.chatInstanceRowContainer.classList.remove('hidden');
+      selectors.addChatInstance.classList.add('hidden');
+
+      const croppedImage = buildfire.imageLib.cropImage(settings.messagingFeatureInstance.iconUrl, { size: "xs", aspect: "1:1" });
+      selectors.chatInstanceIcon.src = croppedImage;
+      selectors.chatInstanceTitle.textContent = settings.messagingFeatureInstance.title;
+    } else {
+      selectors.chatInstanceRowContainer.classList.add('hidden');
+      selectors.addChatInstance.classList.remove('hidden');
+    }
+
+    if (settings.enableUserProfile) {
+      selectors.directoryBadgesRow.classList.remove('hidden');
+      selectors.chatMessagingRow.classList.remove('hidden');
+    } else {
+      selectors.directoryBadgesRow.classList.add('hidden');
+      selectors.chatMessagingRow.classList.add('hidden');
     }
   },
 
@@ -235,14 +290,14 @@ const content = {
       } else {
         state.settings.inAppPurchase.enabled = true;
       }
-      contentController.saveSettings(state.settings);
+      settingsController.saveSettings(state.settings);
 
       this.updateUI();
     }, 500);
   },
 
   init() {
-    contentController.getSettings()
+    settingsController.getSettings()
       .then(() => {
         this.initSelectors();
         this.initListeners();
@@ -252,7 +307,7 @@ const content = {
         this.initTagsInput({ selector: '#pushNotificationUserTags', settingKey: 'permissions.receiveNotifications' });
 
         this.initDropdown({ selector: '#hideCompletedDropdown', items: this.hideCompletedItemsList, settingKey: 'hideCompletedItems' });
-        contentController.getInAppPurchaseProducts().then((products) => {
+        settingsController.getInAppPurchaseProducts().then((products) => {
           const items = [
             { value: '', text: 'Disabled' },
             ...products.map((product) => ({ value: product.id, text: product.name })),
@@ -269,5 +324,5 @@ const content = {
 };
 
 window.onload = () => {
-  content.init();
+  settingsPage.init();
 }

@@ -1,4 +1,4 @@
-const contentController = {
+const settingsController = {
   saveSettings(settings) {
     return new Promise((resolve, reject) => {
       Settings.save(settings).then(resolve).catch(reject);
