@@ -162,7 +162,7 @@ const content = {
 
     const value = this.getDeepSettingValue(options.settingKey);
     const selectedItem = options.items.find((item) => item.value === value);
-    buttonLabel.textContent = selectedItem ? selectedItem.text : 'Disabled';
+    buttonLabel.textContent = selectedItem ? selectedItem.text : options.items[0].text;
 
     dropdownButton.onclick = () => {
       dropdownContainer.classList.toggle('open');
