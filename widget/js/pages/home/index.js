@@ -44,24 +44,26 @@ const homePage = {
 	},
 
 	updateSuggestionStatus(suggestion) {
-		updateStatusDrawer.init(suggestion, (err, res) => {
-			const suggestionContainer = document.getElementById(`suggestion-${suggestion.id}`);
-			const suggestionStatus = suggestionContainer.querySelector('#suggestionStatus');
+		if (hasPermission('updateStatus')) {
+			updateStatusDrawer.init(suggestion, (err, res) => {
+				const suggestionContainer = document.getElementById(`suggestion-${suggestion.id}`);
+				const suggestionStatus = suggestionContainer.querySelector('#suggestionStatus');
 
-			suggestionStatus.classList.add('disabled');
-			homeController.updateSuggestionStatus(suggestion.id, res.id).then(() => {
-				suggestionStatus.classList.remove('disabled');
+				suggestionStatus.classList.add('disabled');
+				homeController.updateSuggestionStatus(suggestion.id, res.id).then(() => {
+					suggestionStatus.classList.remove('disabled');
 
-				suggestion.status = res.id;
-				const suggestionData = this.getSuggestionStatusData(suggestion);
+					suggestion.status = res.id;
+					const suggestionData = this.getSuggestionStatusData(suggestion);
 
-				suggestionStatus.innerHTML = `<span class="margin--0 bodyTextTheme" >${suggestionData.statusText}</span>`;
-				suggestionStatus.className = `pill shrink--0 ${suggestionData.statusContainerClass}`;
-			}).catch((err) => {
-				console.error(err);
-				suggestionStatus.classList.remove('disabled');
+					suggestionStatus.innerHTML = `<span class="margin--0 bodyTextTheme" >${suggestionData.statusText}</span>`;
+					suggestionStatus.className = `pill shrink--0 ${suggestionData.statusContainerClass}`;
+				}).catch((err) => {
+					console.error(err);
+					suggestionStatus.classList.remove('disabled');
+				});
 			});
-		});
+		}
 	},
 
 	voteToSuggestion(suggestion) {
@@ -222,7 +224,7 @@ const homePage = {
 
 	init() {
 		this.initSelectors();
-		if (state.hasAccessToAddSuggestions) {
+		if (hasPermission('createPosts')) {
 			this.initSuggestionsFab();
 		}
 

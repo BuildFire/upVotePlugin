@@ -1,3 +1,27 @@
+const hasPermission = (permissionType) => {
+	let userPermitted = false;
+	if (state.settings.permissions[permissionType].value === ENUMS.USERS_PERMISSIONS.ALL_USERS) {
+		userPermitted = true;
+	} else if (state.settings.permissions[permissionType].value === ENUMS.USERS_PERMISSIONS.NO_USERS) {
+		userPermitted = false;
+	} else {
+		const appId = buildfire.getContext().appId;
+		if (authManager.currentUser && authManager.currentUser.tags && authManager.currentUser.tags[appId]) {
+			const userTags = authManager.currentUser.tags[appId];
+			const permissionTags = state.settings.permissions[permissionType].tags;
+
+			for (let i = 0; i < permissionTags.length; i++) {
+				if (userTags.some(_tag => _tag.tagName === permissionTags[i].tagName)) {
+					userPermitted = true;
+					break;
+				}
+			}
+		}
+	}
+
+	return userPermitted;
+}
+
 const getUserDirectoryRecord = userId => {
 	return new Promise((resolve, reject) => {
 		const filter = {
@@ -10,7 +34,7 @@ const getUserDirectoryRecord = userId => {
 				resolve(res[0] ? res[0].data : null);
 			}
 		});
-    });
+	});
 }
 
 const getSettings = () => {
