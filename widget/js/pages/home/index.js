@@ -159,8 +159,72 @@ const homePage = {
 		});
 	},
 
+	handleCreateNewSuggestion() {
+		if (authManager.currentUser) {
+			const step1 = {
+				placeholder: state.strings['addNewItem.title'] || "Enter short title*",
+				saveText: state.strings['addNewItem.next'] || "Next",
+				defaultValue: "",
+				cancelText: state.strings['addNewItem.cancel'] || "Cancel",
+				required: true,
+				maxLength: 500
+			}
+			const step2 = {
+				placeholder: state.strings['addNewItem.description'] || "Add more details*",
+				saveText: state.strings['addNewItem.submit'] || "Submit",
+				defaultValue: "",
+				cancelText: state.strings['addNewItem.cancel'] || "Cancel",
+				attachments: {
+					images: { enable: true, multiple: false },
+				},
+				required: true,
+			}
+
+			buildfire.input.showTextDialog([step1, step2], (err, response) => {
+				if (response.results.length == 2) {
+					const paragraph = document.createElement("p")
+					paragraph.innerHTML = response.results[1].textValue;
+					const images = response.results[1].images;
+					if (images && images.length > 0) {
+						for (let i = 0; i < images.length; i++) {
+							const imgEl = document.createElement("img");
+							const imgUrl = buildfire.imageLib.cropImage(images[i], { size: "full_width", aspect: "16:9" })
+							imgEl.src = imgUrl;
+							paragraph.append(imgEl);
+						}
+					}
+
+					const title = response.results[0].textValue;
+					const description = paragraph.innerHTML;
+					homeController.createNewSuggestion(title, description).then((newSuggestion) => {
+						this.printSuggestionCard(newSuggestion);
+					});
+				}
+			});
+		} else {
+			authManager.enforceLogin().then(this.handleCreateNewSuggestion);
+		}
+	},
+
+	initSuggestionsFab() {
+		const suggestionFab = new buildfire.components.fabSpeedDial('#fabSpeedDialContainer', {
+			mainButton: {
+				content: `<i class="icon fab-icon-btn">
+							<svg width="14" height="14" viewBox="0 0 14 14"  xmlns="http://www.w3.org/2000/svg" fill="#ffffff">
+								<path fill-rule="evenodd" clip-rule="evenodd" d="M14 8H8V14H6V8H0V6H6V0H8V6H14V8Z"/>
+							</svg>
+						 </i>`,
+				type: 'success',
+			},
+		});
+		suggestionFab.onMainButtonClick = () => this.handleCreateNewSuggestion();
+	},
+
 	init() {
 		this.initSelectors();
+		if (state.hasAccessToAddSuggestions) {
+			this.initSuggestionsFab();
+		}
 
 		homeController.getSuggestions().then((suggestions) => {
 			this.renderSuggestionsCards(suggestions);

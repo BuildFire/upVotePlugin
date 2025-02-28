@@ -31,15 +31,13 @@ class Suggestions {
   }
 
 
-  static insert(suggestion, callback) {
+  static insert(suggestion) {
     return new Promise((resolve, reject) => {
-      buildfire.publicData.insert(suggestion, Suggestions.TAG, (e, r) => {
-        if (e) {
-          reject(e);
-          if (callback) callback(e);
+      buildfire.publicData.insert(suggestion, Suggestions.TAG, (err, res) => {
+        if (err) {
+          reject(err);
         } else {
-          resolve(r);
-          if (callback) callback(null, r);
+          resolve(new Suggestion({...res.data, id: res.id}));
         }
       });
     });

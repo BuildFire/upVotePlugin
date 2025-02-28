@@ -2,105 +2,111 @@
 <html ng-app="upvote">
 
 <head>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta name="buildfire" content="enablePluginJsonLoad">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="buildfire" content="enablePluginJsonLoad">
 
-	<link rel="stylesheet" href="../../../styles/components/skeleton.css" />
+  <link rel="stylesheet" href="../../../styles/components/skeleton.css" />
+  <link rel="stylesheet" href="../../../styles/components/fabSpeedDial/fabSpeedDial.css" />
 
-	<script src="../../../scripts/jquery/jquery-1.11.2.min.js"></script>
+  <script src="../../../scripts/jquery/jquery-1.11.2.min.js"></script>
 
-	<script src="../../../scripts/buildfire.min.js"></script>
-	<script src="../../../scripts/buildfire/services/notifications/pushNotifications.js"></script>
-	<script src="../../../scripts/buildfire/components/drawer/drawer.js"></script>
-	<script src="../../../scripts/buildfire/services/commerce/inAppPurchase.js"></script>
+  <script src="../../../scripts/buildfire.min.js"></script>
+  <script src="../../../scripts/buildfire/components/fabSpeedDial/fabSpeedDial.js"></script>
+  <script src="../../../scripts/buildfire/services/notifications/pushNotifications.js"></script>
+  <script src="../../../scripts/buildfire/components/drawer/drawer.js"></script>
+  <script src="../../../scripts/buildfire/services/commerce/inAppPurchase.js"></script>
 
-	<!-- build:bundleJSFiles  -->
+  <!-- build:bundleJSFiles  -->
 
-	<!-- endbuild -->
+  <!-- endbuild -->
 
-	<!-- build:bundleSharedJSFiles  -->
+  <!-- build:bundleSharedJSFiles  -->
 
-	<!-- endbuild -->
+  <!-- endbuild -->
 
-	<link rel="stylesheet" href="../../../styles/transitionAnimation.css">
-	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-	<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+  <link rel="stylesheet" href="../../../styles/transitionAnimation.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
 
-	<link rel="stylesheet" href="./assets/css/pluginIcons.css">
-	<link rel="stylesheet" href="./assets/css/animations.css">
+  <link rel="stylesheet" href="./assets/css/pluginIcons.css">
+  <link rel="stylesheet" href="./assets/css/animations.css">
 
-	<style>
-		/* keep compatibility with layout1 v0.1 */
-		html p,
-		html span,
-		html a,
-		html .paragraph {
-			margin-bottom: 0;
-		}
+  <style>
+    /* keep compatibility with layout1 v0.1 */
+    html p,
+    html span,
+    html a,
+    html .paragraph {
+      margin-bottom: 0;
+    }
 
-		.page-view {
-			width: 100%;
-			height: 100%;
-		}
+    .page-view {
+      width: 100%;
+      height: 100%;
+      padding-bottom: 1rem;
+      overflow: auto;
+    }
 
-		.defaultBackgroundStatus {
-			background-color: rgba(150, 150, 150, 0.1) !important;
-		}
-	</style>
+    .defaultBackgroundStatus {
+      background-color: rgba(150, 150, 150, 0.1) !important;
+    }
+  </style>
 </head>
 <style>
-	.grid-block {
-		height: 200px;
-		margin: 12px;
-		border-radius: 5px;
-	}
-	.disabled {
-		pointer-events: none;
+  .grid-block {
+    height: 200px;
+    margin: 12px;
+    border-radius: 5px;
+  }
+  .disabled {
+    pointer-events: none;
         opacity: 0.5;
-	}
+  }
 </style>
 
 <body>
-	<section class="page-view" id="homePage"></section>
-	<section class="page-view hidden" id="suggestionPage"></section>
+  <section class="page-view" id="homePage">
+    <div id="fabSpeedDialContainer"></div>
+  </section>
+  <section class="page-view hidden" id="suggestionPage"></section>
 
-	<template id="suggestionCard">
-		<div class="card suggestionCard">
-			<div class="card__header padded padded-l margin-bottom--sm">
-				<div class="user-image-container">
-					<img id="userImage" alt="" class="avatar" src="">
-				</div>
-				<div class="ellipsis padded padded--x padded--sm suggestion__name">
-					<p id="userName" class="margin--0 ellipsis header-text"></p>
-					<h6 id="suggestionCreatedOn" class="pull-left caption margin--0 text--secondary"></h6>
-					<!-- <h6 ng-if="!s._createdOn" class="pull-left caption margin--0 text--secondary">{{s.createdOn | date:'MMM dd, y'}}</h6> -->
-				</div>
+  <template id="suggestionCard">
+    <div class="card suggestionCard">
+      <div class="card__header padded padded-l margin-bottom--sm">
+        <div class="user-image-container">
+          <img id="userImage" alt="" class="avatar" src="">
+        </div>
+        <div class="ellipsis padded padded--x padded--sm suggestion__name">
+          <p id="userName" class="margin--0 ellipsis header-text"></p>
+          <h6 id="suggestionCreatedOn" class="pull-left caption margin--0 text--secondary"></h6>
+          <!-- <h6 ng-if="!s._createdOn" class="pull-left caption margin--0 text--secondary">{{s.createdOn | date:'MMM dd, y'}}</h6> -->
+        </div>
 
-				<p id="suggestionStatus" class="pill shrink--0 pill-body-theme">
-					<span class="margin--0"></span>
-				</p>
-			</div>
-			<div class="suggestion">
-				<h4 id="suggestionTitle" class="word--break body-text font-weight-500"></h4>
-				<p class="white-space-pre-line margin-bottom--m body-text" id="suggestionBodyText"></p>
-			</div>
-			<div class="button__panel shrink--0 padded padded--sm padded--x padding-right-zero">
-				<span class="suggestion-icon-holder">
-					<button id="upvote_icon" class="voteButton btn btn--icon--text">
-						<i class="iconsTheme material-icons-outlined" aria-hidden="true">thumb_up_alt</i>
-						<!-- <i ng-if="!s.upvoteByYou" class="iconsTheme material-icons-outlined" aria-hidden="true">thumb_up_off_alt</i> -->
-					</button>
-					<p id="suggestionVotesCount" class="pill-count shrink--0">
-						<span class="margin--0 iconsTheme"></span>
-					</p>
-				</span>
-				<span id="suggestionCommentContainer" class="suggestion-icon-holder">
-					<i class="iconsTheme material-icons-outlined" aria-hidden="true">chat_bubble_outline</i>
-					<span class="iconsTheme margin-left-five" bfString="mainScreen.commentButton"></span>
-				</span>
-			</div>
-		</div>
-	</template>
+        <p id="suggestionStatus" class="pill shrink--0 pill-body-theme">
+          <span class="margin--0"></span>
+        </p>
+      </div>
+      <div class="suggestion">
+        <h4 id="suggestionTitle" class="word--break body-text font-weight-500"></h4>
+        <p class="white-space-pre-line margin-bottom--m body-text" id="suggestionBodyText"></p>
+      </div>
+      <div class="button__panel shrink--0 padded padded--sm padded--x padding-right-zero">
+        <span class="suggestion-icon-holder">
+          <button id="upvote_icon" class="voteButton btn btn--icon--text">
+            <i class="iconsTheme material-icons-outlined" aria-hidden="true">thumb_up_alt</i>
+            <!-- <i ng-if="!s.upvoteByYou" class="iconsTheme material-icons-outlined" aria-hidden="true">thumb_up_off_alt</i> -->
+          </button>
+          <p id="suggestionVotesCount" class="pill-count shrink--0">
+            <span class="margin--0 iconsTheme"></span>
+          </p>
+        </span>
+        <span id="suggestionCommentContainer" class="suggestion-icon-holder">
+          <i class="iconsTheme material-icons-outlined" aria-hidden="true">chat_bubble_outline</i>
+          <span class="iconsTheme margin-left-five" bfString="mainScreen.commentButton"></span>
+        </span>
+      </div>
+    </div>
+  </template>
 </body>
 
 </html>
