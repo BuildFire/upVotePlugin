@@ -102,6 +102,38 @@
                     "toolTip": "",
                     "placeholder": "Someone"
                 },
+                "noBadgesYet": {
+                    "title": "No Badges Yet",
+                    "defaultValue": "No Badges Yet",
+                    "inputType": "text",
+                    "maxLength": 20,
+                    "toolTip": "",
+                    "placeholder": "No Badges Yet"
+                },
+                "openProfile": {
+                    "title": "Open Profile",
+                    "defaultValue": "Open Profile",
+                    "inputType": "text",
+                    "maxLength": 20,
+                    "toolTip": "",
+                    "placeholder": "Open Profile"
+                },
+                "messageUser": {
+                    "title": "Message User",
+                    "defaultValue": "Message User",
+                    "inputType": "text",
+                    "maxLength": 20,
+                    "toolTip": "",
+                    "placeholder": "Message User"
+                },
+                "viewProfile": {
+                    "title": "View Profile",
+                    "defaultValue": "View Profile",
+                    "inputType": "text",
+                    "maxLength": 20,
+                    "toolTip": "",
+                    "placeholder": "View Profile"
+                },
                 "day": {
                     "title": "Day",
                     "defaultValue": "Day",

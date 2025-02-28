@@ -12,8 +12,8 @@ class Setting {
 
     this.enableComments = typeof data.enableComments === 'boolean' ? data.enableComments : false;
     this.messagingFeatureInstance = data.messagingFeatureInstance || {};
-    this.enableUserProfile = typeof data.enableUserProfile === 'boolean' ? data.enableComments : false;
-    this.enableDirectoryBadges = typeof data.enableDirectoryBadges === 'boolean' ? data.enableComments : false;
+    this.enableUserProfile = typeof data.enableUserProfile === 'boolean' ? data.enableUserProfile : false;
+    this.enableDirectoryBadges = typeof data.enableDirectoryBadges === 'boolean' ? data.enableDirectoryBadges : false;
 
     this.defaultItemSorting = data.defaultItemSorting || ENUMS.SUGGESTIONS_SORTING.NEWEST;
     this.hideCompletedItems = data.hideCompletedItems || 0;

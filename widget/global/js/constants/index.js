@@ -8,5 +8,11 @@ const ENUMS = Object.freeze({
     'NEWEST': 'NEWEST',
     'OLDEST': 'OLDEST',
     'MOST_VOTES': 'MOST_VOTES'
-  }
+  },
 })
+
+var SUGGESTION_STATUS = Object.freeze({
+	BACKLOG: 1,
+  INPROGRESS: 2,
+  COMPLETED: 3,
+});
