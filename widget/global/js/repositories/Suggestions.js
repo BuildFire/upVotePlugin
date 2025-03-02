@@ -45,11 +45,11 @@ class Suggestions {
 
   static update(suggestionId, payload) {
     return new Promise((resolve, reject) => {
-        buildfire.publicData.update(suggestionId, payload, Suggestions.TAG, (e, r) => {
-          if (e) {
-            reject(e);
+        buildfire.publicData.update(suggestionId, payload, Suggestions.TAG, (err, res) => {
+          if (err) {
+            reject(err);
           } else {
-            resolve(r);
+            resolve(new Suggestion({...res.data, id: res.id}));
           }
         });
       });

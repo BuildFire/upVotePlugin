@@ -52,4 +52,8 @@ const state = {
     'notifications.youGotAnUpVoteTitle': '',
   },
   settings: new Setting(),
+  page: 0,
+  pageSize: 50,
+  fetching: false,
+  isAllSuggestionFetched: false,
 }

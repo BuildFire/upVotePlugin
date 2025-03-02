@@ -63,20 +63,37 @@ const settingsPage = {
     this.selectors.editChatInstance.onclick = this.addEditChatInstance.bind(this);
     this.selectors.deleteChatInstance.onclick = () => {
       state.settings.messagingFeatureInstance = {};
-      this.saveWithDelay();
+      const syncMessageData = {
+        scope: "directoryOptions",
+        directoryOptions: { messagingFeatureInstance: {} }
+      };
+
+      this.saveWithDelay(syncMessageData);
     }
 
     this.selectors.enableComments.onchange = (event) => {
       state.settings.enableComments = event.target.checked;
-      this.saveWithDelay();
+      const syncMessageData = { scope: "reload" };
+
+      this.saveWithDelay(syncMessageData);
     };
     this.selectors.enableUserProfile.onchange = (event) => {
       state.settings.enableUserProfile = event.target.checked;
-      this.saveWithDelay();
+      const syncMessageData = {
+        scope: "directoryOptions",
+        directoryOptions: { enableUserProfile: event.target.checked }
+      };
+
+      this.saveWithDelay(syncMessageData);
     };
     this.selectors.enableDirectoryBadges.onchange = (event) => {
       state.settings.enableDirectoryBadges = event.target.checked;
-      this.saveWithDelay();
+      const syncMessageData = {
+        scope: "directoryOptions",
+        directoryOptions: { enableDirectoryBadges: event.target.checked }
+      };
+
+      this.saveWithDelay(syncMessageData);
     };
 
     [
@@ -92,8 +109,13 @@ const settingsPage = {
     ].forEach((permissionRadio) => {
       permissionRadio.onchange = (event) => {
         state.settings.permissions[event.target.name].value = event.target.value;
+        const syncMessageData = {
+          scope: "permissions",
+          permissions: state.settings.permissions
+        };
+
         this.updateUI();
-        this.saveWithDelay();
+        this.saveWithDelay(syncMessageData);
       };
     });
 
@@ -105,7 +127,9 @@ const settingsPage = {
       sortRadio.onchange = (event) => {
         state.settings.defaultItemSorting = event.target.value;
         this.updateUI();
-        this.saveWithDelay();
+        const syncMessageData = { scope: "reload" };
+
+        this.saveWithDelay(syncMessageData);
       }
     });
 
@@ -117,17 +141,23 @@ const settingsPage = {
         this.selectors.votesNumberErrorMessage.classList.add('hidden');
         this.selectors.votesNumberInput.classList.remove('border-danger');
         state.settings.inAppPurchase.votesPerPurchase = parseInt(event.target.value);
-        this.saveWithDelay();
+        const syncMessageData = { scope: "reload" };
+
+        this.saveWithDelay(syncMessageData);
       }
     }
   },
 
   addEditChatInstance() {
-
     buildfire.pluginInstance.showDialog({}, (error, instances) => {
       if (!error && instances.length > 0) {
         state.settings.messagingFeatureInstance = instances[0];
-        this.saveWithDelay();
+        const syncMessageData = {
+          scope: "directoryOptions",
+          directoryOptions: { messagingFeatureInstance: state.settings.messagingFeatureInstance }
+        };
+
+        this.saveWithDelay(syncMessageData);
       } else if (error) {
         console.error(error);
         buildfire.dialog.toast({
@@ -162,7 +192,18 @@ const settingsPage = {
     const isEquals = utils.checkEquality(current[keys[keys.length - 1]], value);
     if (!isEquals) {
       current[keys[keys.length - 1]] = value;
-      this.saveWithDelay();
+
+	  let syncMessageData;
+	  if (settingKey.includes('permissions')) {
+		syncMessageData = {
+			scope: "permissions",
+			permissions: state.settings.permissions
+		  };
+	  } else {
+		syncMessageData = { scope: "reload" };
+	  }
+
+      this.saveWithDelay(syncMessageData);
     }
   },
 
@@ -282,7 +323,7 @@ const settingsPage = {
     }
   },
 
-  saveWithDelay() {
+  saveWithDelay(syncMessageData) {
     clearTimeout(this.saveTimer);
     this.saveTimer = setTimeout(() => {
       if (!state.settings.inAppPurchase.planId) {
@@ -290,7 +331,9 @@ const settingsPage = {
       } else {
         state.settings.inAppPurchase.enabled = true;
       }
-      settingsController.saveSettings(state.settings);
+      settingsController.saveSettings(state.settings).then(() => {
+        buildfire.messaging.sendMessageToWidget(syncMessageData);
+      })
 
       this.updateUI();
     }, 500);

@@ -8,8 +8,20 @@ const contentController = {
   getSettings() {
     return new Promise((resolve) => {
       Settings.get().then((result) => {
-        state.settings = result;
-        resolve();
+        debugger
+        if (!result || !Object.keys(result).length) {
+          Analytics.init(); // init analytics only for the first time of installing the plugin
+          Settings.save(new Setting()).then((settings) => {
+            state.settings = new Setting();
+            resolve();
+          }).catch((err) => { // don't blok the ui, just print the error and resolve
+            console.error(err);
+            resolve();
+          });
+        } else {
+          state.settings = new Setting(result);
+          resolve();
+        }
       }).catch((err) => { // don't blok the ui, just print the error and resolve
         console.error(err);
         resolve();

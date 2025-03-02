@@ -43,21 +43,23 @@ const updateStatusDrawer = {
   },
 
   init(suggestion, callback) {
-    this.activeSuggestion = suggestion;
-    const listItems = this.prepareOptions();
+    Suggestions.getById(suggestion.id).then((updatedSuggestion) => {
+      this.activeSuggestion = updatedSuggestion;
+      const listItems = this.prepareOptions();
 
-    buildfire.components.drawer.open(
-      {
-        multiSelection: false,
-        allowSelectAll: false,
-        content: `<div style="color:${this.appTheme.colors.headerText};font-weight: bold;">${state.strings['mainScreen.updateStatus']}</div>`,
-        isHTML: true,
-        triggerCallbackOnUIDismiss: false,
-        listItems: listItems
-      },
-      (err, result) => {
-        buildfire.components.drawer.closeDrawer();
-        callback(err, result);
-      });
+      buildfire.components.drawer.open(
+        {
+          multiSelection: false,
+          allowSelectAll: false,
+          content: `<div style="color:${this.appTheme.colors.headerText};font-weight: bold;">${state.strings['mainScreen.updateStatus']}</div>`,
+          isHTML: true,
+          triggerCallbackOnUIDismiss: false,
+          listItems: listItems
+        },
+        (err, result) => {
+          buildfire.components.drawer.closeDrawer();
+          callback(err, result);
+        });
+    })
   }
 }

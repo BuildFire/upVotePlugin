@@ -9,7 +9,7 @@ class Settings {
         if (err) {
           reject(err);
         } else {
-          resolve(new Setting(res.data))
+          resolve(res.data)
         }
       });
     })
