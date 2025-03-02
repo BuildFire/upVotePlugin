@@ -1,4 +1,5 @@
 const UserModal = {
+  appTheme: buildfire.getContext().appTheme,
   userData: {},
   subtitle: "",
   item: null,
@@ -21,8 +22,7 @@ const UserModal = {
   },
 
   initModalTabs() {
-    let badgesContent = `<div style="justify-content: center; text-transform: capitalize; text-align: center; font-size: 14px; padding: 24px; opacity: .7; min-height: 80px; display: flex; align-items:center;">
-                        <span>${state.strings['mainScreen.noBadgesYet']}</span></div>`
+    let badgesContent;
 
     if (this.userData.badges && this.userData.badges.length) {
       badgesContent = `
@@ -34,6 +34,32 @@ const UserModal = {
                                         <h5 style="margin: .75rem 0 .125rem 0; font-weight: bold; word-break: break;">${badge.name}</h5>
                                        </div>`).join(' ')}
                   </div>`
+    } else {
+      const emptyContainer = document.createElement('div');
+      emptyContainer.style.display = 'flex';
+      emptyContainer.style.justifyContent = 'center';
+      emptyContainer.style.textTransform = 'capitalize';
+      emptyContainer.style.flexDirection = 'column';
+      emptyContainer.style.textAlign = 'center';
+      emptyContainer.style.fontSize = '14px';
+      emptyContainer.style.padding = '24px';
+      emptyContainer.style.opacity = '0.7';
+      emptyContainer.style.minHeight = '80px';
+      emptyContainer.style.alignItems = 'center';
+
+      const emptySvg = document.createElement('img');
+      emptySvg.src = '../../../styles/media/empty.svg';
+      emptySvg.style.width = '60px';
+      emptySvg.style.marginBottom = '10px';
+
+      const emptyTextContainer = document.createElement('span');
+      emptyTextContainer.style.color = this.appTheme.colors.bodyText;
+      emptyTextContainer.innerHTML = state.strings['mainScreen.noBadgesYet'];
+
+      emptyContainer.appendChild(emptySvg);
+      emptyContainer.appendChild(emptyTextContainer);
+
+      badgesContent = emptyContainer.outerHTML;
     }
 
     const badgesTab = {

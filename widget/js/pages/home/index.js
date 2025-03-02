@@ -117,6 +117,7 @@ const homePage = {
 					const title = response.results[0].textValue;
 					const description = paragraph.innerHTML;
 					widgetController.createNewSuggestion(title, description).then((newSuggestion) => {
+						this.destroyEmptyState();
 						this.printSuggestionCard(newSuggestion);
 						Analytics.trackAction(analyticKeys.SUGGESTIONS_NUMBER.key, { _buildfire: { aggregationValue: 1 } });
 
@@ -138,7 +139,7 @@ const homePage = {
 				}
 			});
 		} else {
-			authManager.enforceLogin().then(this.handleCreateNewSuggestion);
+			authManager.enforceLogin().then(this.handleCreateNewSuggestion.bind(this));
 		}
 	},
 
@@ -171,6 +172,18 @@ const homePage = {
 		this.skeleton = null;
 	},
 
+	printEmptyState() {
+		const cloneCard = this.selectors.emptyStateTemplate.content.cloneNode(true);
+		this.selectors.homePageContainer.appendChild(cloneCard);
+	},
+
+	destroyEmptyState() {
+		const emptyStateHolder = this.selectors.homePageContainer.querySelector('.empty-state-holder');
+		if (emptyStateHolder) {
+			emptyStateHolder.remove();
+		}
+	},
+
 	init() {
 		this.initSelectors();
 
@@ -179,13 +192,11 @@ const homePage = {
 				this.destroySkeleton();
 
 				if (suggestions.length === 0) {
-					const cloneCard = this.selectors.emptyStateTemplate.content.cloneNode(true);
-					this.selectors.homePageContainer.appendChild(cloneCard);
-
+					this.printEmptyState();
 				} else {
 					this.renderSuggestionsCards(suggestions);
-					this.initListeners();
 				}
+				this.initListeners();
 
 				this.initSuggestionsFab();
 				this.selectors.wysiwygContainer.innerHTML = state.settings.introduction;

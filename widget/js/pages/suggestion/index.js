@@ -4,6 +4,7 @@ const suggestionDetailsPage = {
     this.selectors = {
       detailsContainer: document.getElementById('suggestionPage'),
       suggestionCardTemplate: document.getElementById('suggestionCard'),
+      emptyStateTemplate: document.getElementById('emptyStateTemplate'),
     };
   },
 
@@ -62,6 +63,18 @@ const suggestionDetailsPage = {
     this.skeleton = null;
   },
 
+  printEmptyState() {
+    const cloneCard = this.selectors.emptyStateTemplate.content.cloneNode(true);
+    this.selectors.detailsContainer.appendChild(cloneCard);
+  },
+
+  destroyEmptyState() {
+    const emptyStateHolder = this.selectors.homePageContainer.querySelector('.empty-state-holder');
+    if (emptyStateHolder) {
+      emptyStateHolder.remove();
+    }
+  },
+
   init(suggestion) {
     this.initSelectors();
     this.initSkeleton();
@@ -71,11 +84,19 @@ const suggestionDetailsPage = {
     Suggestions.getById(suggestion.id).then((updatedSuggestion) => {
       setTimeout(() => {
         this.destroySkeleton();
+        this.selectors.detailsContainer.innerHTML = '';
 
-        state.activeSuggestion = updatedSuggestion;
-        this.renderSuggestionDetails();
+        if (updatedSuggestion && updatedSuggestion.id) {
+          state.activeSuggestion = updatedSuggestion;
+          this.renderSuggestionDetails();
+        } else {
+          this.printEmptyState();
+        }
       }, 500);
     }).catch((err) => {
+      this.destroySkeleton();
+      this.selectors.detailsContainer.innerHTML = '';
+      this.printEmptyState();
       console.error(err);
     })
   },

@@ -1,7 +1,7 @@
 class Suggestions {
-	static get TAG() {
-		return 'suggestion';
-	}
+  static get TAG() {
+    return 'suggestion';
+  }
 
   static search(options) {
     return new Promise((resolve, reject) => {
@@ -9,7 +9,7 @@ class Suggestions {
         if (e) {
           reject(e);
         } else {
-          let suggestions = results.map(result => new Suggestion({...result.data, id: result.id}))
+          let suggestions = results.map(result => new Suggestion({ ...result.data, id: result.id }))
           resolve(suggestions);
         }
       });
@@ -22,9 +22,12 @@ class Suggestions {
         id,
         Suggestions.TAG,
         (err, result) => {
-
           if (err) reject(err);
-          resolve(new Suggestion({...result.data, id: result.id}) )
+          if (result && result.data && result.id) {
+            resolve(new Suggestion({ ...result.data, id: result.id }))
+          } else {
+            resolve(null);
+          }
         }
       );
     });
@@ -37,7 +40,7 @@ class Suggestions {
         if (err) {
           reject(err);
         } else {
-          resolve(new Suggestion({...res.data, id: res.id}));
+          resolve(new Suggestion({ ...res.data, id: res.id }));
         }
       });
     });
@@ -45,19 +48,19 @@ class Suggestions {
 
   static update(suggestionId, payload) {
     return new Promise((resolve, reject) => {
-        buildfire.publicData.update(suggestionId, payload, Suggestions.TAG, (err, res) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(new Suggestion({...res.data, id: res.id}));
-          }
-        });
+      buildfire.publicData.update(suggestionId, payload, Suggestions.TAG, (err, res) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(new Suggestion({ ...res.data, id: res.id }));
+        }
       });
+    });
   }
 
-  static searchAndUpdate(id, payload){
+  static searchAndUpdate(id, payload) {
     return new Promise((resolve, reject) => {
-      buildfire.publicData.searchAndUpdate({"id": id}, payload, Suggestions.TAG, (e, r) => {
+      buildfire.publicData.searchAndUpdate({ "id": id }, payload, Suggestions.TAG, (e, r) => {
         if (e) {
           reject(e);
         } else {
@@ -67,12 +70,12 @@ class Suggestions {
     });
   }
 
-  static delete(id){
+  static delete(id) {
     return new Promise((resolve, reject) => {
       buildfire.publicData.delete(id, Suggestions.TAG, (e, r) => {
         if (e) {
           reject(e);
-        }else{
+        } else {
           resolve(r);
         }
       });
