@@ -1,208 +1,212 @@
 const homePage = {
-	selectors: {},
-	initSelectors() {
-		this.selectors = {
-			wysiwygContainer: document.getElementById('wysiwygContainer'),
-			homePageContainer: document.getElementById('homePage'),
-			suggestionCardTemplate: document.getElementById('suggestionCard'),
-			fabSpeedDialContainer: document.getElementById('fabSpeedDialContainer'),
-			emptyStateTemplate: document.getElementById('emptyStateTemplate'),
-		}
-	},
+  selectors: {},
+  initSelectors() {
+    this.selectors = {
+      wysiwygContainer: document.getElementById('wysiwygContainer'),
+      homePageContainer: document.getElementById('homePage'),
+      suggestionCardTemplate: document.getElementById('suggestionCard'),
+      fabSpeedDialContainer: document.getElementById('fabSpeedDialContainer'),
+      emptyStateTemplate: document.getElementById('emptyStateTemplate'),
+    }
+  },
 
-	initListeners() {
-		this.selectors.homePageContainer.onscroll = () => {
-			if (this.selectors.homePageContainer.scrollTop / (this.selectors.homePageContainer.scrollHeight - this.selectors.homePageContainer.offsetHeight) > 0.8) {
-				if (state.fetching || state.isAllSuggestionFetched) return;
+  initListeners() {
+    this.selectors.homePageContainer.onscroll = () => {
+      if (this.selectors.homePageContainer.scrollTop / (this.selectors.homePageContainer.scrollHeight - this.selectors.homePageContainer.offsetHeight) > 0.8) {
+        if (state.fetching || state.isAllSuggestionFetched) return;
 
-				state.fetching = true;
-				widgetController.getSuggestions().then((suggestions) => {
-					if (suggestions.length < state.pageSize) state.isAllSuggestionFetched = true;
+        state.fetching = true;
+        widgetController.getSuggestions().then((suggestions) => {
+          if (suggestions.length < state.pageSize) state.isAllSuggestionFetched = true;
 
-					this.renderSuggestionsCards(suggestions);
-					state.fetching = false;
-				}).catch(err => {
-					console.error(err);
-				});
-			}
-		}
-	},
+          this.renderSuggestionsCards(suggestions);
+          state.fetching = false;
+        }).catch(err => {
+          console.error(err);
+        });
+      }
+    }
+  },
 
-	printSuggestionCard(suggestion) {
-		const cloneCard = this.selectors.suggestionCardTemplate.content.cloneNode(true);
+  printSuggestionCard(suggestion) {
+    const cloneCard = this.selectors.suggestionCardTemplate.content.cloneNode(true);
 
-		const suggestionDetails = cloneCard.querySelector('.suggestion-details');
-		const suggestionCard = cloneCard.querySelector('.suggestionCard');
-		const userImage = cloneCard.querySelector('#userImage');
-		const userName = cloneCard.querySelector('#userName');
-		const suggestionCreatedOn = cloneCard.querySelector('#suggestionCreatedOn');
-		const suggestionStatus = cloneCard.querySelector('#suggestionStatus');
-		const suggestionTitle = cloneCard.querySelector('#suggestionTitle');
-		const suggestionBodyText = cloneCard.querySelector('#suggestionBodyText');
-		const suggestionVotesCount = cloneCard.querySelector('#suggestionVotesCount');
+    const suggestionDetails = cloneCard.querySelector('.suggestion-details');
+    const suggestionCard = cloneCard.querySelector('.suggestionCard');
+    const userImage = cloneCard.querySelector('#userImage');
+    const userName = cloneCard.querySelector('#userName');
+    const suggestionCreatedOn = cloneCard.querySelector('#suggestionCreatedOn');
+    const suggestionStatus = cloneCard.querySelector('#suggestionStatus');
+    const suggestionTitle = cloneCard.querySelector('#suggestionTitle');
+    const suggestionBodyText = cloneCard.querySelector('#suggestionBodyText');
+    const suggestionVotesCount = cloneCard.querySelector('#suggestionVotesCount');
 
-		const upvote_icon = cloneCard.querySelector('#upvote_icon');
-		const suggestionCommentContainer = cloneCard.querySelector('#suggestionCommentContainer');
+    const upvote_icon = cloneCard.querySelector('#upvote_icon');
+    const suggestionCommentContainer = cloneCard.querySelector('#suggestionCommentContainer');
 
-		userImage.src = buildfire.auth.getUserPictureUrl({ userId: suggestion.createdBy._id });
-		userName.textContent = suggestion.createdBy.displayName;
-		suggestionCreatedOn.textContent = widgetUtils.formatDate(suggestion.createdOn);
+    userImage.src = buildfire.auth.getUserPictureUrl({ userId: suggestion.createdBy._id });
+    userName.textContent = widgetUtils.getUserName(suggestion.createdBy);
+    suggestionCreatedOn.textContent = widgetUtils.formatDate(suggestion.createdOn);
 
-		const suggestionStatusData = widgetUtils.getSuggestionStatusData(suggestion);
-		suggestionStatus.innerHTML = `<span class="margin--0 bodyTextTheme" >${suggestionStatusData.statusText}</span>`;
-		suggestionStatus.className = `pill shrink--0 ${suggestionStatusData.statusContainerClass}`;
+    const suggestionStatusData = widgetUtils.getSuggestionStatusData(suggestion);
+    suggestionStatus.innerHTML = `<span class="margin--0 bodyTextTheme" >${suggestionStatusData.statusText}</span>`;
+    suggestionStatus.className = `pill shrink--0 ${suggestionStatusData.statusContainerClass}`;
 
-		suggestionTitle.innerHTML = suggestion.title;
-		suggestionBodyText.innerHTML = suggestion.suggestion;
-		suggestionVotesCount.innerHTML = `<span class="margin--0 iconsTheme">${Object.keys(suggestion.upVotedBy).length}</span>`;
+    suggestionTitle.innerHTML = suggestion.title;
+    suggestionBodyText.innerHTML = suggestion.suggestion;
+    suggestionVotesCount.innerHTML = `<span class="margin--0 iconsTheme">${Object.keys(suggestion.upVotedBy).length}</span>`;
 
-		if (!state.settings.enableComments) {
-			suggestionCommentContainer.classList.add('hidden');
-		}
+    if (!state.settings.enableComments) {
+      suggestionCommentContainer.classList.add('hidden');
+    }
 
-		suggestionCommentContainer.onclick = () => widgetSharedController.navigateToSuggestionComments(suggestion);
-		upvote_icon.onclick = () => widgetSharedController.voteToSuggestion(suggestion);
-		suggestionStatus.onclick = () => widgetSharedController.updateSuggestionStatus(suggestion);
-		suggestionVotesCount.onclick = () => widgetSharedController.openVotersDrawer(suggestion);
-		suggestionDetails.onclick = () => {
-			buildfire.history.push('Suggestion Details');
-			suggestionDetailsPage.init(suggestion);
-		}
+    if (suggestion.upVotedBy && suggestion.upVotedBy[authManager.currentUser.userId]) {
+      upvote_icon.className = 'padding-zero margin--zero iconsTheme material-icons';
+    }
 
-		suggestionCard.id = `suggestion-${suggestion.id}`;
-		this.selectors.homePageContainer.appendChild(cloneCard);
-	},
+    suggestionCommentContainer.onclick = () => widgetSharedController.navigateToSuggestionComments(suggestion);
+    upvote_icon.onclick = () => widgetSharedController.voteToSuggestion(suggestion);
+    suggestionStatus.onclick = () => widgetSharedController.updateSuggestionStatus(suggestion);
+    suggestionVotesCount.onclick = () => widgetSharedController.openVotersDrawer(suggestion);
+    suggestionDetails.onclick = () => {
+      buildfire.history.push('Suggestion Details');
+      suggestionDetailsPage.init(suggestion);
+    }
 
-	renderSuggestionsCards(suggestionList) {
-		suggestionList.forEach((suggestion) => {
-			this.printSuggestionCard(suggestion);
-		});
-	},
+    suggestionCard.id = `suggestion-${suggestion.id}`;
+    this.selectors.homePageContainer.appendChild(cloneCard);
+  },
 
-	handleCreateNewSuggestion() {
-		if (authManager.currentUser) {
-			const step1 = {
-				placeholder: state.strings['addNewItem.title'] || "Enter short title*",
-				saveText: state.strings['addNewItem.next'] || "Next",
-				defaultValue: "",
-				cancelText: state.strings['addNewItem.cancel'] || "Cancel",
-				required: true,
-				maxLength: 500
-			}
-			const step2 = {
-				placeholder: state.strings['addNewItem.description'] || "Add more details*",
-				saveText: state.strings['addNewItem.submit'] || "Submit",
-				defaultValue: "",
-				cancelText: state.strings['addNewItem.cancel'] || "Cancel",
-				attachments: {
-					images: { enable: true, multiple: false },
-				},
-				required: true,
-			}
+  renderSuggestionsCards(suggestionList) {
+    suggestionList.forEach((suggestion) => {
+      this.printSuggestionCard(suggestion);
+    });
+  },
 
-			buildfire.input.showTextDialog([step1, step2], (err, response) => {
-				if (response.results.length == 2) {
-					const paragraph = document.createElement("p")
-					paragraph.innerHTML = response.results[1].textValue;
-					const images = response.results[1].images;
-					if (images && images.length > 0) {
-						for (let i = 0; i < images.length; i++) {
-							const imgEl = document.createElement("img");
-							const imgUrl = buildfire.imageLib.cropImage(images[i], { size: "full_width", aspect: "16:9" })
-							imgEl.src = imgUrl;
-							paragraph.append(imgEl);
-						}
-					}
+  handleCreateNewSuggestion() {
+    if (authManager.currentUser) {
+      const step1 = {
+        placeholder: state.strings['addNewItem.title'] || "Enter short title*",
+        saveText: state.strings['addNewItem.next'] || "Next",
+        defaultValue: "",
+        cancelText: state.strings['addNewItem.cancel'] || "Cancel",
+        required: true,
+        maxLength: 500
+      }
+      const step2 = {
+        placeholder: state.strings['addNewItem.description'] || "Add more details*",
+        saveText: state.strings['addNewItem.submit'] || "Submit",
+        defaultValue: "",
+        cancelText: state.strings['addNewItem.cancel'] || "Cancel",
+        attachments: {
+          images: { enable: true, multiple: false },
+        },
+        required: true,
+      }
 
-					const title = response.results[0].textValue;
-					const description = paragraph.innerHTML;
-					widgetController.createNewSuggestion(title, description).then((newSuggestion) => {
-						this.destroyEmptyState();
-						this.printSuggestionCard(newSuggestion);
-						Analytics.trackAction(analyticKeys.SUGGESTIONS_NUMBER.key, { _buildfire: { aggregationValue: 1 } });
+      buildfire.input.showTextDialog([step1, step2], (err, response) => {
+        if (response.results.length == 2) {
+          const paragraph = document.createElement("p")
+          paragraph.innerHTML = response.results[1].textValue;
+          const images = response.results[1].images;
+          if (images && images.length > 0) {
+            for (let i = 0; i < images.length; i++) {
+              const imgEl = document.createElement("img");
+              const imgUrl = buildfire.imageLib.cropImage(images[i], { size: "full_width", aspect: "16:9" })
+              imgEl.src = imgUrl;
+              paragraph.append(imgEl);
+            }
+          }
 
-						if (state.settings.permissions.receiveNotifications.value === ENUMS.USERS_PERMISSIONS.NO_USERS) return;
+          const title = response.results[0].textValue;
+          const description = paragraph.innerHTML;
+          widgetController.createNewSuggestion(title, description).then((newSuggestion) => {
+            this.destroyEmptyState();
+            this.printSuggestionCard(newSuggestion);
+            Analytics.trackAction(analyticKeys.SUGGESTIONS_NUMBER.key, { _buildfire: { aggregationValue: 1 } });
 
-						const expressionData = { itemTitle: title };
-						widgetUtils.setDynamicExpressionContext(expressionData);
-						getLanguage('notifications.newItemBody').then((notificationBody) => {
-							if (state.settings.permissions.receiveNotifications.value === ENUMS.USERS_PERMISSIONS.ALL_USERS) {
-								PushNotification.sendToAll(state.strings['notifications.newItemTitle'], notificationBody, newSuggestion.id);
-							} else if (state.settings.permissions.receiveNotifications.value === ENUMS.USERS_PERMISSIONS.USERS_WITH) {
-								const userTags = state.settings.permissions.receiveNotifications.tags.map(tag => (tag.tagName ? tag.tagName : tag.value));
-								if (userTags.length > 0) {
-									PushNotification.sendToUserSegment(state.strings['notifications.newItemTitle'], notificationBody, newSuggestion.id, userTags)
-								}
-							}
-						});
-					});
-				}
-			});
-		} else {
-			authManager.enforceLogin().then(this.handleCreateNewSuggestion.bind(this));
-		}
-	},
+            if (state.settings.permissions.receiveNotifications.value === ENUMS.USERS_PERMISSIONS.NO_USERS) return;
 
-	initSuggestionsFab() {
-		this.selectors.fabSpeedDialContainer.innerHTML = '';
-		if (!hasPermission('createPosts')) {
-			return;
-		}
-		const suggestionFab = new buildfire.components.fabSpeedDial('#fabSpeedDialContainer', {
-			mainButton: {
-				content: `<i class="icon fab-icon-btn">
+            const expressionData = { itemTitle: title };
+            widgetUtils.setDynamicExpressionContext(expressionData);
+            getLanguage('notifications.newItemBody').then((notificationBody) => {
+              if (state.settings.permissions.receiveNotifications.value === ENUMS.USERS_PERMISSIONS.ALL_USERS) {
+                PushNotification.sendToAll(state.strings['notifications.newItemTitle'], notificationBody, newSuggestion.id);
+              } else if (state.settings.permissions.receiveNotifications.value === ENUMS.USERS_PERMISSIONS.USERS_WITH) {
+                const userTags = state.settings.permissions.receiveNotifications.tags.map(tag => (tag.tagName ? tag.tagName : tag.value));
+                if (userTags.length > 0) {
+                  PushNotification.sendToUserSegment(state.strings['notifications.newItemTitle'], notificationBody, newSuggestion.id, userTags)
+                }
+              }
+            });
+          });
+        }
+      });
+    } else {
+      authManager.enforceLogin().then(this.handleCreateNewSuggestion.bind(this));
+    }
+  },
+
+  initSuggestionsFab() {
+    this.selectors.fabSpeedDialContainer.innerHTML = '';
+    if (!hasPermission('createPosts')) {
+      return;
+    }
+    const suggestionFab = new buildfire.components.fabSpeedDial('#fabSpeedDialContainer', {
+      mainButton: {
+        content: `<i class="icon fab-icon-btn">
               <svg width="14" height="14" viewBox="0 0 14 14"  xmlns="http://www.w3.org/2000/svg" fill="#ffffff">
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M14 8H8V14H6V8H0V6H6V0H8V6H14V8Z"/>
               </svg>
              </i>`,
-				type: 'success',
-			},
-		});
-		suggestionFab.onMainButtonClick = () => this.handleCreateNewSuggestion();
-	},
+        type: 'success',
+      },
+    });
+    suggestionFab.onMainButtonClick = () => this.handleCreateNewSuggestion();
+  },
 
-	initSkeleton() {
-		const skeletonType = [...Array(5)].map(i => 'list-item-avatar-two-line, list-item-three-line, actions'); // let's print a skeleton of 5 suggestion cards
-		this.skeleton = new buildfire.components.skeleton('#homePage', { type: skeletonType.join(',') });
-		this.skeleton.start();
-	},
+  initSkeleton() {
+    const skeletonType = [...Array(5)].map(i => 'list-item-avatar-two-line, list-item-three-line, actions'); // let's print a skeleton of 5 suggestion cards
+    this.skeleton = new buildfire.components.skeleton('#homePage', { type: skeletonType.join(',') });
+    this.skeleton.start();
+  },
 
-	destroySkeleton() {
-		this.skeleton.stop();
-		this.skeleton = null;
-	},
+  destroySkeleton() {
+    this.skeleton.stop();
+    this.skeleton = null;
+  },
 
-	printEmptyState() {
-		const cloneCard = this.selectors.emptyStateTemplate.content.cloneNode(true);
-		this.selectors.homePageContainer.appendChild(cloneCard);
-	},
+  printEmptyState() {
+    const cloneCard = this.selectors.emptyStateTemplate.content.cloneNode(true);
+    this.selectors.homePageContainer.appendChild(cloneCard);
+  },
 
-	destroyEmptyState() {
-		const emptyStateHolder = this.selectors.homePageContainer.querySelector('.empty-state-holder');
-		if (emptyStateHolder) {
-			emptyStateHolder.remove();
-		}
-	},
+  destroyEmptyState() {
+    const emptyStateHolder = this.selectors.homePageContainer.querySelector('.empty-state-holder');
+    if (emptyStateHolder) {
+      emptyStateHolder.remove();
+    }
+  },
 
-	init() {
-		this.initSelectors();
+  init() {
+    this.initSelectors();
 
-		widgetController.getSuggestions().then((suggestions) => {
-			setTimeout(() => {
-				this.destroySkeleton();
+    widgetController.getSuggestions().then((suggestions) => {
+      setTimeout(() => {
+        this.destroySkeleton();
 
-				if (suggestions.length === 0) {
-					this.printEmptyState();
-				} else {
-					this.renderSuggestionsCards(suggestions);
-				}
-				this.initListeners();
+        if (suggestions.length === 0) {
+          this.printEmptyState();
+        } else {
+          this.renderSuggestionsCards(suggestions);
+        }
+        this.initListeners();
 
-				this.initSuggestionsFab();
-				this.selectors.wysiwygContainer.innerHTML = state.settings.introduction;
-			}, 500);
-		}).catch(err => {
-			console.error(err);
-		});
-	}
+        this.initSuggestionsFab();
+        this.selectors.wysiwygContainer.innerHTML = state.settings.introduction;
+      }, 500);
+    }).catch(err => {
+      console.error(err);
+    });
+  }
 };

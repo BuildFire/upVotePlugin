@@ -7,14 +7,15 @@ const UserModal = {
   toggleEmptyState() { },
 
   initModalHeader() {
+    const userName = widgetUtils.getUserName(this.userData);
     return `
         <div style="display: flex; align-items: center;">
             <div class="avatar">
-                <img src="${this.userData.image}" alt="${this.userData.displayName ? this.userData.displayName : state.strings['mainScreen.unknownUser']}"/>
+                <img src="${this.userData.image}" alt="${userName}"/>
             </div>
 
             <div class="user-info-holder ellipsis">
-                <span class="user-title titleBarTextAndIcons ellipsis userNameTitle">${this.userData.displayName ? this.userData.displayName : state.strings['mainScreen.unknownUser']}</span></br>
+                <span class="user-title titleBarTextAndIcons ellipsis userNameTitle">${userName}</span></br>
                 <span class="user-subtitle ellipsis">${this.subtitle}</span>
             </div>
         </div>
@@ -48,7 +49,7 @@ const UserModal = {
       emptyContainer.style.alignItems = 'center';
 
       const emptySvg = document.createElement('img');
-      emptySvg.src = '../../../styles/media/empty.svg';
+      emptySvg.src = 'https://pluginserver.buildfire.com/styles/media/empty.svg';
       emptySvg.style.width = '60px';
       emptySvg.style.marginBottom = '10px';
 
@@ -125,7 +126,10 @@ const UserModal = {
         const userIds = [this.userData.userId, authManager.currentUser._id];
         userIds.sort();
 
-        const wTitle = `${this.userData.displayName ? this.userData.displayName : state.strings['mainScreen.unknownUser']} | ${authManager.currentUser.displayName ? authManager.currentUser.displayName : state.strings['mainScreen.unknownUser']}`;
+        const firstUserName = widgetUtils.getUserName(this.userData);
+        const secondUserName = widgetUtils.getUserName(authManager.currentUser);
+
+        const wTitle = `${firstUserName} | ${secondUserName}`;
         const wid = userIds[0] + userIds[1];
         const queryString = widgetUtils.prepareDeeplinkQueryStringData({ wid, wTitle, userIds });
 

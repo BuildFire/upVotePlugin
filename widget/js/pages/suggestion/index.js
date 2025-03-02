@@ -24,7 +24,7 @@ const suggestionDetailsPage = {
     const suggestionCommentContainer = cloneCard.querySelector('#suggestionCommentContainer');
 
     userImage.src = buildfire.auth.getUserPictureUrl({ userId: state.activeSuggestion.createdBy._id });
-    userName.textContent = state.activeSuggestion.createdBy.displayName;
+    userName.textContent = widgetUtils.getUserName(state.activeSuggestion.createdBy);
     suggestionCreatedOn.textContent = widgetUtils.formatDate(state.activeSuggestion.createdOn);
 
     const suggestionStatusData = widgetUtils.getSuggestionStatusData(state.activeSuggestion);
@@ -37,6 +37,10 @@ const suggestionDetailsPage = {
 
     if (!state.settings.enableComments) {
       suggestionCommentContainer.classList.add('hidden');
+    }
+
+    if (state.activeSuggestion && state.activeSuggestion[authManager.currentUser.userId]) {
+      upvote_icon.className = 'padding-zero margin--zero iconsTheme material-icons';
     }
 
     suggestionCommentContainer.onclick = () => widgetSharedController.navigateToSuggestionComments(state.activeSuggestion);

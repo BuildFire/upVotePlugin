@@ -59,14 +59,12 @@ const init = () => {
       }
     });
 
-    buildfire.deeplink.getData((deeplinkData) => {
-      if (deeplinkData && deeplinkData.split("=")[1]) {
-        let id = deeplinkData.split("=")[1];
-        suggestionDetailsPage.init({ id });
-      } else {
-        homePage.init();
-      }
-    });
+    const suggestionIdToNavigate = widgetUtils.getSuggestionIdOnNewNotification();
+    if (suggestionIdToNavigate) {
+      suggestionDetailsPage.init({ id: suggestionIdToNavigate });
+    } else {
+      homePage.init();
+    }
 
     buildfire.history.onPop(onPopHandler);
   }).catch((err) => {
