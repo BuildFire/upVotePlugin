@@ -9,6 +9,7 @@ const ENUMS = Object.freeze({
     'OLDEST': 'OLDEST',
     'MOST_VOTES': 'MOST_VOTES'
   },
+  'SECRET_KEY': 'upvote',
 })
 
 var SUGGESTION_STATUS = Object.freeze({

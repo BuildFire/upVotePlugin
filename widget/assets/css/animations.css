@@ -59,5 +59,6 @@
 .fadeInRight {
   -webkit-animation-name: fadeInRight;
   animation-name: fadeInRight;
+  animation-duration: 0.3s;
 }
 

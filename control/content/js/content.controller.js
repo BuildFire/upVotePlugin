@@ -8,7 +8,6 @@ const contentController = {
   getSettings() {
     return new Promise((resolve) => {
       Settings.get().then((result) => {
-        debugger
         if (!result || !Object.keys(result).length) {
           Analytics.init(); // init analytics only for the first time of installing the plugin
           Settings.save(new Setting()).then((settings) => {

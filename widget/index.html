@@ -29,7 +29,8 @@
   <link rel="stylesheet" href="../../../styles/transitionAnimation.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@40,400,1,0&icon_names=thumb_up" />
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@40,400,1,0&icon_names=thumb_up" />
 
   <link rel="stylesheet" href="./assets/css/pluginIcons.css">
   <link rel="stylesheet" href="./assets/css/animations.css">
@@ -84,9 +85,16 @@
       padding: 0 16px;
     }
 
-  .padding-zero {
-    padding: 0 !important;
-  }
+    .padding-zero {
+      padding: 0 !important;
+    }
+
+    .empty-state-holder {
+      width: 100%;
+      height: calc(100vh - 8rem);
+      align-items: center;
+      justify-content: center;
+    }
   </style>
 </head>
 
@@ -121,7 +129,8 @@
       <div class="button__panel shrink--0 padded padded--sm padded--x padding-right-zero">
         <span class="suggestion-icon-holder">
           <button class="voteButton btn btn--icon--text">
-            <i id="upvote_icon" class="padding-zero iconsTheme material-icons-outlined" aria-hidden="true">thumb_up</i>
+            <i id="upvote_icon" class="padding-zero iconsTheme material-icons-outlined"
+              aria-hidden="true">thumb_up</i>
           </button>
           <p id="suggestionVotesCount" class="pill-count shrink--0">
             <span class="margin--0 iconsTheme"></span>
@@ -131,6 +140,14 @@
           <i class="iconsTheme material-icons-outlined" aria-hidden="true">chat_bubble_outline</i>
           <span class="iconsTheme margin-left-five" bfString="mainScreen.commentButton"></span>
         </span>
+      </div>
+    </div>
+  </template>
+  <template id="emptyStateTemplate">
+    <div class="empty-state-holder">
+      <img src="../../../styles/media/empty.svg"></img>
+      <div class="text-container">
+        <span class="empty-message">No Items Yet</span>
       </div>
     </div>
   </template>
