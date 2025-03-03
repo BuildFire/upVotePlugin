@@ -10,6 +10,7 @@ class Setting {
 
     this.introduction = data.introduction || ''; // wysiwyg content migrated from primary
 
+    this.navigateToCwByDefault = typeof data.navigateToCwByDefault === 'boolean' ? data.navigateToCwByDefault : false;
     this.enableComments = typeof data.enableComments === 'boolean' ? data.enableComments : false;
     this.messagingFeatureInstance = data.messagingFeatureInstance || {};
     this.enableUserProfile = typeof data.enableUserProfile === 'boolean' ? data.enableUserProfile : false;

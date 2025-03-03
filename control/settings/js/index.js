@@ -33,8 +33,6 @@ const settingsPage = {
       chatInstanceTitle: document.getElementById('chatInstanceTitle'),
       chatInstanceTypeTitle: document.getElementById('chatInstanceTypeTitle'),
 
-
-
       // radios
       postCreationAllUsers: document.getElementById('postCreationAllUsers'),
       postCreationNoUsers: document.getElementById('postCreationNoUsers'),
@@ -154,7 +152,7 @@ const settingsPage = {
   addEditChatInstance() {
     buildfire.pluginInstance.showDialog({}, (error, instances) => {
       if (!error && instances.length > 0) {
-        const communityWallInstance = instances.find(instance => instance.pluginTypeId === 'b15c62f2-7a99-48dc-a37a-e42d46bd3289');
+        const communityWallInstance = instances.find((instance) => instance.pluginTypeId === 'b15c62f2-7a99-48dc-a37a-e42d46bd3289');
         if (communityWallInstance) {
           state.settings.messagingFeatureInstance = communityWallInstance;
           const syncMessageData = {
@@ -387,6 +385,7 @@ const settingsPage = {
         });
 
         this.updateUI();
+        document.body.classList.remove('hidden');
       });
   },
 };

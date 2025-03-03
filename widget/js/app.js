@@ -26,16 +26,6 @@ const hasPermission = (permissionType) => {
   return userPermitted;
 };
 
-const getSettings = () => new Promise((resolve) => {
-  Settings.get().then((result) => {
-    state.settings = new Setting(result);
-    resolve();
-  }).catch((err) => { // don't blok the ui, just print the error and resolve
-    console.error(err);
-    resolve();
-  });
-});
-
 const init = () => {
   homePage.initSkeleton();
   handleCPSync();
@@ -45,7 +35,7 @@ const init = () => {
   });
 
   const promises = [
-    getSettings(),
+    widgetController.getSettings(),
     authManager.getCurrentUser(),
     initLanguageStrings(),
   ];

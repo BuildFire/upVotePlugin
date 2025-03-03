@@ -7,14 +7,25 @@ const widgetPagesShared = {
       updateStatusDrawer.init(suggestion, (err, res) => {
         const detailsPageContainer = document.getElementById('suggestionPage');
         const detailsStatus = detailsPageContainer.querySelector('#suggestionStatus');
+        const detailsVoteIcon = detailsPageContainer.querySelector('#upvote_icon');
 
         const suggestionContainer = document.getElementById(`suggestion-${suggestion.id}`);
         const suggestionStatus = suggestionContainer.querySelector('#suggestionStatus');
+        const upvote_icon = suggestionContainer.querySelector('#upvote_icon');
+
+
 
         if (detailsStatus) detailsStatus.classList.add('disabled');
         suggestionStatus.classList.add('disabled');
         widgetController.updateSuggestionStatus(suggestion.id, res.id).then((updatedSuggestion) => {
           suggestionStatus.classList.remove('disabled');
+          if (updatedSuggestion.status === SUGGESTION_STATUS.COMPLETED) {
+            upvote_icon.classList.add('disabled');
+            if (detailsVoteIcon) detailsVoteIcon.classList.add('disabled');
+          } else {
+            upvote_icon.classList.remove('disabled');
+            if (detailsVoteIcon) detailsVoteIcon.classList.remove('disabled');
+          }
 
           const suggestionStatusData = widgetUtils.getSuggestionStatusData(updatedSuggestion);
 
@@ -39,10 +50,19 @@ const widgetPagesShared = {
             if (!voterIds || !voterIds.length) return;
 
             if (updatedSuggestion.status === SUGGESTION_STATUS.BACKLOG) {
+              upvote_icon.classList.remove('disabled');
+              if (detailsVoteIcon) detailsVoteIcon.classList.remove('disabled');
+
               PushNotification.sendToCustomUsers(state.strings['notifications.backlogItemTitle'], backlogItemBody, updatedSuggestion.id, voterIds);
             } else if (updatedSuggestion.status === SUGGESTION_STATUS.INPROGRESS) {
+              upvote_icon.classList.remove('disabled');
+              if (detailsVoteIcon) detailsVoteIcon.classList.remove('disabled');
+
               PushNotification.sendToCustomUsers(state.strings['notifications.inProgressItemTitle'], inProgressItemBody, updatedSuggestion.id, voterIds);
             } else {
+              upvote_icon.classList.add('disabled');
+              if (detailsVoteIcon) detailsVoteIcon.classList.add('disabled');
+
               buildfire.input.showTextDialog({
                 placeholder: completedItemMessageInputPlaceholder,
                 saveText: state.strings['notifications.completedItemMessageSendText'],
@@ -188,7 +208,7 @@ const widgetPagesShared = {
           const expressionData = {
             itemTitle: updatedSuggestion.title,
             userName: widgetUtils.getUserName(authManager.currentUser),
-            remainingVotes
+            remainingVotes,
           };
           widgetUtils.setDynamicExpressionContext(expressionData);
           getLanguage('notifications.youGotAnUpVoteBody').then((youGotAnUpVoteBody) => {
@@ -253,6 +273,8 @@ const widgetPagesShared = {
     });
   },
   voteToSuggestion(suggestion) {
+    if (suggestion.status === SUGGESTION_STATUS.COMPLETED) return;
+
     if (!authManager.currentUser) {
       return authManager.enforceLogin().then(() => widgetPagesShared.voteToSuggestion(suggestion));
     }
@@ -300,7 +322,7 @@ const widgetPagesShared = {
       title: suggestion.title,
       queryString,
       headerContentHtml: widgetUtils.buildHeaderContentHtml(suggestion.title, suggestion.suggestion),
-      pluginTypeOrder: ['community', 'premium_social', 'social'],
+      pluginTypeOrder: state.settings.navigateToCwByDefault ? ['community', 'premium_social', 'social'] : ['premium_social', 'social', 'community'],
     }, () => { });
   },
 };

@@ -18,7 +18,6 @@ function releaseFolder() {
   return arr.join('/');
 }
 
-
 const cssTasks = [
   { name: 'controlContentCSS', src: 'control/content/**/*.css', dest: '/control/content' },
   { name: 'controlAssetsCSS', src: 'control/assets/**/*.css', dest: '/control/assets' },
@@ -32,7 +31,7 @@ cssTasks.forEach((task) => {
      the widget and control folders, processes each CSS file and puts
      a processes copy in the 'build' folder
      note if the order matters you can import each css separately in the array
-    
+
      */
   gulp.task(task.name, () => gulp.src(task.src, { base: '.' })
 

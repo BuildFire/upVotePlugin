@@ -149,7 +149,7 @@ const UserModal = {
     const userImageSrc = buildfire.auth.getUserPictureUrl({ userId: userData._id || userData.userId });
     widgetUtils.validateImage(userImageSrc).then((isValid) => {
       if (isValid) {
-        this.userData.image = buildfire.imageLib.cropImage(userImageSrc, { size: 'm', aspect: '1:1' });;
+        this.userData.image = buildfire.imageLib.cropImage(userImageSrc, { size: 'm', aspect: '1:1' });
       } else {
         this.userData.image = buildfire.imageLib.cropImage('https://app.buildfire.com/app/media/avatar.png', { size: 'm', aspect: '1:1' });
       }

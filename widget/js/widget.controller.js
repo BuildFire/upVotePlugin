@@ -2,6 +2,19 @@ const widgetController = {
   getSettings() {
     return new Promise((resolve) => {
       Settings.get().then((result) => {
+        if (result && result.hasOwnProperty('selectedPurchaseProductId') && result.hasOwnProperty('votesCountPerPurchase')) {
+          Settings.unifyOldSettingsData().then((unifiedSettings) => {
+            state.settings = unifiedSettings;
+            resolve();
+          }).catch((err) => { // don't blok the ui, just print the error and resolve
+            console.error(err);
+            resolve();
+          });
+        } else {
+          state.settings = new Setting(result);
+          resolve();
+        }
+
         state.settings = new Setting(result);
         resolve();
       }).catch((err) => { // don't blok the ui, just print the error and resolve

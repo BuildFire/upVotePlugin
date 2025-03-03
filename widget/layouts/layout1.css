@@ -1,3 +1,9 @@
+
+/* Important Note
+ * Any change in this file will not be backward compatible with apps that have css layouts overrides
+ * Make sure to test the changes in the app before releasing
+ */
+
 * {
   margin: 0;
   padding: 0;

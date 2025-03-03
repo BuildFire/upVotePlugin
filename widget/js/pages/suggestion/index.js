@@ -34,7 +34,7 @@ const suggestionDetailsPage = {
         userImageContainer.classList.remove('loading-image');
         if (isValid) {
           state.validUserImages[state.activeSuggestion.createdBy._id] = userImageSrc;
-          const croppedImage = buildfire.imageLib.cropImage(userImageSrc, { size: "m", aspect: "1:1" });
+          const croppedImage = buildfire.imageLib.cropImage(userImageSrc, { size: 'm', aspect: '1:1' });
           userImage.src = croppedImage;
         }
       });
@@ -57,6 +57,9 @@ const suggestionDetailsPage = {
 
     if (state.activeSuggestion.upVotedBy && state.activeSuggestion.upVotedBy[authManager.currentUser.userId]) {
       upvote_icon.className = 'padding-zero margin--zero iconsTheme material-icons';
+    }
+    if (state.activeSuggestion.status === SUGGESTION_STATUS.COMPLETED) {
+      upvote_icon.classList.add('disabled');
     }
 
     suggestionCommentContainer.onclick = () => widgetPagesShared.navigateToSuggestionComments(state.activeSuggestion);
