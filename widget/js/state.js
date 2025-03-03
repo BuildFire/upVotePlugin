@@ -55,4 +55,5 @@ const state = {
   pageSize: 50,
   fetching: false,
   isAllSuggestionFetched: false,
+  validUserImages: {},
 };

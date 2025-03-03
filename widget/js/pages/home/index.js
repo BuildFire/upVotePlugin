@@ -45,15 +45,21 @@ const homePage = {
     const upvote_icon = cloneCard.querySelector('#upvote_icon');
     const suggestionCommentContainer = cloneCard.querySelector('#suggestionCommentContainer');
 
-    userImage.src = buildfire.imageLib.cropImage('https://app.buildfire.com/app/media/avatar.png', { size: 'm', aspect: '1:1' });
     const userImageSrc = buildfire.auth.getUserPictureUrl({ userId: suggestion.createdBy._id });
-    widgetUtils.validateImage(userImageSrc).then((isValid) => {
+    if (state.validUserImages[suggestion.createdBy._id]) {
       userImageContainer.classList.remove('loading-image');
-      if (isValid) {
-        const croppedImage = buildfire.imageLib.cropImage(userImageSrc, { size: 'm', aspect: '1:1' });
-        userImage.src = croppedImage;
-      }
-    });
+      userImage.src = buildfire.imageLib.cropImage(state.validUserImages[suggestion.createdBy._id], { size: 'm', aspect: '1:1' });
+    } else {
+      userImage.src = buildfire.imageLib.cropImage('https://app.buildfire.com/app/media/avatar.png', { size: 'm', aspect: '1:1' });
+      widgetUtils.validateImage(userImageSrc).then((isValid) => {
+        userImageContainer.classList.remove('loading-image');
+        if (isValid) {
+          state.validUserImages[suggestion.createdBy._id] = userImageSrc;
+          const croppedImage = buildfire.imageLib.cropImage(userImageSrc, { size: 'm', aspect: '1:1' });
+          userImage.src = croppedImage;
+        }
+      });
+    }
 
     userName.textContent = widgetUtils.getUserName(suggestion.createdBy);
     suggestionCreatedOn.textContent = widgetUtils.getSuggestionDisplayTime(suggestion.createdOn);
