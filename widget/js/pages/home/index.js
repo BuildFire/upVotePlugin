@@ -76,7 +76,7 @@ const homePage = {
       suggestionCommentContainer.classList.add('hidden');
     }
 
-    if (suggestion.upVotedBy && suggestion.upVotedBy[authManager.currentUser.userId]) {
+    if (authManager.currentUser && suggestion.upVotedBy && suggestion.upVotedBy[authManager.currentUser.userId]) {
       upvote_icon.className = 'padding-zero margin--zero iconsTheme material-icons';
     }
     if (suggestion.status === SUGGESTION_STATUS.COMPLETED) {

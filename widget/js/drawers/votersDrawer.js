@@ -12,7 +12,7 @@ const votersDrawer = {
             user.lastName ? user.lastName : ''}`
         );
       }
-      return state.string['mainScreen.unknownUser'] || 'Someone';
+      return state.strings['mainScreen.unknownUser'] || 'Someone';
     }
   },
 

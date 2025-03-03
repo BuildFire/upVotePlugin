@@ -118,6 +118,11 @@ const UserModal = {
         buildfire.auth.openProfile(this.userData.userId);
         break;
       case 'messageUser':
+        if (!authManager.currentUser) {
+          return authManager.enforceLogin().then(() => UserModal.handleModalSelection(error, result));
+        }
+        if (authManager.currentUser._id === this.userData.userId) return;
+
         const actionItem = state.settings.messagingFeatureInstance;
         const userIds = [this.userData.userId, authManager.currentUser._id];
         userIds.sort();

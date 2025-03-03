@@ -55,4 +55,5 @@ const state = {
   fetching: false,
   isAllSuggestionFetched: false,
   validUserImages: {},
+  suggestionsList: [],
 };

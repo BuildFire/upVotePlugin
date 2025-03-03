@@ -13,8 +13,6 @@ const widgetPagesShared = {
         const suggestionStatus = suggestionContainer.querySelector('#suggestionStatus');
         const upvote_icon = suggestionContainer.querySelector('#upvote_icon');
 
-
-
         if (detailsStatus) detailsStatus.classList.add('disabled');
         suggestionStatus.classList.add('disabled');
         widgetController.updateSuggestionStatus(suggestion.id, res.id).then((updatedSuggestion) => {
@@ -276,7 +274,10 @@ const widgetPagesShared = {
     if (suggestion.status === SUGGESTION_STATUS.COMPLETED) return;
 
     if (!authManager.currentUser) {
-      return authManager.enforceLogin().then(() => widgetPagesShared.voteToSuggestion(suggestion));
+      return authManager.enforceLogin().then(() => {
+        if (authManager.currentUser && suggestion.upVotedBy[authManager.currentUser.userId]) return;
+        widgetPagesShared.voteToSuggestion(suggestion)
+      });
     }
     const detailsPageContainer = document.getElementById('suggestionPage');
     const detailsVoteIcon = detailsPageContainer.querySelector('#upvote_icon');
@@ -324,5 +325,23 @@ const widgetPagesShared = {
       headerContentHtml: widgetUtils.buildHeaderContentHtml(suggestion.title, suggestion.suggestion),
       pluginTypeOrder: state.settings.navigateToCwByDefault ? ['community', 'premium_social', 'social'] : ['premium_social', 'social', 'community'],
     }, () => { });
+  },
+  checkVotedPosts() {
+    if (!authManager.currentUser) return;
+
+    state.suggestionsList.forEach(suggestion => {
+      if (authManager.currentUser && suggestion.upVotedBy && suggestion.upVotedBy[authManager.currentUser.userId]) {
+        const suggestionContainer = document.getElementById(`suggestion-${suggestion.id}`);
+        const upvote_icon = suggestionContainer.querySelector('#upvote_icon');
+
+        if (upvote_icon) upvote_icon.className = 'padding-zero margin--zero iconsTheme material-icons';
+      }
+    });
+
+    if (state.activeSuggestion && state.activeSuggestion.upVotedBy && state.activeSuggestion.upVotedBy[authManager.currentUser.userId]) {
+      const detailsPageContainer = document.getElementById('suggestionPage');
+      const detailsVoteIcon = detailsPageContainer.querySelector('#upvote_icon');
+      if (detailsVoteIcon) detailsVoteIcon.className = 'padding-zero margin--zero iconsTheme material-icons';
+    }
   },
 };

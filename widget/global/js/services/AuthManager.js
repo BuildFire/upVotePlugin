@@ -40,9 +40,9 @@ const authManager = {
 
 buildfire.auth.onLogin((user) => {
   authManager.currentUser = user;
+  widgetPagesShared.checkVotedPosts();
   homePage.initSuggestionsFab();
 }, false);
 buildfire.auth.onLogout((user) => {
-  authManager.currentUser = null;
-  homePage.initSuggestionsFab();
+  window.location.reload();
 }, false);

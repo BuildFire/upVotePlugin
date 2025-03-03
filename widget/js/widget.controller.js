@@ -65,6 +65,8 @@ const widgetController = {
 
       Suggestions.search(searchOptions).then((result) => {
         state.page += 1;
+        state.suggestionsList = state.suggestionsList.concat(result);
+
         resolve(result);
       });
     });

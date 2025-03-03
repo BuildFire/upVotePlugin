@@ -55,7 +55,7 @@ const suggestionDetailsPage = {
       suggestionCommentContainer.classList.add('hidden');
     }
 
-    if (state.activeSuggestion.upVotedBy && state.activeSuggestion.upVotedBy[authManager.currentUser.userId]) {
+    if (authManager.currentUser && state.activeSuggestion.upVotedBy && state.activeSuggestion.upVotedBy[authManager.currentUser.userId]) {
       upvote_icon.className = 'padding-zero margin--zero iconsTheme material-icons';
     }
     if (state.activeSuggestion.status === SUGGESTION_STATUS.COMPLETED) {
