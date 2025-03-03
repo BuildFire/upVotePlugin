@@ -102,37 +102,29 @@
                     "toolTip": "",
                     "placeholder": "Someone"
                 },
-                "noBadgesYet": {
-                    "title": "No Badges Yet",
-                    "defaultValue": "No Badges Yet",
+                "viewProfile": {
+                    "title": "View Profile",
+                    "defaultValue": "View Profile",
                     "inputType": "text",
                     "maxLength": 20,
-                    "toolTip": "",
-                    "placeholder": "No Badges Yet"
-                },
-                "openProfile": {
-                    "title": "Open Profile",
-                    "defaultValue": "Open Profile",
-                    "inputType": "text",
-                    "maxLength": 20,
-                    "toolTip": "",
-                    "placeholder": "Open Profile"
+                    "toolTip": "This message will only be shown if the 'Show Upvoter's Profile Details' setting is enabled.",
+                    "placeholder": "View Profile"
                 },
                 "messageUser": {
                     "title": "Message User",
                     "defaultValue": "Message User",
                     "inputType": "text",
                     "maxLength": 20,
-                    "toolTip": "",
+                    "toolTip": "This message will only be shown if the 'Show Upvoter's Profile Details' setting and the corresponding subsetting are enabled.",
                     "placeholder": "Message User"
                 },
-                "viewProfile": {
-                    "title": "View Profile",
-                    "defaultValue": "View Profile",
+                "noBadgesYet": {
+                    "title": "No Badges Yet",
+                    "defaultValue": "No Badges Yet",
                     "inputType": "text",
                     "maxLength": 20,
-                    "toolTip": "",
-                    "placeholder": "View Profile"
+                    "toolTip": "This message will only be shown if the 'Show Upvoter's Profile Details' setting and the corresponding subsetting are enabled.",
+                    "placeholder": "No Badges Yet"
                 },
                 "day": {
                     "title": "Day",

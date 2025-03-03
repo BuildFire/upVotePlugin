@@ -17,7 +17,6 @@ const state = {
     'mainScreen.min': '',
     'mainScreen.unknownUser': '',
     'mainScreen.noBadgesYet': '',
-    'mainScreen.openProfile': '',
     'mainScreen.messageUser': '',
     'mainScreen.viewProfile': '',
 

@@ -75,9 +75,9 @@ const UserModal = {
     if (authManager.currentUser && this.userData.userId === authManager.currentUser._id) {
       userActionTab.listItems = [
         {
-          id: 'openProfile',
+          id: 'viewProfile',
           icon: 'glyphicon glyphicon-circle-arrow-right',
-          text: state.strings['mainScreen.openProfile'],
+          text: state.strings['mainScreen.viewProfile'],
         },
       ];
     } else {
@@ -114,9 +114,6 @@ const UserModal = {
     }
 
     switch (result.id) {
-      case 'openProfile':
-        buildfire.auth.openProfile();
-        break;
       case 'viewProfile':
         buildfire.auth.openProfile(this.userData.userId);
         break;
