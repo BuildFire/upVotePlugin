@@ -28,7 +28,7 @@ const homePage = {
     };
   },
 
-  printSuggestionCard(suggestion) {
+  printSuggestionCard(suggestion, position = 'bottom') {
     const cloneCard = this.selectors.suggestionCardTemplate.content.cloneNode(true);
 
     const suggestionDetails = cloneCard.querySelector('.suggestion-details');
@@ -93,7 +93,12 @@ const homePage = {
     };
 
     suggestionCard.id = `suggestion-${suggestion.id}`;
-    this.selectors.homePageContainer.appendChild(cloneCard);
+    const firstSuggestionCard = this.selectors.homePageContainer.querySelectorAll('.suggestionCard')[0]
+    if (position === 'top' && firstSuggestionCard) {
+      this.selectors.homePageContainer.insertBefore(cloneCard, firstSuggestionCard);
+    } else {
+      this.selectors.homePageContainer.appendChild(cloneCard);
+    }
   },
 
   renderSuggestionsCards(suggestionList) {
@@ -146,7 +151,7 @@ const homePage = {
             });
 
             this.destroyEmptyState();
-            this.printSuggestionCard(newSuggestion);
+            this.printSuggestionCard(newSuggestion, 'top');
             Analytics.trackAction(analyticKeys.SUGGESTIONS_NUMBER.key, { _buildfire: { aggregationValue: 1 } });
 
             if (state.settings.permissions.receiveNotifications.value === ENUMS.USERS_PERMISSIONS.NO_USERS) return;
