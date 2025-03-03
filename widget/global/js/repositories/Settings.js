@@ -9,10 +9,10 @@ class Settings {
         if (err) {
           reject(err);
         } else {
-          resolve(res.data)
+          resolve(res.data);
         }
       });
-    })
+    });
   }
 
   static save(settings) {
@@ -24,6 +24,6 @@ class Settings {
           resolve();
         }
       });
-    })
+    });
   }
 }

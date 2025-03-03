@@ -20,7 +20,6 @@ const state = {
     'mainScreen.openProfile': '',
     'mainScreen.messageUser': '',
     'mainScreen.viewProfile': '',
-    'mainScreen.somethingWentWrong': '',
 
     'addNewItem.title': '',
     'addNewItem.description': '',
@@ -56,4 +55,4 @@ const state = {
   pageSize: 50,
   fetching: false,
   isAllSuggestionFetched: false,
-}
+};

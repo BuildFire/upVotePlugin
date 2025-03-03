@@ -1,6 +1,6 @@
 const onPopHandler = (breadcrumb) => {
   suggestionDetailsPage.destroy();
-}
+};
 
 const hasPermission = (permissionType) => {
   let userPermitted = false;
@@ -15,7 +15,7 @@ const hasPermission = (permissionType) => {
       const permissionTags = state.settings.permissions[permissionType].tags;
 
       for (let i = 0; i < permissionTags.length; i++) {
-        if (userTags.some(_tag => _tag.tagName === permissionTags[i].tagName)) {
+        if (userTags.some((_tag) => _tag.tagName === permissionTags[i].tagName)) {
           userPermitted = true;
           break;
         }
@@ -24,19 +24,17 @@ const hasPermission = (permissionType) => {
   }
 
   return userPermitted;
-}
-
-const getSettings = () => {
-  return new Promise((resolve) => {
-    Settings.get().then((result) => {
-      state.settings = new Setting(result);
-      resolve();
-    }).catch((err) => { // don't blok the ui, just print the error and resolve
-      console.error(err);
-      resolve();
-    });
-  });
 };
+
+const getSettings = () => new Promise((resolve) => {
+  Settings.get().then((result) => {
+    state.settings = new Setting(result);
+    resolve();
+  }).catch((err) => { // don't blok the ui, just print the error and resolve
+    console.error(err);
+    resolve();
+  });
+});
 
 const init = () => {
   homePage.initSkeleton();
@@ -49,12 +47,12 @@ const init = () => {
   const promises = [
     getSettings(),
     authManager.getCurrentUser(),
-    initLanguageStrings()
+    initLanguageStrings(),
   ];
   Promise.all(promises).then(() => {
     buildfire.deeplink.onUpdate((deeplinkData) => {
-      if (deeplinkData && deeplinkData.split("=")[1]) {
-        let id = deeplinkData.split("=")[1];
+      if (deeplinkData && deeplinkData.split('=')[1]) {
+        const id = deeplinkData.split('=')[1];
         suggestionDetailsPage.init({ id });
       }
     });
@@ -70,7 +68,7 @@ const init = () => {
   }).catch((err) => {
     console.error(err);
   });
-}
+};
 
 window.onload = () => {
   init();

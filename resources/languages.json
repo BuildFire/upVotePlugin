@@ -136,35 +136,35 @@
                 },
                 "day": {
                     "title": "Day",
-                    "defaultValue": "Day",
+                    "defaultValue": "day",
                     "inputType": "text",
                     "maxLength": 15,
                     "toolTip": "",
-                    "placeholder": "Day"
+                    "placeholder": "day"
                 },
                 "hour": {
                     "title": "Hour",
-                    "defaultValue": "Hour",
+                    "defaultValue": "hour",
                     "inputType": "text",
                     "maxLength": 15,
                     "toolTip": "",
-                    "placeholder": "Hour"
+                    "placeholder": "hour"
                 },
                 "hours": {
                     "title": "Hours",
-                    "defaultValue": "Hours",
+                    "defaultValue": "hours",
                     "inputType": "text",
                     "maxLength": 15,
                     "toolTip": "",
-                    "placeholder": "Hours"
+                    "placeholder": "hours"
                 },
                 "min": {
                     "title": "Min",
-                    "defaultValue": "Min",
+                    "defaultValue": "min",
                     "inputType": "text",
                     "maxLength": 15,
                     "toolTip": "",
-                    "placeholder": "Min"
+                    "placeholder": "min"
                 }
             }
         },

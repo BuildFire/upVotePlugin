@@ -24,5 +24,5 @@ const settingsController = {
         resolve(products);
       });
     });
-  }
-}
+  },
+};

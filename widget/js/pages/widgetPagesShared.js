@@ -1,7 +1,7 @@
-const widgetSharedController = {
+const widgetPagesShared = {
   updateSuggestionStatus(suggestion) {
     if (!authManager.currentUser) {
-      return authManager.enforceLogin().then(() => widgetSharedController.updateSuggestionStatus(suggestion));
+      return authManager.enforceLogin().then(() => widgetPagesShared.updateSuggestionStatus(suggestion));
     }
     if (hasPermission('updateStatus')) {
       updateStatusDrawer.init(suggestion, (err, res) => {
@@ -16,13 +16,13 @@ const widgetSharedController = {
         widgetController.updateSuggestionStatus(suggestion.id, res.id).then((updatedSuggestion) => {
           suggestionStatus.classList.remove('disabled');
 
-          const suggestionData = widgetUtils.getSuggestionStatusData(updatedSuggestion);
+          const suggestionStatusData = widgetUtils.getSuggestionStatusData(updatedSuggestion);
 
-          suggestionStatus.innerHTML = `<span class="margin--0 bodyTextTheme" >${suggestionData.statusText}</span>`;
-          suggestionStatus.className = `pill shrink--0 ${suggestionData.statusContainerClass}`;
+          suggestionStatus.innerHTML = `<span class="margin--0 ${suggestionStatusData.textColorClass}" >${suggestionStatusData.statusText}</span>`;
+          suggestionStatus.className = `pill shrink--0 ${suggestionStatusData.statusContainerClass}`;
           if (detailsStatus) {
-            detailsStatus.innerHTML = `<span class="margin--0 bodyTextTheme" >${suggestionData.statusText}</span>`;
-            detailsStatus.className = `pill shrink--0 ${suggestionData.statusContainerClass}`;
+            detailsStatus.innerHTML = `<span class="margin--0 ${suggestionStatusData.textColorClass}" >${suggestionStatusData.statusText}</span>`;
+            detailsStatus.className = `pill shrink--0 ${suggestionStatusData.statusContainerClass}`;
           }
 
           const expressionData = { itemTitle: updatedSuggestion.title };
@@ -48,13 +48,13 @@ const widgetSharedController = {
                 saveText: state.strings['notifications.completedItemMessageSendText'],
                 defaultValue: completedItemMessageInputPlaceholder,
                 required: true,
-                cancelText: state.strings['notifications.completedItemMessageCancelText']
+                cancelText: state.strings['notifications.completedItemMessageCancelText'],
               }, (err, response) => {
                 if (err) console.error(err);
                 if (response && response.results && response.results[0]) {
                   PushNotification.sendToCustomUsers(state.strings['notifications.completedItemBody'], response.results[0].textValue, updatedSuggestion.id, voterIds);
                 }
-              })
+              });
             }
           });
         }).catch((err) => {
@@ -67,16 +67,18 @@ const widgetSharedController = {
   },
   _confirmUserAction(options) {
     return new Promise((resolve, reject) => {
-      if (!options.requireConfirm) return resolve(true);
-
-      buildfire.dialog.confirm(options, (err, isConfirmed) => {
-        if (isConfirmed) {
-          resolve(true);
-        } else {
-          resolve(false);
-        }
-      });
-    })
+      if (!options.requireConfirm) {
+        resolve(true);
+      } else {
+        buildfire.dialog.confirm(options, (err, isConfirmed) => {
+          if (isConfirmed) {
+            resolve(true);
+          } else {
+            resolve(false);
+          }
+        });
+      }
+    });
   },
   _validateCurrentUserCredit() {
     return new Promise((resolve, reject) => {
@@ -89,7 +91,8 @@ const widgetSharedController = {
           if (credits > 0) {
             resolve(true);
           } else {
-            let confirmTitle, confirmMessage, confirmButtonText, cancelButtonText;
+            let confirmTitle; let confirmMessage; let confirmButtonText; let
+              cancelButtonText;
 
             if (state.userCredits && state.userCredits.firstTimePurchase) {
               confirmTitle = state.strings['votesDepletedMessage.title'] || 'Get More Votes';
@@ -103,14 +106,14 @@ const widgetSharedController = {
               cancelButtonText = state.strings['firstTimePurchaseMessage.cancel'] || 'Cancel';
             }
 
-            const needPurchase = state.settings.inAppPurchase.enabled && state.settings.inAppPurchase.planId
+            const needPurchase = state.settings.inAppPurchase.enabled && state.settings.inAppPurchase.planId;
 
             this._confirmUserAction({
               title: confirmTitle,
               message: confirmMessage,
               confirmButton: { text: confirmButtonText },
-              cancelButtonText: cancelButtonText,
-              requireConfirm: needPurchase
+              cancelButtonText,
+              requireConfirm: needPurchase,
             }).then((isConfirmed) => {
               if (isConfirmed) {
                 if (needPurchase) {
@@ -141,7 +144,7 @@ const widgetSharedController = {
                       console.error(err);
 
                       buildfire.dialog.toast({
-                        message: state.strings['mainScreen.somethingWentWrong'],
+                        message: state.strings['mainScreen.somethingWentWrong'] + err,
                         type: 'danger',
                       });
                       resolve(false);
@@ -157,7 +160,7 @@ const widgetSharedController = {
           }
         }).catch(reject);
       }
-    })
+    });
   },
   _handleVote(suggestion) {
     const detailsPageContainer = document.getElementById('suggestionPage');
@@ -177,17 +180,25 @@ const widgetSharedController = {
           if (detailsVoteIcon) detailsVoteIcon.className = 'padding-zero margin--zero iconsTheme material-icons';
           if (detailsVotesCount) detailsVotesCount.innerHTML = `<span class="margin--0 iconsTheme">${Object.keys(updatedSuggestion.upVotedBy).length}</span>`;
 
+          let remainingVotes = 0;
+          if (state.userCredits) {
+            remainingVotes = Number(widgetUtils.decryptCredit(state.userCredits.credits, ENUMS.SECRET_KEY)) - 1;
+          }
+          
           const expressionData = {
             itemTitle: updatedSuggestion.title,
             userName: widgetUtils.getUserName(authManager.currentUser),
+            remainingVotes
           };
           widgetUtils.setDynamicExpressionContext(expressionData);
           getLanguage('notifications.youGotAnUpVoteBody').then((youGotAnUpVoteBody) => {
             PushNotification.sendToCustomUsers(state.strings['notifications.youGotAnUpVoteTitle'], youGotAnUpVoteBody, updatedSuggestion.id, [updatedSuggestion.createdBy._id]);
           });
 
-          buildfire.dialog.toast({message: state.strings['mainScreen.voteConfirmed'], type: 'info',});
           if (state.settings.inAppPurchase.enabled && state.settings.inAppPurchase.planId) {
+            getLanguage('mainScreen.voteConfirmed').then((youGotAnUpVoteBodyMessage) => {
+              buildfire.dialog.toast({ message: youGotAnUpVoteBodyMessage, type: 'info' });
+            });
             widgetController.decreaseUserCredits();
           }
         }).catch((err) => {
@@ -218,10 +229,10 @@ const widgetSharedController = {
       title: state.strings['unvoteMessage.title'] || 'Remove Vote',
       message: state.strings['unvoteMessage.body'] || 'Removing your vote will not refund your voting credit. Voting again will deduct anther credit.',
       confirmButton: {
-        text: state.strings['unvoteMessage.remove'] || 'Remove'
+        text: state.strings['unvoteMessage.remove'] || 'Remove',
       },
       cancelButtonText: state.strings['unvoteMessage.cancel'] || 'Cancel',
-      requireConfirm: state.settings.inAppPurchase.enabled && state.settings.inAppPurchase.planId
+      requireConfirm: state.settings.inAppPurchase.enabled && state.settings.inAppPurchase.planId,
     }).then((isConfirmed) => {
       if (isConfirmed) {
         widgetController.handleSuggestionUnVote(suggestion).then((updatedSuggestion) => {
@@ -243,7 +254,7 @@ const widgetSharedController = {
   },
   voteToSuggestion(suggestion) {
     if (!authManager.currentUser) {
-      return authManager.enforceLogin().then(() => widgetSharedController.voteToSuggestion(suggestion));
+      return authManager.enforceLogin().then(() => widgetPagesShared.voteToSuggestion(suggestion));
     }
     const detailsPageContainer = document.getElementById('suggestionPage');
     const detailsVoteIcon = detailsPageContainer.querySelector('#upvote_icon');
@@ -268,20 +279,20 @@ const widgetSharedController = {
         if (state.settings.enableDirectoryBadges || (state.settings.messagingFeatureInstance && state.settings.messagingFeatureInstance.instanceId)) {
           // show new drawer
           UserDirectory.getUserDirectoryRecord(selectedUser.userId).then((userDirectoryData) => {
-            UserModal.init(userDirectoryData || suggestion.upVotedBy[selectedUser.userId].user)
-          })
+            UserModal.init(userDirectoryData || suggestion.upVotedBy[selectedUser.userId].user);
+          });
         } else {
           buildfire.auth.openProfile(selectedUser.userId);
         }
       }
-    })
+    });
   },
   navigateToSuggestionComments(suggestion) {
     if (!authManager.currentUser) {
-      return authManager.enforceLogin().then(() => widgetSharedController.navigateToSuggestionComments(suggestion));
+      return authManager.enforceLogin().then(() => widgetPagesShared.navigateToSuggestionComments(suggestion));
     }
 
-    const wid = encodeURIComponent(widgetUtils.getUserName(suggestion.createdBy) + "-" + suggestion.createdOn)
+    const wid = encodeURIComponent(`${widgetUtils.getUserName(suggestion.createdBy)}-${suggestion.createdOn}`);
     const wTitle = encodeURIComponent(suggestion.title);
     const queryString = `wid=${wid}&wTitle=${wTitle}`;
 
@@ -289,7 +300,7 @@ const widgetSharedController = {
       title: suggestion.title,
       queryString,
       headerContentHtml: widgetUtils.buildHeaderContentHtml(suggestion.title, suggestion.suggestion),
-      pluginTypeOrder: ['premium_social', 'social', 'community']
+      pluginTypeOrder: ['premium_social', 'social', 'community'],
     }, () => { });
   },
-}
+};

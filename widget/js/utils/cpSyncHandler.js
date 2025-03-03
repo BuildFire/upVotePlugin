@@ -7,7 +7,7 @@ const handleCPSync = () => {
       state.settings = {
         ...state.settings,
         ...message.directoryOptions,
-      }
+      };
     } else if (message.scope === 'permissions') {
       state.settings.permissions = message.permissions;
 

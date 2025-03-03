@@ -18,89 +18,50 @@
   <script src="../../../scripts/buildfire/services/commerce/inAppPurchase.js"></script>
   <script src="../../../scripts/buildfire/components/skeleton/skeleton.js"></script>
 
+  
+   <!-- build:bundleSharedJSFiles  -->
+   <script src="global/js/constants/index.js"></script>
+   <script src="global/js/models/Setting.js"></script>
+   <script src="global/js/models/Suggestion.js"></script>
+   <script src="global/js/models/UserCredit.js"></script>
+   <script src="global/js/repositories/Settings.js"></script>
+   <script src="global/js/repositories/Suggestions.js"></script>
+   <script src="global/js/repositories/UserCredits.js"></script>
+   <script src="global/js/services/PushNotifications.js"></script>
+   <script src="global/js/services/AuthManager.js"></script>
+   <script src="global/js/services/UserDirectory.js"></script>
+   <script src="global/js/services/Analyutics.js"></script>
+   <!-- endbuild -->
+ 
   <!-- build:bundleJSFiles  -->
-
+  <script src="js/widget.controller.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/utils/cpSyncHandler.js"></script>
+  <script src="js/utils/widgetUtils.js"></script>
+  <script src="js/utils/strings.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/drawers/userInfoDrawer.js"></script>
+  <script src="js/drawers/updateStatusDrawer.js"></script>
+  <script src="js/drawers/votersDrawer.js"></script>
+  <script src="js/pages/widgetPagesShared.js"></script>
+  <script src="js/pages/suggestion/index.js"></script>
+  <script src="js/pages/home/index.js"></script>
   <!-- endbuild -->
-
-  <!-- build:bundleSharedJSFiles  -->
-
-  <!-- endbuild -->
-
+ 
   <link rel="stylesheet" href="../../../styles/transitionAnimation.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
   <link rel="stylesheet"
     href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@40,400,1,0&icon_names=thumb_up" />
 
+	
+  <!-- build:bundleCSSFiles  -->
+  <link rel="stylesheet" href="./assets/css/style.css">
   <link rel="stylesheet" href="./assets/css/pluginIcons.css">
   <link rel="stylesheet" href="./assets/css/animations.css">
+   <!-- endbuild -->
 
-  <style>
-    /* keep compatibility with layout1 v0.1 */
-    html p,
-    html span,
-    html a,
-    html .paragraph {
-      margin-bottom: 0;
-    }
-
-    .page-view {
-      width: 100%;
-      height: 100%;
-      padding-bottom: 1rem;
-      overflow: auto;
-    }
-
-    .defaultBackgroundStatus {
-      background-color: rgba(150, 150, 150, 0.1) !important;
-    }
-
-    .grid-block {
-      height: 200px;
-      margin: 12px;
-      border-radius: 5px;
-    }
-
-    .disabled {
-      pointer-events: none;
-      opacity: 0.5;
-    }
-
-    .details-page {
-      position: fixed;
-      top: 0;
-      width: 100vw;
-      height: 100vh;
-      background: var(--bf-theme-background);
-      padding: 0;
-      z-index: 10;
-    }
-
-    .bf-skeleton-container .skeleton-list-item-avatar-two-line {
-      margin-top: 25px;
-    }
-
-    .bf-skeleton-container .skeleton-actions {
-      text-align: left !important;
-      padding: 0 16px;
-    }
-
-    .padding-zero {
-      padding: 0 !important;
-    }
-
-    .empty-state-holder {
-      width: 100%;
-      height: calc(100vh - 8rem);
-      align-items: center;
-      justify-content: center;
-    }
-	.margin--zero {
-		margin: 0 !important;
-	}
-  </style>
 </head>
-
 
 <body>
   <section class="page-view" id="homePage">
@@ -126,8 +87,44 @@
         </p>
       </div>
       <div class="suggestion-details">
-        <h4 id="suggestionTitle" class="word--break body-text font-weight-500"></h4>
+        <h4 id="suggestionTitle" class="word--break body-text font-weight-600"></h4>
         <p class="white-space-pre-line margin-bottom--m body-text" id="suggestionBodyText"></p>
+      </div>
+      <div class="button__panel shrink--0 padded padded--sm padded--x padding-right-zero">
+        <span class="suggestion-icon-holder">
+          <button class="voteButton btn btn--icon--text">
+            <i id="upvote_icon" class="padding-zero iconsTheme material-icons-outlined"
+              aria-hidden="true">thumb_up</i>
+          </button>
+          <p id="suggestionVotesCount" class="pill-count shrink--0">
+            <span class="margin--0 iconsTheme"></span>
+          </p>
+        </span>
+        <span id="suggestionCommentContainer" class="suggestion-icon-holder">
+          <i class="iconsTheme material-icons-outlined" aria-hidden="true">chat_bubble_outline</i>
+          <span class="iconsTheme margin-left-five" bfString="mainScreen.commentButton"></span>
+        </span>
+      </div>
+    </div>
+  </template>
+  <template id="suggestionDetailsCard">
+    <div class="suggestionCard">
+      <div class="card__header padded padded-l margin-bottom--sm">
+        <div class="user-image-container">
+          <img id="userImage" alt="" class="avatar" src="">
+        </div>
+        <div class="ellipsis padded padded--x padded--sm suggestion__name">
+          <p class="margin--0 ellipsis header-text" id="suggestionUserName"></p>
+          <h6 id="suggestionCreatedOn" class="pull-left caption margin--0 text--secondary"></h6>
+        </div>
+
+        <p id="suggestionStatus" class="pill shrink--0 pill-success-theme">
+          <span class="margin--0"></span>
+        </p>
+      </div>
+      <div class="padded padded--m padded--x">
+        <h4 class="body-text font-weight-600" id="suggestionTitle"></h4>
+        <p class="margin-bottom--m body-text white-space-pre-line" id="suggestionBodyText"></p>
       </div>
       <div class="button__panel shrink--0 padded padded--sm padded--x padding-right-zero">
         <span class="suggestion-icon-holder">
@@ -157,29 +154,3 @@
 </body>
 
 </html>
-
-<script src="global/js/constants/index.js"></script>
-<script src="global/js/models/Setting.js"></script>
-<script src="global/js/models/Suggestion.js"></script>
-<script src="global/js/models/UserCredit.js"></script>
-<script src="global/js/repositories/Settings.js"></script>
-<script src="global/js/repositories/Suggestions.js"></script>
-<script src="global/js/repositories/UserCredits.js"></script>
-<script src="global/js/services/PushNotifications.js"></script>
-<script src="global/js/services/AuthManager.js"></script>
-<script src="global/js/services/UserDirectory.js"></script>
-<script src="global/js/services/Analyutics.js"></script>
-
-<script src="js/widget.controller.js"></script>
-<script src="js/app.js"></script>
-<script src="js/utils/cpSyncHandler.js"></script>
-<script src="js/utils/widgetUtils.js"></script>
-<script src="js/utils/strings.js"></script>
-<script src="js/state.js"></script>
-
-<script src="js/drawers/userInfoDrawer.js"></script>
-<script src="js/drawers/updateStatusDrawer.js"></script>
-<script src="js/drawers/votersDrawer.js"></script>
-<script src="js/pages/shared.controller.js"></script>
-<script src="js/pages/suggestion/index.js"></script>
-<script src="js/pages/home/index.js"></script>

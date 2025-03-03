@@ -21,13 +21,13 @@ class Setting {
     this.inAppPurchase = data.inAppPurchase || {
       enabled: false,
       planId: null,
-      votesPerPurchase: 1
+      votesPerPurchase: 1,
     };
 
     this.permissions = data.permissions || {
       createPosts: { tags: [], value: ENUMS.USERS_PERMISSIONS.ALL_USERS }, // value = 'usersWith' | 'all',
       updateStatus: { tags: [], value: ENUMS.USERS_PERMISSIONS.NO_USERS },
       receiveNotifications: { tags: [], value: ENUMS.USERS_PERMISSIONS.NO_USERS },
-    }
+    };
   }
 }

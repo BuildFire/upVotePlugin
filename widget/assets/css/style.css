@@ -1,0 +1,68 @@
+
+/* keep compatibility with layout1 v0.1 */
+html p,
+html span,
+html a,
+html .paragraph {
+  margin-bottom: 0;
+}
+
+.page-view {
+  width: 100%;
+  height: 100%;
+  padding-bottom: 1rem;
+  overflow: auto;
+}
+
+.defaultBackgroundStatus {
+  background-color: rgba(150, 150, 150, 0.1) !important;
+}
+
+.grid-block {
+  height: 200px;
+  margin: 12px;
+  border-radius: 5px;
+}
+
+.disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.details-page {
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background: var(--bf-theme-background);
+  padding: 0;
+  z-index: 1000 !important;
+}
+
+.bf-skeleton-container .skeleton-list-item-avatar-two-line {
+  margin-top: 25px;
+}
+
+.bf-skeleton-container .skeleton-actions {
+  text-align: left !important;
+  padding: 0 16px;
+}
+
+.padding-zero {
+  padding: 0 !important;
+}
+
+.empty-state-holder {
+  width: 100%;
+  height: calc(100vh - 8rem);
+  align-items: center;
+  justify-content: center;
+}
+
+.margin--zero {
+  margin: 0 !important;
+}
+
+.font-weight-600 {
+	font-weight: 600;
+}

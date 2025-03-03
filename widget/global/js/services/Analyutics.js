@@ -30,7 +30,7 @@ const Analytics = {
   },
   registerEvent: (event, options, callback) => {
     if (event.title && event.key) {
-      let _options = options.silentNotification || true;
+      const _options = options.silentNotification || true;
       buildfire.analytics.registerEvent(event, _options, (err, res) => {
         if (err) return callback(err, null);
         return callback(null, res);
@@ -60,7 +60,7 @@ const Analytics = {
       { silentNotification: true },
       (err, res) => {
         if (err) console.error(err);
-      }
+      },
     );
 
     Analytics.registerEvent(
@@ -68,21 +68,21 @@ const Analytics = {
       { silentNotification: true },
       (err, res) => {
         if (err) console.error(err);
-      }
+      },
     );
     Analytics.registerEvent(
       analyticKeys.CHARGING_CREDITS,
       { silentNotification: true },
       (err, res) => {
         if (err) console.error(err);
-      }
+      },
     );
     Analytics.registerEvent(
       analyticKeys.CONSUMING_CREDITS,
       { silentNotification: true },
       (err, res) => {
         if (err) console.error(err);
-      }
+      },
     );
   },
 };

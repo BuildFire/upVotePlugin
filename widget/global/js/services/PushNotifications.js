@@ -1,53 +1,51 @@
 class PushNotification {
   static sendToAll(title, message, id) {
     const notification = {
-      title: title,
+      title,
       text: message,
       at: new Date(),
       sendToSelf: false,
-      queryString: `id=${id}`
+      queryString: `id=${id}`,
     };
     buildfire.notifications.pushNotification.schedule(
       notification,
-      function (err, data) {
-        if (err) return;
-      }
+      (err, data) => {
+        if (err) console.error(err);
+      },
     );
-  };
+  }
 
   static sendToCustomUsers(title, message, id, users) {
     const notification = {
-      title: title,
+      title,
       text: message,
       at: new Date(),
       sendToSelf: false,
-      users: users,
-      queryString: `id=${id}`
+      users,
+      queryString: `id=${id}`,
     };
     buildfire.notifications.pushNotification.schedule(
       notification,
-      function (err, data) {
-        if (err) return;
-      }
+      (err, data) => {
+        if (err) console.error(err);
+      },
     );
-  };
+  }
 
   static sendToUserSegment(title, message, id, userTags) {
     const notification = {
-      title: title,
+      title,
       text: message,
       at: new Date(),
-      userTags: userTags,
+      userTags,
       sendToSelf: false,
-      queryString: `id=${id}`
+      queryString: `id=${id}`,
     };
     buildfire.notifications.pushNotification.schedule(
       notification,
-      function (err, data) {
-        console.log("Trace1", err)
-        console.log("Trace1", data)
-        if (err) return;
-      }
+      (err, data) => {
+        if (err) console.error(err);
+      },
     );
-  };
+  }
 }

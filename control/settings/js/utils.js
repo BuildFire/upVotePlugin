@@ -27,7 +27,7 @@ const utils = {
       return false;
     }
 
-    for (let key of keys1) {
+    for (const key of keys1) {
       if (!keys2.includes(key) || !utils.checkEquality(obj1[key], obj2[key])) {
         return false;
       }
@@ -48,5 +48,5 @@ const utils = {
     }
 
     return true;
-  }
-}
+  },
+};

@@ -5,15 +5,14 @@ const widgetUtils = {
     if (userObj) {
       if (userObj.displayName) {
         return userObj.displayName;
-      } else if ((userObj.firstName || userObj.lastName) && (userObj.firstName.trim() !== '' || userObj.lastName.trim() !== '')) {
+      } if ((userObj.firstName || userObj.lastName) && (userObj.firstName.trim() !== '' || userObj.lastName.trim() !== '')) {
         return (
-          (userObj.firstName ? userObj.firstName : '') +
-          ' ' +
-          (userObj.lastName ? userObj.lastName : '')
+          `${userObj.firstName ? userObj.firstName : ''
+          } ${
+            userObj.lastName ? userObj.lastName : ''}`
         );
-      } else {
-        return state.strings['mainScreen.unknownUser'] || 'Someone';
       }
+      return state.strings['mainScreen.unknownUser'] || 'Someone';
     }
   },
   getUserNeededAuthData(userObj) {
@@ -26,7 +25,7 @@ const widgetUtils = {
         lastName: userObj.lastName,
         displayName: userObj.displayName,
         username: userObj.username,
-      }
+      };
     }
   },
   prepareDeeplinkQueryStringData(obj) {
@@ -37,42 +36,70 @@ const widgetUtils = {
     const options = { month: 'short', day: 'numeric', year: 'numeric' };
     return new Date(date).toLocaleDateString('en-US', options);
   },
+  getSuggestionDisplayTime(createdOn) {
+    const createdDate = new Date(createdOn);
+    const currentDate = new Date();
+
+    const timeDifference = currentDate.getTime() - createdDate.getTime();
+    const minutesDifference = Math.floor(timeDifference / (1000 * 60));
+    const hoursDifference = Math.floor(timeDifference / (1000 * 60 * 60));
+    const daysDifference = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+
+    if (hoursDifference < 24 && hoursDifference !== 0) {
+      if (hoursDifference === 1) {
+        const hourText = state.strings['mainScreen.hour'];
+        return `${hoursDifference} ${hourText}`;
+      }
+      const hoursText = state.strings['mainScreen.hours'];
+      return `${hoursDifference} ${hoursText}`;
+    } if (hoursDifference === 0) {
+      const minutesText = state.strings['mainScreen.min'];
+      return `${minutesDifference} ${minutesText}`;
+    } if (daysDifference === 1) {
+      const dayText = state.strings['mainScreen.day'];
+      return `${daysDifference} ${dayText}`;
+    }
+    return this.formatDate(createdOn);
+  },
   getSuggestionStatusData(suggestion) {
     const suggestionStatus = {};
     switch (suggestion.status) {
       case 3:
         suggestionStatus.statusText = state.strings['mainScreen.completed'];
         suggestionStatus.statusContainerClass = 'successBackgroundTheme';
+        suggestionStatus.textColorClass = 'whiteTheme';
         break;
       case 2:
         suggestionStatus.statusText = state.strings['mainScreen.inProgress'];
         suggestionStatus.statusContainerClass = 'warningBackgroundTheme';
+        suggestionStatus.textColorClass = 'whiteTheme';
         break;
       case 1:
       default:
         suggestionStatus.statusText = state.strings['mainScreen.backlog'];
         suggestionStatus.statusContainerClass = 'defaultBackgroundStatus';
+        suggestionStatus.textColorClass = 'bodyTextTheme';
         break;
     }
     return suggestionStatus;
   },
   buildHeaderContentHtml(title, description) {
-    const div = document.createElement("div")
-    const titleParagraph = document.createElement("p")
+    const div = document.createElement('div');
+    const titleParagraph = document.createElement('p');
     titleParagraph.style.color = this.appTheme.colors.bodyText;
-    titleParagraph.style.fontSize = "16px"
+    titleParagraph.style.fontSize = '16px';
     titleParagraph.style.fontWeight = 500;
     titleParagraph.innerHTML = title;
 
-    const descriptionParagraph = document.createElement("p")
+    const descriptionParagraph = document.createElement('p');
     descriptionParagraph.style.color = this.appTheme.colors.bodyText;
     descriptionParagraph.style.fontWeight = 400;
-    descriptionParagraph.style.fontSize = "14px"
+    descriptionParagraph.style.fontSize = '14px';
 
     descriptionParagraph.innerHTML = description;
 
-    div.appendChild(titleParagraph)
-    div.appendChild(descriptionParagraph)
+    div.appendChild(titleParagraph);
+    div.appendChild(descriptionParagraph);
 
     return div.innerHTML;
   },
@@ -89,8 +116,8 @@ const widgetUtils = {
   getSuggestionIdOnNewNotification() {
     const getParamsRegex = /\?(.+)/;
     let suggestionId = '';
-    if (getParamsRegex.test(location.href)) {
-      const params = getParamsRegex.exec(location.href)[1].split('&');
+    if (getParamsRegex.test(window.location.href)) {
+      const params = getParamsRegex.exec(window.location.href)[1].split('&');
       params.forEach((param) => {
         const keyValue = param.split('=');
         if (keyValue[0] === 'id') {
@@ -116,10 +143,18 @@ const widgetUtils = {
     encryptedCredit = atob(encryptedCredit);
     let decryptedCredit = '';
     for (let i = 0; i < encryptedCredit.length; i++) {
-      const charCode =
-        encryptedCredit.charCodeAt(i) ^ key.charCodeAt(i % key.length);
+      const charCode = encryptedCredit.charCodeAt(i) ^ key.charCodeAt(i % key.length);
       decryptedCredit += String.fromCharCode(charCode);
     }
     return decryptedCredit;
-  }
-}
+  },
+
+  validateImage(imgUrl) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => resolve(true);
+      img.onerror = () => resolve(false);
+      img.src = imgUrl;
+    });
+  },
+};

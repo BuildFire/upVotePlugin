@@ -10,7 +10,7 @@ const updateStatusDrawer = {
         aspect-ratio: 1;
         margin: 0;
         background: ${status.statusBackgroundColor};
-        border-radius: 100%;"></span>${status.statusText}</span>`
+        border-radius: 100%;"></span>${status.statusText}</span>`;
 
     return element;
   },
@@ -20,22 +20,22 @@ const updateStatusDrawer = {
     const availableStatuses = [
       {
         statusText: state.strings['mainScreen.backlog'],
-        statusBackgroundColor: "rgba(150, 150, 150, 0.1)"
+        statusBackgroundColor: 'rgba(150, 150, 150, 0.1)',
       },
       {
         statusText: state.strings['mainScreen.inProgress'],
-        statusBackgroundColor: this.appTheme.colors.warningTheme
+        statusBackgroundColor: this.appTheme.colors.warningTheme,
       },
       {
         statusText: state.strings['mainScreen.completed'],
-        statusBackgroundColor: this.appTheme.colors.successTheme
+        statusBackgroundColor: this.appTheme.colors.successTheme,
       },
     ];
     for (let i = 1; i <= availableStatuses.length; i++) {
       listItems.push({
         id: i,
         text: this.renderStatusItem(availableStatuses[i - 1]),
-        selected: this.activeSuggestion.status === i
+        selected: this.activeSuggestion.status === i,
       });
     }
 
@@ -54,12 +54,13 @@ const updateStatusDrawer = {
           content: `<div style="color:${this.appTheme.colors.headerText};font-weight: bold;">${state.strings['mainScreen.updateStatus']}</div>`,
           isHTML: true,
           triggerCallbackOnUIDismiss: false,
-          listItems: listItems
+          listItems,
         },
         (err, result) => {
           buildfire.components.drawer.closeDrawer();
           callback(err, result);
-        });
-    })
-  }
-}
+        },
+      );
+    });
+  },
+};

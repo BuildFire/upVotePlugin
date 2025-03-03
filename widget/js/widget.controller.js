@@ -19,12 +19,12 @@ const widgetController = {
       switch (settings.defaultItemSorting) {
         case ENUMS.SUGGESTIONS_SORTING.NEWEST:
           searchOptions.sort = {
-            createdOn: -1
+            createdOn: -1,
           };
           break;
         case ENUMS.SUGGESTIONS_SORTING.OLDEST:
           searchOptions.sort = {
-            createdOn: 1
+            createdOn: 1,
           };
           break;
         case ENUMS.SUGGESTIONS_SORTING.MOST_VOTES:
@@ -37,24 +37,24 @@ const widgetController = {
 
       if (settings.hideCompletedItems === 0) {
         searchOptions.filter = {
-          status: { $ne: SUGGESTION_STATUS.COMPLETED }
-        }
+          status: { $ne: SUGGESTION_STATUS.COMPLETED },
+        };
       } else if (settings.hideCompletedItems > 0) {
         const startDate = new Date();
         startDate.setDate(startDate.getDate() - settings.hideCompletedItems);
         searchOptions.filter = {
           $or: [
             { status: { $ne: SUGGESTION_STATUS.COMPLETED } },
-            { status: SUGGESTION_STATUS.COMPLETED, modifiedOn: { $gte: startDate } }
-          ]
-        }
+            { status: SUGGESTION_STATUS.COMPLETED, modifiedOn: { $gte: startDate } },
+          ],
+        };
       }
 
       Suggestions.search(searchOptions).then((result) => {
         state.page += 1;
         resolve(result);
       });
-    })
+    });
   },
 
   isSuggestionVoted(suggestion) {
@@ -65,8 +65,8 @@ const widgetController = {
         } else {
           resolve(false);
         }
-      }).catch(reject)
-    })
+      }).catch(reject);
+    });
   },
 
   handleSuggestionVote(suggestion) {
@@ -75,12 +75,12 @@ const widgetController = {
 
       Suggestions.update(suggestion.id, {
         $set: {
-          ['upVotedBy.' + authManager.currentUser.userId]: {
+          [`upVotedBy.${authManager.currentUser.userId}`]: {
             user: widgetUtils.getUserNeededAuthData(authManager.currentUser),
-            votedOn: new Date()
+            votedOn: new Date(),
           },
-          upVoteCount: suggestion.upVoteCount + 1
-        }
+          upVoteCount: suggestion.upVoteCount + 1,
+        },
       }).then(resolve).catch(reject);
     });
   },
@@ -90,8 +90,8 @@ const widgetController = {
       Analytics.trackAction(analyticKeys.VOTE_NUMBER.key, { votes: -1, _buildfire: { aggregationValue: -1 } });
 
       Suggestions.update(suggestion.id, {
-        $unset: { ['upVotedBy.' + authManager.currentUser.userId]: "" },
-        $set: { upVoteCount: suggestion.upVoteCount - 1 }
+        $unset: { [`upVotedBy.${authManager.currentUser.userId}`]: '' },
+        $set: { upVoteCount: suggestion.upVoteCount - 1 },
       }).then(resolve).catch(reject);
     });
   },
@@ -99,9 +99,9 @@ const widgetController = {
   updateSuggestionStatus(suggestionId, updatedStatus) {
     return new Promise((resolve, reject) => {
       Suggestions.update(suggestionId, {
-        $set: { status: updatedStatus, modifiedOn: new Date() }
+        $set: { status: updatedStatus, modifiedOn: new Date() },
       }).then(resolve).catch(reject);
-    })
+    });
   },
 
   createNewSuggestion(suggestionTitle, suggestionDescription) {
@@ -114,12 +114,12 @@ const widgetController = {
         upVotedBy: {
           [authManager.currentUser.userId]: {
             user: widgetUtils.getUserNeededAuthData(authManager.currentUser),
-            votedOn: new Date()
-          }
-        }
-      })
+            votedOn: new Date(),
+          },
+        },
+      });
       Suggestions.insert(newSuggestion).then(resolve).catch(reject);
-    })
+    });
   },
 
   getUserCredits() {
@@ -135,38 +135,46 @@ const widgetController = {
         const updatedUserCredits = credits - 1;
         const encryptedCredits = widgetUtils.encryptCredit(updatedUserCredits, ENUMS.SECRET_KEY);
 
-        let payload = {
+        const payload = {
           $set: {
             credits: encryptedCredits,
-          }
-        }
-        return UserCredits.update(authManager.currentUser._id, payload).then(() => {
+          },
+        };
+        return UserCredits.update(authManager.currentUser._id, payload).then((updatedCredits) => {
+          state.userCredits = {
+            credits: encryptedCredits,
+          };
           if (updatedUserCredits === 0) {
             Analytics.trackAction(analyticKeys.CONSUMING_CREDITS.key);
           }
 
           resolve(true);
         }).catch(reject);
-      })
-    })
+      });
+    });
   },
 
   addUserCredits() {
     return new Promise((resolve, reject) => {
-      let encryptedCredits = widgetUtils.encryptCredit(state.settings.inAppPurchase.votesPerPurchase, ENUMS.SECRET_KEY);
-      let payload = {
+      const encryptedCredits = widgetUtils.encryptCredit(state.settings.inAppPurchase.votesPerPurchase, ENUMS.SECRET_KEY);
+      const payload = {
         $set: {
           createdBy: authManager.currentUser._id,
           credits: encryptedCredits,
-          firstTimePurchase: true
-        }
-      }
-      return UserCredits.update(authManager.currentUser._id, payload).then(() => {
+          firstTimePurchase: true,
+        },
+      };
+      UserCredits.update(authManager.currentUser._id, payload).then((updatedCredits) => {
+        state.userCredits = {
+          createdBy: authManager.currentUser._id,
+          credits: encryptedCredits,
+          firstTimePurchase: true,
+        };
         Analytics.trackAction(analyticKeys.CHARGING_CREDITS.key);
 
         resolve(true);
       }).catch(reject);
-    })
+    });
   },
 
   handleUserPurchase() {
@@ -183,8 +191,7 @@ const widgetController = {
         } else {
           resolve({ purchaseStatus: 'cancelled' });
         }
-      }
-      );
-    })
-  }
+      });
+    });
+  },
 };

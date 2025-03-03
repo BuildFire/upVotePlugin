@@ -3,7 +3,7 @@ const suggestionDetailsPage = {
   initSelectors() {
     this.selectors = {
       detailsContainer: document.getElementById('suggestionPage'),
-      suggestionCardTemplate: document.getElementById('suggestionCard'),
+      suggestionCardTemplate: document.getElementById('suggestionDetailsCard'),
       emptyStateTemplate: document.getElementById('emptyStateTemplate'),
     };
   },
@@ -13,7 +13,7 @@ const suggestionDetailsPage = {
 
     const suggestionCard = cloneCard.querySelector('.suggestionCard');
     const userImage = cloneCard.querySelector('#userImage');
-    const userName = cloneCard.querySelector('#userName');
+    const userName = cloneCard.querySelector('#suggestionUserName');
     const suggestionCreatedOn = cloneCard.querySelector('#suggestionCreatedOn');
     const suggestionStatus = cloneCard.querySelector('#suggestionStatus');
     const suggestionTitle = cloneCard.querySelector('#suggestionTitle');
@@ -25,10 +25,10 @@ const suggestionDetailsPage = {
 
     userImage.src = buildfire.auth.getUserPictureUrl({ userId: state.activeSuggestion.createdBy._id });
     userName.textContent = widgetUtils.getUserName(state.activeSuggestion.createdBy);
-    suggestionCreatedOn.textContent = widgetUtils.formatDate(state.activeSuggestion.createdOn);
+    suggestionCreatedOn.textContent = widgetUtils.getSuggestionDisplayTime(state.activeSuggestion.createdOn);
 
     const suggestionStatusData = widgetUtils.getSuggestionStatusData(state.activeSuggestion);
-    suggestionStatus.innerHTML = `<span class="margin--0 bodyTextTheme" >${suggestionStatusData.statusText}</span>`;
+    suggestionStatus.innerHTML = `<span class="margin--0 ${suggestionStatusData.textColorClass}" >${suggestionStatusData.statusText}</span>`;
     suggestionStatus.className = `pill shrink--0 ${suggestionStatusData.statusContainerClass}`;
 
     suggestionTitle.innerHTML = state.activeSuggestion.title;
@@ -43,12 +43,11 @@ const suggestionDetailsPage = {
       upvote_icon.className = 'padding-zero margin--zero iconsTheme material-icons';
     }
 
-    suggestionCommentContainer.onclick = () => widgetSharedController.navigateToSuggestionComments(state.activeSuggestion);
-    upvote_icon.onclick = () => widgetSharedController.voteToSuggestion(state.activeSuggestion);
-    suggestionStatus.onclick = () => widgetSharedController.updateSuggestionStatus(state.activeSuggestion);
-    suggestionVotesCount.onclick = () => widgetSharedController.openVotersDrawer(state.activeSuggestion);
+    suggestionCommentContainer.onclick = () => widgetPagesShared.navigateToSuggestionComments(state.activeSuggestion);
+    upvote_icon.onclick = () => widgetPagesShared.voteToSuggestion(state.activeSuggestion);
+    suggestionStatus.onclick = () => widgetPagesShared.updateSuggestionStatus(state.activeSuggestion);
+    suggestionVotesCount.onclick = () => widgetPagesShared.openVotersDrawer(state.activeSuggestion);
 
-    suggestionCard.id = `suggestion-${state.activeSuggestion.id}`;
     this.selectors.detailsContainer.appendChild(cloneCard);
   },
 
@@ -102,6 +101,6 @@ const suggestionDetailsPage = {
       this.selectors.detailsContainer.innerHTML = '';
       this.printEmptyState();
       console.error(err);
-    })
+    });
   },
-}
+};

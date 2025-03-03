@@ -64,24 +64,24 @@ const settingsPage = {
     this.selectors.deleteChatInstance.onclick = () => {
       state.settings.messagingFeatureInstance = {};
       const syncMessageData = {
-        scope: "directoryOptions",
-        directoryOptions: { messagingFeatureInstance: {} }
+        scope: 'directoryOptions',
+        directoryOptions: { messagingFeatureInstance: {} },
       };
 
       this.saveWithDelay(syncMessageData);
-    }
+    };
 
     this.selectors.enableComments.onchange = (event) => {
       state.settings.enableComments = event.target.checked;
-      const syncMessageData = { scope: "reload" };
+      const syncMessageData = { scope: 'reload' };
 
       this.saveWithDelay(syncMessageData);
     };
     this.selectors.enableUserProfile.onchange = (event) => {
       state.settings.enableUserProfile = event.target.checked;
       const syncMessageData = {
-        scope: "directoryOptions",
-        directoryOptions: { enableUserProfile: event.target.checked }
+        scope: 'directoryOptions',
+        directoryOptions: { enableUserProfile: event.target.checked },
       };
 
       this.saveWithDelay(syncMessageData);
@@ -89,8 +89,8 @@ const settingsPage = {
     this.selectors.enableDirectoryBadges.onchange = (event) => {
       state.settings.enableDirectoryBadges = event.target.checked;
       const syncMessageData = {
-        scope: "directoryOptions",
-        directoryOptions: { enableDirectoryBadges: event.target.checked }
+        scope: 'directoryOptions',
+        directoryOptions: { enableDirectoryBadges: event.target.checked },
       };
 
       this.saveWithDelay(syncMessageData);
@@ -105,13 +105,13 @@ const settingsPage = {
       this.selectors.statusUpdateUsersWith,
       this.selectors.pushNotificationAllUsers,
       this.selectors.pushNotificationNoUsers,
-      this.selectors.pushNotificationUsersWith
+      this.selectors.pushNotificationUsersWith,
     ].forEach((permissionRadio) => {
       permissionRadio.onchange = (event) => {
         state.settings.permissions[event.target.name].value = event.target.value;
         const syncMessageData = {
-          scope: "permissions",
-          permissions: state.settings.permissions
+          scope: 'permissions',
+          permissions: state.settings.permissions,
         };
 
         this.updateUI();
@@ -127,10 +127,10 @@ const settingsPage = {
       sortRadio.onchange = (event) => {
         state.settings.defaultItemSorting = event.target.value;
         this.updateUI();
-        const syncMessageData = { scope: "reload" };
+        const syncMessageData = { scope: 'reload' };
 
         this.saveWithDelay(syncMessageData);
-      }
+      };
     });
 
     this.selectors.votesNumberInput.oninput = (event) => {
@@ -141,11 +141,11 @@ const settingsPage = {
         this.selectors.votesNumberErrorMessage.classList.add('hidden');
         this.selectors.votesNumberInput.classList.remove('border-danger');
         state.settings.inAppPurchase.votesPerPurchase = parseInt(event.target.value);
-        const syncMessageData = { scope: "reload" };
+        const syncMessageData = { scope: 'reload' };
 
         this.saveWithDelay(syncMessageData);
       }
-    }
+    };
   },
 
   addEditChatInstance() {
@@ -153,15 +153,15 @@ const settingsPage = {
       if (!error && instances.length > 0) {
         state.settings.messagingFeatureInstance = instances[0];
         const syncMessageData = {
-          scope: "directoryOptions",
-          directoryOptions: { messagingFeatureInstance: state.settings.messagingFeatureInstance }
+          scope: 'directoryOptions',
+          directoryOptions: { messagingFeatureInstance: state.settings.messagingFeatureInstance },
         };
 
         this.saveWithDelay(syncMessageData);
       } else if (error) {
         console.error(error);
         buildfire.dialog.toast({
-          message: "Something went wrong.",
+          message: 'Something went wrong.',
           type: 'danger',
         });
       }
@@ -171,7 +171,7 @@ const settingsPage = {
   getDeepSettingValue(settingKey) {
     const keys = settingKey.split('.');
     let settingValue = state.settings;
-    for (let key of keys) {
+    for (const key of keys) {
       if (settingValue[key] !== undefined) {
         settingValue = settingValue[key];
       } else {
@@ -193,15 +193,15 @@ const settingsPage = {
     if (!isEquals) {
       current[keys[keys.length - 1]] = value;
 
-	  let syncMessageData;
-	  if (settingKey.includes('permissions')) {
-		syncMessageData = {
-			scope: "permissions",
-			permissions: state.settings.permissions
-		  };
-	  } else {
-		syncMessageData = { scope: "reload" };
-	  }
+      let syncMessageData;
+      if (settingKey.includes('permissions')) {
+        syncMessageData = {
+          scope: 'permissions',
+          permissions: state.settings.permissions,
+        };
+      } else {
+        syncMessageData = { scope: 'reload' };
+      }
 
       this.saveWithDelay(syncMessageData);
     }
@@ -239,17 +239,30 @@ const settingsPage = {
 
     dropdownButton.onclick = () => {
       dropdownContainer.classList.toggle('open');
-    }
+    };
 
     dropdownList.innerHTML = ''; // clear the list before adding items
     options.items.forEach((item) => {
       const listItem = document.createElement('li');
       listItem.innerHTML = `<a>${item.text}</a>`;
       listItem.onclick = () => {
-        buttonLabel.textContent = item.text;
-        dropdownContainer.classList.remove('open');
-        this.updateDeepSettingValue(options.settingKey, item.value);
-      }
+        if (options.settingKey.includes('inAppPurchase')) {
+          if (!item.text.startsWith('c_')) {
+            buildfire.dialog.toast({
+              message: 'The selected product does not appear to be consumable.',
+              type: 'warning',
+            });
+          } else {
+            buttonLabel.textContent = item.text;
+            dropdownContainer.classList.remove('open');
+            this.updateDeepSettingValue(options.settingKey, item.value);
+          }
+        } else {
+          buttonLabel.textContent = item.text;
+          dropdownContainer.classList.remove('open');
+          this.updateDeepSettingValue(options.settingKey, item.value);
+        }
+      };
       dropdownList.appendChild(listItem);
     });
   },
@@ -306,7 +319,7 @@ const settingsPage = {
       selectors.chatInstanceRowContainer.classList.remove('hidden');
       selectors.addChatInstance.classList.add('hidden');
 
-      const croppedImage = buildfire.imageLib.cropImage(settings.messagingFeatureInstance.iconUrl, { size: "xs", aspect: "1:1" });
+      const croppedImage = buildfire.imageLib.cropImage(settings.messagingFeatureInstance.iconUrl, { size: 'xs', aspect: '1:1' });
       selectors.chatInstanceIcon.src = croppedImage;
       selectors.chatInstanceTitle.textContent = settings.messagingFeatureInstance.title;
     } else {
@@ -333,7 +346,7 @@ const settingsPage = {
       }
       settingsController.saveSettings(state.settings).then(() => {
         buildfire.messaging.sendMessageToWidget(syncMessageData);
-      })
+      });
 
       this.updateUI();
     }, 500);
@@ -363,9 +376,9 @@ const settingsPage = {
 
         this.updateUI();
       });
-  }
+  },
 };
 
 window.onload = () => {
   settingsPage.init();
-}
+};

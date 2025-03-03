@@ -7,7 +7,7 @@ const homePage = {
       suggestionCardTemplate: document.getElementById('suggestionCard'),
       fabSpeedDialContainer: document.getElementById('fabSpeedDialContainer'),
       emptyStateTemplate: document.getElementById('emptyStateTemplate'),
-    }
+    };
   },
 
   initListeners() {
@@ -21,11 +21,11 @@ const homePage = {
 
           this.renderSuggestionsCards(suggestions);
           state.fetching = false;
-        }).catch(err => {
+        }).catch((err) => {
           console.error(err);
         });
       }
-    }
+    };
   },
 
   printSuggestionCard(suggestion) {
@@ -46,10 +46,10 @@ const homePage = {
 
     userImage.src = buildfire.auth.getUserPictureUrl({ userId: suggestion.createdBy._id });
     userName.textContent = widgetUtils.getUserName(suggestion.createdBy);
-    suggestionCreatedOn.textContent = widgetUtils.formatDate(suggestion.createdOn);
+    suggestionCreatedOn.textContent = widgetUtils.getSuggestionDisplayTime(suggestion.createdOn);
 
     const suggestionStatusData = widgetUtils.getSuggestionStatusData(suggestion);
-    suggestionStatus.innerHTML = `<span class="margin--0 bodyTextTheme" >${suggestionStatusData.statusText}</span>`;
+    suggestionStatus.innerHTML = `<span class="margin--0 ${suggestionStatusData.textColorClass}" >${suggestionStatusData.statusText}</span>`;
     suggestionStatus.className = `pill shrink--0 ${suggestionStatusData.statusContainerClass}`;
 
     suggestionTitle.innerHTML = suggestion.title;
@@ -64,14 +64,14 @@ const homePage = {
       upvote_icon.className = 'padding-zero margin--zero iconsTheme material-icons';
     }
 
-    suggestionCommentContainer.onclick = () => widgetSharedController.navigateToSuggestionComments(suggestion);
-    upvote_icon.onclick = () => widgetSharedController.voteToSuggestion(suggestion);
-    suggestionStatus.onclick = () => widgetSharedController.updateSuggestionStatus(suggestion);
-    suggestionVotesCount.onclick = () => widgetSharedController.openVotersDrawer(suggestion);
+    suggestionCommentContainer.onclick = () => widgetPagesShared.navigateToSuggestionComments(suggestion);
+    upvote_icon.onclick = () => widgetPagesShared.voteToSuggestion(suggestion);
+    suggestionStatus.onclick = () => widgetPagesShared.updateSuggestionStatus(suggestion);
+    suggestionVotesCount.onclick = () => widgetPagesShared.openVotersDrawer(suggestion);
     suggestionDetails.onclick = () => {
       buildfire.history.push('Suggestion Details');
       suggestionDetailsPage.init(suggestion);
-    }
+    };
 
     suggestionCard.id = `suggestion-${suggestion.id}`;
     this.selectors.homePageContainer.appendChild(cloneCard);
@@ -86,33 +86,33 @@ const homePage = {
   handleCreateNewSuggestion() {
     if (authManager.currentUser) {
       const step1 = {
-        placeholder: state.strings['addNewItem.title'] || "Enter short title*",
-        saveText: state.strings['addNewItem.next'] || "Next",
-        defaultValue: "",
-        cancelText: state.strings['addNewItem.cancel'] || "Cancel",
+        placeholder: state.strings['addNewItem.title'] || 'Enter short title*',
+        saveText: state.strings['addNewItem.next'] || 'Next',
+        defaultValue: '',
+        cancelText: state.strings['addNewItem.cancel'] || 'Cancel',
         required: true,
-        maxLength: 500
-      }
+        maxLength: 500,
+      };
       const step2 = {
-        placeholder: state.strings['addNewItem.description'] || "Add more details*",
-        saveText: state.strings['addNewItem.submit'] || "Submit",
-        defaultValue: "",
-        cancelText: state.strings['addNewItem.cancel'] || "Cancel",
+        placeholder: state.strings['addNewItem.description'] || 'Add more details*',
+        saveText: state.strings['addNewItem.submit'] || 'Submit',
+        defaultValue: '',
+        cancelText: state.strings['addNewItem.cancel'] || 'Cancel',
         attachments: {
           images: { enable: true, multiple: false },
         },
         required: true,
-      }
+      };
 
       buildfire.input.showTextDialog([step1, step2], (err, response) => {
-        if (response.results.length == 2) {
-          const paragraph = document.createElement("p")
+        if (response.results.length === 2) {
+          const paragraph = document.createElement('p');
           paragraph.innerHTML = response.results[1].textValue;
           const images = response.results[1].images;
           if (images && images.length > 0) {
             for (let i = 0; i < images.length; i++) {
-              const imgEl = document.createElement("img");
-              const imgUrl = buildfire.imageLib.cropImage(images[i], { size: "full_width", aspect: "16:9" })
+              const imgEl = document.createElement('img');
+              const imgUrl = buildfire.imageLib.cropImage(images[i], { size: 'full_width', aspect: '16:9' });
               imgEl.src = imgUrl;
               paragraph.append(imgEl);
             }
@@ -121,6 +121,11 @@ const homePage = {
           const title = response.results[0].textValue;
           const description = paragraph.innerHTML;
           widgetController.createNewSuggestion(title, description).then((newSuggestion) => {
+            buildfire.dialog.toast({
+              message: state.strings['mainScreen.suggestionSuccessfullyAdded'],
+              type: 'info',
+            });
+
             this.destroyEmptyState();
             this.printSuggestionCard(newSuggestion);
             Analytics.trackAction(analyticKeys.SUGGESTIONS_NUMBER.key, { _buildfire: { aggregationValue: 1 } });
@@ -133,11 +138,18 @@ const homePage = {
               if (state.settings.permissions.receiveNotifications.value === ENUMS.USERS_PERMISSIONS.ALL_USERS) {
                 PushNotification.sendToAll(state.strings['notifications.newItemTitle'], notificationBody, newSuggestion.id);
               } else if (state.settings.permissions.receiveNotifications.value === ENUMS.USERS_PERMISSIONS.USERS_WITH) {
-                const userTags = state.settings.permissions.receiveNotifications.tags.map(tag => (tag.tagName ? tag.tagName : tag.value));
+                const userTags = state.settings.permissions.receiveNotifications.tags.map((tag) => (tag.tagName ? tag.tagName : tag.value));
                 if (userTags.length > 0) {
-                  PushNotification.sendToUserSegment(state.strings['notifications.newItemTitle'], notificationBody, newSuggestion.id, userTags)
+                  PushNotification.sendToUserSegment(state.strings['notifications.newItemTitle'], notificationBody, newSuggestion.id, userTags);
                 }
               }
+            });
+          }).catch((err) => {
+            console.error(err);
+
+            buildfire.dialog.toast({
+              message: state.strings['mainScreen.somethingWentWrong'],
+              type: 'danger',
             });
           });
         }
@@ -166,7 +178,7 @@ const homePage = {
   },
 
   initSkeleton() {
-    const skeletonType = [...Array(5)].map(i => 'list-item-avatar-two-line, list-item-three-line, actions'); // let's print a skeleton of 5 suggestion cards
+    const skeletonType = [...Array(5)].map((i) => 'list-item-avatar-two-line, list-item-three-line, actions'); // let's print a skeleton of 5 suggestion cards
     this.skeleton = new buildfire.components.skeleton('#homePage', { type: skeletonType.join(',') });
     this.skeleton.start();
   },
@@ -205,8 +217,8 @@ const homePage = {
         this.initSuggestionsFab();
         this.selectors.wysiwygContainer.innerHTML = state.settings.introduction;
       }, 500);
-    }).catch(err => {
+    }).catch((err) => {
       console.error(err);
     });
-  }
+  },
 };

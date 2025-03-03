@@ -5,15 +5,14 @@ const votersDrawer = {
     if (user) {
       if (user.displayName) {
         return user.displayName;
-      } else if ((user.firstName || user.lastName) && (user.firstName.trim() !== '' || user.lastName.trim() !== '')) {
+      } if ((user.firstName || user.lastName) && (user.firstName.trim() !== '' || user.lastName.trim() !== '')) {
         return (
-          (user.firstName ? user.firstName : '') +
-          ' ' +
-          (user.lastName ? user.lastName : '')
+          `${user.firstName ? user.firstName : ''
+          } ${
+            user.lastName ? user.lastName : ''}`
         );
-      } else {
-        return state.string['mainScreen.unknownUser'] || 'Someone';
       }
+      return state.string['mainScreen.unknownUser'] || 'Someone';
     }
   },
 
@@ -28,7 +27,7 @@ const votersDrawer = {
         text: this.getUserName(user),
         imageUrl: croppedUserImage,
         userId: user._id,
-      })
+      });
     }
 
     return listItems;
@@ -46,11 +45,12 @@ const votersDrawer = {
           content: `<div style="color:${this.appTheme.colors.headerText};font-weight: bold;">${state.strings['mainScreen.upvotes']}</div>`,
           isHTML: true,
           triggerCallbackOnUIDismiss: false,
-          listItems: listItems
+          listItems,
         },
         (err, result) => {
           callback(err, result);
-        });
-    })
-  }
-}
+        },
+      );
+    });
+  },
+};

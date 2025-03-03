@@ -2,35 +2,42 @@
 <html>
 
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link href="../../../../styles/helper.css" rel="stylesheet">
-    <link href="../../../../styles/siteIcons.css" rel="stylesheet">
-    <link rel="stylesheet" href="../assets/control.css">
+  <link href="../../../../styles/helper.css" rel="stylesheet">
+  <link href="../../../../styles/siteIcons.css" rel="stylesheet">
 
-    <!-- JS -->
-    <script src="../../../../scripts/buildfire.min.js"></script>
+  <!-- build:bundleControlAssetsCSSFiles  -->
+  <link rel="stylesheet" href="../assets/control.css">
+  <!-- endbuild -->
 
-    <!-- build:bundleSharedJSFiles  -->
-    <script src="../../widget/global/js/constants/index.js"></script>
-    <script src="../../widget/global/js/models/Setting.js"></script>
-    <script src="../../widget/global/js/repositories/Settings.js"></script>
-    <script src="../../widget/global/js/services/Analyutics.js"></script>
-	<!-- endbuild -->
+  <!-- JS -->
+  <script src="../../../../scripts/buildfire.min.js"></script>
 
-	<script src="../../../../scripts/tinymce/tinymce.min.js"></script>
-    <link href="../../../../styles/control/bf-base.css" rel="stylesheet">
+  <!-- build:bundleSharedJSFiles  -->
+  <script src="../../widget/global/js/constants/index.js"></script>
+  <script src="../../widget/global/js/models/Setting.js"></script>
+  <script src="../../widget/global/js/repositories/Settings.js"></script>
+  <script src="../../widget/global/js/services/Analyutics.js"></script>
+  <!-- endbuild -->
+
+  <!-- build:bundleJSFiles  -->
+  <script src="js/content.controller.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/index.js"></script>
+  <!-- endbuild -->
+
+
+  <script src="../../../../scripts/tinymce/tinymce.min.js"></script>
+  <link href="../../../../styles/control/bf-base.css" rel="stylesheet">
 </head>
 
 <body>
-    <div>
-        <h1>Introduction</h1>
-        <textarea id="introduction" class="form-control"></textarea>
-    </div>
+  <div>
+    <h1>Introduction</h1>
+    <textarea id="introduction" class="form-control"></textarea>
+  </div>
 </body>
 
-<script src="js/content.controller.js"></script>
-<script src="js/state.js"></script>
-<script src="js/index.js"></script>
 
 </html>

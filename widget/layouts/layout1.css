@@ -408,13 +408,11 @@ textarea {
 
 .card {
   background-color: rgba(255, 255, 255, .1);
-  border-radius: .5rem;
   box-shadow: 0 .125rem .5rem rgba(50, 50, 50, 0.2);
-  margin: 8px
+  margin: 8px 0;
 }
 
 .card.suggestionCard {
-  border-radius: 4px;
   padding: 0 0 10px 0
 }
 
@@ -663,14 +661,14 @@ textarea {
   color: var(--bf-theme-header-text)
 }
 
-.card.suggestionCard .suggestion-icon-holder {
+.suggestion-icon-holder {
   display: flex;
   align-items: center;
   font-size: .75rem;
   margin-right: .75rem;
 }
 
-.card.suggestionCard .suggestion-icon-holder i {
+.suggestion-icon-holder i {
   font-size: 26px !important;
 }
 

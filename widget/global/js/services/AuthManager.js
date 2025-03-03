@@ -23,7 +23,7 @@ const authManager = {
           resolve();
         }
       });
-    })
+    });
   },
 
   getCurrentUser() {
@@ -34,7 +34,7 @@ const authManager = {
         }
         resolve();
       });
-    })
+    });
   },
 };
 

@@ -9,7 +9,7 @@ class Suggestions {
         if (e) {
           reject(e);
         } else {
-          let suggestions = results.map(result => new Suggestion({ ...result.data, id: result.id }))
+          const suggestions = results.map((result) => new Suggestion({ ...result.data, id: result.id }));
           resolve(suggestions);
         }
       });
@@ -24,15 +24,14 @@ class Suggestions {
         (err, result) => {
           if (err) reject(err);
           if (result && result.data && result.id) {
-            resolve(new Suggestion({ ...result.data, id: result.id }))
+            resolve(new Suggestion({ ...result.data, id: result.id }));
           } else {
             resolve(null);
           }
-        }
+        },
       );
     });
   }
-
 
   static insert(suggestion) {
     return new Promise((resolve, reject) => {
@@ -60,7 +59,7 @@ class Suggestions {
 
   static searchAndUpdate(id, payload) {
     return new Promise((resolve, reject) => {
-      buildfire.publicData.searchAndUpdate({ "id": id }, payload, Suggestions.TAG, (e, r) => {
+      buildfire.publicData.searchAndUpdate({ id }, payload, Suggestions.TAG, (e, r) => {
         if (e) {
           reject(e);
         } else {
@@ -81,5 +80,4 @@ class Suggestions {
       });
     });
   }
-
 }
