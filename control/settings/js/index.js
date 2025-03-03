@@ -31,6 +31,9 @@ const settingsPage = {
       deleteChatInstance: document.getElementById('deleteChatInstance'),
       chatInstanceIcon: document.getElementById('chatInstanceIcon'),
       chatInstanceTitle: document.getElementById('chatInstanceTitle'),
+      chatInstanceTypeTitle: document.getElementById('chatInstanceTypeTitle'),
+
+
 
       // radios
       postCreationAllUsers: document.getElementById('postCreationAllUsers'),
@@ -151,13 +154,21 @@ const settingsPage = {
   addEditChatInstance() {
     buildfire.pluginInstance.showDialog({}, (error, instances) => {
       if (!error && instances.length > 0) {
-        state.settings.messagingFeatureInstance = instances[0];
-        const syncMessageData = {
-          scope: 'directoryOptions',
-          directoryOptions: { messagingFeatureInstance: state.settings.messagingFeatureInstance },
-        };
+        const communityWallInstance = instances.find(instance => instance.pluginTypeId === 'b15c62f2-7a99-48dc-a37a-e42d46bd3289');
+        if (communityWallInstance) {
+          state.settings.messagingFeatureInstance = communityWallInstance;
+          const syncMessageData = {
+            scope: 'directoryOptions',
+            directoryOptions: { messagingFeatureInstance: state.settings.messagingFeatureInstance },
+          };
 
-        this.saveWithDelay(syncMessageData);
+          this.saveWithDelay(syncMessageData);
+        } else {
+          buildfire.dialog.toast({
+            message: 'Please select a Community Wall instance.',
+            type: 'warning',
+          });
+        }
       } else if (error) {
         console.error(error);
         buildfire.dialog.toast({
@@ -247,7 +258,7 @@ const settingsPage = {
       listItem.innerHTML = `<a>${item.text}</a>`;
       listItem.onclick = () => {
         if (options.settingKey.includes('inAppPurchase')) {
-          if (!item.text.startsWith('c_')) {
+          if (!item.text.startsWith('c_') && item.text !== 'Disabled') {
             buildfire.dialog.toast({
               message: 'The selected product does not appear to be consumable.',
               type: 'warning',
@@ -322,6 +333,7 @@ const settingsPage = {
       const croppedImage = buildfire.imageLib.cropImage(settings.messagingFeatureInstance.iconUrl, { size: 'xs', aspect: '1:1' });
       selectors.chatInstanceIcon.src = croppedImage;
       selectors.chatInstanceTitle.textContent = settings.messagingFeatureInstance.title;
+      selectors.chatInstanceTypeTitle.textContent = settings.messagingFeatureInstance.pluginTypeName;
     } else {
       selectors.chatInstanceRowContainer.classList.add('hidden');
       selectors.addChatInstance.classList.remove('hidden');
@@ -370,7 +382,7 @@ const settingsPage = {
           ];
           this.initDropdown({ selector: '#inAppPurchaseDropdown', items, settingKey: 'inAppPurchase.planId' });
         }).catch((err) => {
-          console.error('Error fetching in-app purchase products:', err);
+          console.error('Error fetching in-app purchase products:');
           this.initDropdown({ selector: '#inAppPurchaseDropdown', items: [{ value: '', text: 'Disabled' }], settingKey: 'inAppPurchase.planId' });
         });
 

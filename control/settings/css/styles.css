@@ -304,3 +304,7 @@ label {
   opacity: 1;
   transform: scale(1);
 }
+
+#chatInstanceTypeTitle {
+  color: var(--c-gray6);
+}

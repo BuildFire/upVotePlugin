@@ -144,7 +144,7 @@ const widgetPagesShared = {
                       console.error(err);
 
                       buildfire.dialog.toast({
-                        message: state.strings['mainScreen.somethingWentWrong'] + err,
+                        message: state.strings['mainScreen.somethingWentWrong'],
                         type: 'danger',
                       });
                       resolve(false);
@@ -184,7 +184,7 @@ const widgetPagesShared = {
           if (state.userCredits) {
             remainingVotes = Number(widgetUtils.decryptCredit(state.userCredits.credits, ENUMS.SECRET_KEY)) - 1;
           }
-          
+
           const expressionData = {
             itemTitle: updatedSuggestion.title,
             userName: widgetUtils.getUserName(authManager.currentUser),
