@@ -12,6 +12,7 @@ const suggestionDetailsPage = {
     const cloneCard = this.selectors.suggestionCardTemplate.content.cloneNode(true);
 
     const suggestionCard = cloneCard.querySelector('.suggestionCard');
+    const userImageContainer = cloneCard.querySelector('.user-image-container');
     const userImage = cloneCard.querySelector('#userImage');
     const userName = cloneCard.querySelector('#suggestionUserName');
     const suggestionCreatedOn = cloneCard.querySelector('#suggestionCreatedOn');
@@ -23,7 +24,16 @@ const suggestionDetailsPage = {
     const upvote_icon = cloneCard.querySelector('#upvote_icon');
     const suggestionCommentContainer = cloneCard.querySelector('#suggestionCommentContainer');
 
-    userImage.src = buildfire.auth.getUserPictureUrl({ userId: state.activeSuggestion.createdBy._id });
+    userImage.src = buildfire.imageLib.cropImage('https://app.buildfire.com/app/media/avatar.png', { size: 'm', aspect: '1:1' });
+    const userImageSrc = buildfire.auth.getUserPictureUrl({ userId: state.activeSuggestion.createdBy._id });
+    widgetUtils.validateImage(userImageSrc).then((isValid) => {
+      userImageContainer.classList.remove('loading-image');
+      if (isValid) {
+        const croppedImage = buildfire.imageLib.cropImage(userImageSrc, { size: "m", aspect: "1:1" });
+        userImage.src = croppedImage;
+      }
+    });
+    
     userName.textContent = widgetUtils.getUserName(state.activeSuggestion.createdBy);
     suggestionCreatedOn.textContent = widgetUtils.getSuggestionDisplayTime(state.activeSuggestion.createdOn);
 
@@ -39,7 +49,7 @@ const suggestionDetailsPage = {
       suggestionCommentContainer.classList.add('hidden');
     }
 
-    if (state.activeSuggestion && state.activeSuggestion[authManager.currentUser.userId]) {
+    if (state.activeSuggestion.upVotedBy && state.activeSuggestion.upVotedBy[authManager.currentUser.userId]) {
       upvote_icon.className = 'padding-zero margin--zero iconsTheme material-icons';
     }
 

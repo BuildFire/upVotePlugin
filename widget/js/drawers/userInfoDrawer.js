@@ -149,29 +149,34 @@ const UserModal = {
       this.toggleEmptyState = toggleEmptyState;
     }
 
-    const userImage = buildfire.auth.getUserPictureUrl({ userId: userData._id || userData.userId });
-    const croppedUserImage = buildfire.imageLib.cropImage(userImage, { size: 'm', aspect: '1:1' });
-    this.userData.image = croppedUserImage;
-
-    const userBadgesIds = this.userData.badges ? this.userData.badges.map((badge) => badge.id) : [];
-    UserDirectory.getUserBadges(userBadgesIds).then((userBadges) => {
-      this.userData.badges = userBadges.map((badge) => ({ ...badge, imageUrl: buildfire.imageLib.cropImage(badge.imageUrl, { size: 's', aspect: '1:1' }) }));
-
-      const header = this.initModalHeader();
-      const tabs = this.initModalTabs();
-
-      buildfire.spinner.hide();
-
-      const drawerOptions = {
-        header, enableFilter: false,
-      };
-      if (tabs.length === 1) {
-        drawerOptions.listItems = tabs[0].listItems;
+    const userImageSrc = buildfire.auth.getUserPictureUrl({ userId: userData._id || userData.userId });
+    widgetUtils.validateImage(userImageSrc).then((isValid) => {
+      if (isValid) {
+        this.userData.image = buildfire.imageLib.cropImage(userImageSrc, { size: 'm', aspect: '1:1' });;
       } else {
-        drawerOptions.tabs = tabs;
+        this.userData.image = buildfire.imageLib.cropImage('https://app.buildfire.com/app/media/avatar.png', { size: 'm', aspect: '1:1' });
       }
 
-      buildfire.components.drawer.open(drawerOptions, this.handleModalSelection.bind(this));
+      const userBadgesIds = this.userData.badges ? this.userData.badges.map((badge) => badge.id) : [];
+      UserDirectory.getUserBadges(userBadgesIds).then((userBadges) => {
+        this.userData.badges = userBadges.map((badge) => ({ ...badge, imageUrl: buildfire.imageLib.cropImage(badge.imageUrl, { size: 's', aspect: '1:1' }) }));
+
+        const header = this.initModalHeader();
+        const tabs = this.initModalTabs();
+
+        buildfire.spinner.hide();
+
+        const drawerOptions = {
+          header, enableFilter: false,
+        };
+        if (tabs.length === 1) {
+          drawerOptions.listItems = tabs[0].listItems;
+        } else {
+          drawerOptions.tabs = tabs;
+        }
+
+        buildfire.components.drawer.open(drawerOptions, this.handleModalSelection.bind(this));
+      });
     });
   },
 };

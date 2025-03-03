@@ -300,7 +300,7 @@ const widgetPagesShared = {
       title: suggestion.title,
       queryString,
       headerContentHtml: widgetUtils.buildHeaderContentHtml(suggestion.title, suggestion.suggestion),
-      pluginTypeOrder: ['premium_social', 'social', 'community'],
+      pluginTypeOrder: ['community', 'premium_social', 'social'],
     }, () => { });
   },
 };
