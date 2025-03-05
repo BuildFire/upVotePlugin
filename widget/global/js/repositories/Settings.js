@@ -21,7 +21,7 @@ class Settings {
         if (err) {
           reject(err);
         } else {
-          resolve();
+          resolve(new Setting(res.data));
         }
       });
     });

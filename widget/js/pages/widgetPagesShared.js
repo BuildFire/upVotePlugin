@@ -6,29 +6,31 @@ const widgetPagesShared = {
     if (hasPermission('updateStatus')) {
       updateStatusDrawer.init(suggestion, (err, res) => {
         const detailsPageContainer = document.getElementById('suggestionPage');
-        const detailsStatus = detailsPageContainer.querySelector('#suggestionStatus');
-        const detailsVoteIcon = detailsPageContainer.querySelector('#upvote_icon');
+        const detailsStatus = detailsPageContainer?.querySelector('#suggestionStatus');
+        const detailsVoteIcon = detailsPageContainer?.querySelector('#upvote_icon');
 
         const suggestionContainer = document.getElementById(`suggestion-${suggestion.id}`);
-        const suggestionStatus = suggestionContainer.querySelector('#suggestionStatus');
-        const upvote_icon = suggestionContainer.querySelector('#upvote_icon');
+        const suggestionStatus = suggestionContainer?.querySelector('#suggestionStatus');
+        const upvote_icon = suggestionContainer?.querySelector('#upvote_icon');
 
         if (detailsStatus) detailsStatus.classList.add('disabled');
-        suggestionStatus.classList.add('disabled');
+        if (suggestionStatus) suggestionStatus.classList.add('disabled');
         widgetController.updateSuggestionStatus(suggestion.id, res.id).then((updatedSuggestion) => {
-          suggestionStatus.classList.remove('disabled');
+          if (suggestionStatus) suggestionStatus.classList.remove('disabled');
           if (updatedSuggestion.status === SUGGESTION_STATUS.COMPLETED) {
-            upvote_icon.classList.add('disabled');
+            if (upvote_icon) upvote_icon.classList.add('disabled');
             if (detailsVoteIcon) detailsVoteIcon.classList.add('disabled');
           } else {
-            upvote_icon.classList.remove('disabled');
+            if (upvote_icon) upvote_icon.classList.remove('disabled');
             if (detailsVoteIcon) detailsVoteIcon.classList.remove('disabled');
           }
 
           const suggestionStatusData = widgetUtils.getSuggestionStatusData(updatedSuggestion);
 
-          suggestionStatus.innerHTML = `<span class="margin--0 ${suggestionStatusData.textColorClass}" >${suggestionStatusData.statusText}</span>`;
-          suggestionStatus.className = `pill shrink--0 ${suggestionStatusData.statusContainerClass}`;
+          if (suggestionStatus) {
+            suggestionStatus.innerHTML = `<span class="margin--0 ${suggestionStatusData.textColorClass}" >${suggestionStatusData.statusText}</span>`;
+            suggestionStatus.className = `pill shrink--0 ${suggestionStatusData.statusContainerClass}`;
+          }
           if (detailsStatus) {
             detailsStatus.innerHTML = `<span class="margin--0 ${suggestionStatusData.textColorClass}" >${suggestionStatusData.statusText}</span>`;
             detailsStatus.className = `pill shrink--0 ${suggestionStatusData.statusContainerClass}`;
@@ -48,17 +50,17 @@ const widgetPagesShared = {
             if (!voterIds || !voterIds.length) return;
 
             if (updatedSuggestion.status === SUGGESTION_STATUS.BACKLOG) {
-              upvote_icon.classList.remove('disabled');
+              if (upvote_icon) upvote_icon.classList.remove('disabled');
               if (detailsVoteIcon) detailsVoteIcon.classList.remove('disabled');
 
               PushNotification.sendToCustomUsers(state.strings['notifications.backlogItemTitle'], backlogItemBody, updatedSuggestion.id, voterIds);
             } else if (updatedSuggestion.status === SUGGESTION_STATUS.INPROGRESS) {
-              upvote_icon.classList.remove('disabled');
+              if (upvote_icon) upvote_icon.classList.remove('disabled');
               if (detailsVoteIcon) detailsVoteIcon.classList.remove('disabled');
 
               PushNotification.sendToCustomUsers(state.strings['notifications.inProgressItemTitle'], inProgressItemBody, updatedSuggestion.id, voterIds);
             } else {
-              upvote_icon.classList.add('disabled');
+              if (upvote_icon) upvote_icon.classList.add('disabled');
               if (detailsVoteIcon) detailsVoteIcon.classList.add('disabled');
 
               buildfire.input.showTextDialog({
@@ -77,7 +79,7 @@ const widgetPagesShared = {
           });
         }).catch((err) => {
           console.error(err);
-          suggestionStatus.classList.remove('disabled');
+          if (suggestionStatus) suggestionStatus.classList.remove('disabled');
           if (detailsStatus) detailsStatus.classList.remove('disabled');
         });
       });
@@ -182,18 +184,18 @@ const widgetPagesShared = {
   },
   _handleVote(suggestion) {
     const detailsPageContainer = document.getElementById('suggestionPage');
-    const detailsVoteIcon = detailsPageContainer.querySelector('#upvote_icon');
-    const detailsVotesCount = detailsPageContainer.querySelector('#suggestionVotesCount');
+    const detailsVoteIcon = detailsPageContainer?.querySelector('#upvote_icon');
+    const detailsVotesCount = detailsPageContainer?.querySelector('#suggestionVotesCount');
 
     const suggestionContainer = document.getElementById(`suggestion-${suggestion.id}`);
-    const upvote_icon = suggestionContainer.querySelector('#upvote_icon');
-    const suggestionVotesCount = suggestionContainer.querySelector('#suggestionVotesCount');
+    const upvote_icon = suggestionContainer?.querySelector('#upvote_icon');
+    const suggestionVotesCount = suggestionContainer?.querySelector('#suggestionVotesCount');
 
     this._validateCurrentUserCredit().then((hasCredits) => {
       if (hasCredits) {
         widgetController.handleSuggestionVote(suggestion).then((updatedSuggestion) => {
-          upvote_icon.className = 'padding-zero margin--zero iconsTheme material-icons';
-          suggestionVotesCount.innerHTML = `<span class="margin--0 iconsTheme">${Object.keys(updatedSuggestion.upVotedBy).length}</span>`;
+          if (upvote_icon) upvote_icon.className = 'padding-zero margin--zero iconsTheme material-icons';
+          if (suggestionVotesCount) suggestionVotesCount.innerHTML = `<span class="margin--0 iconsTheme">${Object.keys(updatedSuggestion.upVotedBy).length}</span>`;
 
           if (detailsVoteIcon) detailsVoteIcon.className = 'padding-zero margin--zero iconsTheme material-icons';
           if (detailsVotesCount) detailsVotesCount.innerHTML = `<span class="margin--0 iconsTheme">${Object.keys(updatedSuggestion.upVotedBy).length}</span>`;
@@ -221,27 +223,27 @@ const widgetPagesShared = {
           }
         }).catch((err) => {
           console.error(err);
-          upvote_icon.classList.remove('disabled');
+          if (upvote_icon) upvote_icon.classList.remove('disabled');
           if (detailsVoteIcon) detailsVoteIcon.classList.remove('disabled');
         });
       } else {
-        upvote_icon.classList.remove('disabled');
+        if (upvote_icon) upvote_icon.classList.remove('disabled');
         if (detailsVoteIcon) detailsVoteIcon.classList.remove('disabled');
       }
     }).catch((err) => {
       console.error(err);
-      upvote_icon.classList.remove('disabled');
+      if (upvote_icon) upvote_icon.classList.remove('disabled');
       if (detailsVoteIcon) detailsVoteIcon.classList.remove('disabled');
     });
   },
   _handleUnVote(suggestion) {
     const detailsPageContainer = document.getElementById('suggestionPage');
-    const detailsVoteIcon = detailsPageContainer.querySelector('#upvote_icon');
-    const detailsVotesCount = detailsPageContainer.querySelector('#suggestionVotesCount');
+    const detailsVoteIcon = detailsPageContainer?.querySelector('#upvote_icon');
+    const detailsVotesCount = detailsPageContainer?.querySelector('#suggestionVotesCount');
 
     const suggestionContainer = document.getElementById(`suggestion-${suggestion.id}`);
-    const upvote_icon = suggestionContainer.querySelector('#upvote_icon');
-    const suggestionVotesCount = suggestionContainer.querySelector('#suggestionVotesCount');
+    const upvote_icon = suggestionContainer?.querySelector('#upvote_icon');
+    const suggestionVotesCount = suggestionContainer?.querySelector('#suggestionVotesCount');
 
     this._confirmUserAction({
       title: state.strings['unvoteMessage.title'] || 'Remove Vote',
@@ -254,25 +256,23 @@ const widgetPagesShared = {
     }).then((isConfirmed) => {
       if (isConfirmed) {
         widgetController.handleSuggestionUnVote(suggestion).then((updatedSuggestion) => {
-          upvote_icon.className = 'padding-zero margin--zero iconsTheme material-icons-outlined';
-          suggestionVotesCount.innerHTML = `<span class="margin--0 iconsTheme">${Object.keys(updatedSuggestion.upVotedBy).length}</span>`;
+          if (upvote_icon) upvote_icon.className = 'padding-zero margin--zero iconsTheme material-icons-outlined';
+          if (suggestionVotesCount) suggestionVotesCount.innerHTML = `<span class="margin--0 iconsTheme">${Object.keys(updatedSuggestion.upVotedBy).length}</span>`;
 
           if (detailsVoteIcon) detailsVoteIcon.className = 'padding-zero margin--zero iconsTheme material-icons-outlined';
           if (detailsVotesCount) detailsVotesCount.innerHTML = `<span class="margin--0 iconsTheme">${Object.keys(updatedSuggestion.upVotedBy).length}</span>`;
         }).catch((err) => {
           console.error(err);
-          upvote_icon.classList.remove('disabled');
+          if (upvote_icon) upvote_icon.classList.remove('disabled');
           if (detailsVoteIcon) detailsVoteIcon.classList.remove('disabled');
         });
       } else {
-        upvote_icon.classList.remove('disabled');
+        if (upvote_icon) upvote_icon.classList.remove('disabled');
         if (detailsVoteIcon) detailsVoteIcon.classList.remove('disabled');
       }
     });
   },
   voteToSuggestion(suggestion) {
-    if (suggestion.status === SUGGESTION_STATUS.COMPLETED) return;
-
     if (!authManager.currentUser) {
       return authManager.enforceLogin().then(() => {
         if (authManager.currentUser && suggestion.upVotedBy[authManager.currentUser.userId]) return;
@@ -280,12 +280,12 @@ const widgetPagesShared = {
       });
     }
     const detailsPageContainer = document.getElementById('suggestionPage');
-    const detailsVoteIcon = detailsPageContainer.querySelector('#upvote_icon');
+    const detailsVoteIcon = detailsPageContainer?.querySelector('#upvote_icon');
 
     const suggestionContainer = document.getElementById(`suggestion-${suggestion.id}`);
-    const upvote_icon = suggestionContainer.querySelector('#upvote_icon');
+    const upvote_icon = suggestionContainer?.querySelector('#upvote_icon');
 
-    upvote_icon.classList.add('disabled');
+    if (upvote_icon) upvote_icon.classList.add('disabled');
     if (detailsVoteIcon) detailsVoteIcon.classList.add('disabled');
     widgetController.isSuggestionVoted(suggestion).then((isVoted) => {
       if (isVoted) {
@@ -332,7 +332,7 @@ const widgetPagesShared = {
     state.suggestionsList.forEach(suggestion => {
       if (authManager.currentUser && suggestion.upVotedBy && suggestion.upVotedBy[authManager.currentUser.userId]) {
         const suggestionContainer = document.getElementById(`suggestion-${suggestion.id}`);
-        const upvote_icon = suggestionContainer.querySelector('#upvote_icon');
+        const upvote_icon = suggestionContainer?.querySelector('#upvote_icon');
 
         if (upvote_icon) upvote_icon.className = 'padding-zero margin--zero iconsTheme material-icons';
       }
@@ -340,8 +340,19 @@ const widgetPagesShared = {
 
     if (state.activeSuggestion && state.activeSuggestion.upVotedBy && state.activeSuggestion.upVotedBy[authManager.currentUser.userId]) {
       const detailsPageContainer = document.getElementById('suggestionPage');
-      const detailsVoteIcon = detailsPageContainer.querySelector('#upvote_icon');
+      const detailsVoteIcon = detailsPageContainer?.querySelector('#upvote_icon');
       if (detailsVoteIcon) detailsVoteIcon.className = 'padding-zero margin--zero iconsTheme material-icons';
+    }
+  },
+  validateSuggestionImage(suggestionDetailsContainer) {
+    const image = suggestionDetailsContainer.querySelector('img');
+    if (image) {
+      image.onload = () => {
+        image.classList.add('img-loaded');
+      };
+      image.onerror = () => {
+        image.classList.add('hidden');
+      };
     }
   },
 };

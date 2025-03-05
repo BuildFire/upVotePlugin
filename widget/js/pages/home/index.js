@@ -70,6 +70,7 @@ const homePage = {
 
     suggestionTitle.innerHTML = suggestion.title;
     suggestionBodyText.innerHTML = suggestion.suggestion;
+    widgetPagesShared.validateSuggestionImage(suggestionBodyText);
     suggestionVotesCount.innerHTML = `<span class="margin--0 iconsTheme">${Object.keys(suggestion.upVotedBy).length}</span>`;
 
     if (!state.settings.enableComments) {

@@ -68,7 +68,7 @@ const UserModal = {
       content: badgesContent,
     };
     const userActionTab = {
-      text: '<span class="glyphicon glyphicon-user"></span>',
+      text: '<span class="material-icons">person</span>',
       listItems: [],
     };
 

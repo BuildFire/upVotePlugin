@@ -1,4 +1,3 @@
-
 /* Important Note
  * Any change in this file will not be backward compatible with apps that have css layouts overrides
  * Make sure to test the changes in the app before releasing
@@ -424,6 +423,29 @@ textarea {
 
 .card.suggestionCard:last-of-type {
   margin-bottom: 6rem;
+}
+
+.suggestionCard img {
+  margin-top: 5px;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+}
+
+.suggestionCard img:not(.img-loaded) {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+  object-fit: cover;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 .card__header {

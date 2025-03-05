@@ -49,6 +49,7 @@ const suggestionDetailsPage = {
 
     suggestionTitle.innerHTML = state.activeSuggestion.title;
     suggestionBodyText.innerHTML = state.activeSuggestion.suggestion;
+    widgetPagesShared.validateSuggestionImage(suggestionBodyText);
     suggestionVotesCount.innerHTML = `<span class="margin--0 iconsTheme">${Object.keys(state.activeSuggestion.upVotedBy).length}</span>`;
 
     if (!state.settings.enableComments) {
