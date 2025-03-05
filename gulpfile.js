@@ -111,12 +111,13 @@ gulp.task('images', () => gulp.src(['**/images/**'], { base: '.' })
 
 gulp.task('assets', () => gulp.src(['control/assets/**/*']).pipe(gulp.dest(`${destinationFolder}/control/assets`)));
 
-gulp.task('fonts', () => gulp.src('control/orders/css/fonts/**/*.{eot,svg,ttf,woff,woff2}').pipe(gulp.dest(`${destinationFolder}/control/orders/css/fonts`)));
+gulp.task('copyJS', () => gulp.src(['control/tests/spec/*', 'control/tests/Jasmine-Project/**/*'], { base: '.' })
+  .pipe(gulp.dest(destinationFolder)));
 
 gulp.task('copyCSS', () => gulp.src('widget/layouts/layout1.css', { base: '.' })
   .pipe(gulp.dest(destinationFolder)));
 
-const buildTasksToRun = ['controlHTML', 'widgetHTML', 'resources', 'images', 'sharedJS', 'assets', 'fonts', 'copyCSS'];
+const buildTasksToRun = ['controlHTML', 'widgetHTML', 'resources', 'images', 'sharedJS', 'assets', 'copyCSS', 'copyJS'];
 cssTasks.forEach((task) => { buildTasksToRun.push(task.name); });
 jsTasks.forEach((task) => { buildTasksToRun.push(task.name); });
 
