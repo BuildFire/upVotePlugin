@@ -68,7 +68,7 @@
         </div>
       </div>
     </div>
-    <div class="row margin-bottom-sixteen hidden" id="directoryBadgesRow">
+    <div class="row margin-bottom-sixteen">
       <div class="item clearfix row flex-center">
         <label class="tooltip-container col-md-4">Show Badges from Directory
           <span class="btn-info-icon btn-primary">
@@ -78,13 +78,13 @@
             </span>
           </span>
         </label>
-        <div class="main col-md-8 button-switch padding-right-zero">
+        <div id="directoryBadgesCheckboxContainer" class="main col-md-8 button-switch padding-right-zero">
           <input id="enableDirectoryBadges" type="checkbox" />
           <label for="enableDirectoryBadges" class="label-success"></label>
         </div>
       </div>
     </div>
-    <div class="row margin-bottom-sixteen" id="chatMessagingRow">
+    <div class="row margin-bottom-sixteen">
       <div class="item clearfix row flex flex-align-start">
         <label class="tooltip-container col-md-4">Allow Private Messaging
           <span class="btn-info-icon btn-primary">
@@ -94,10 +94,10 @@
             </span>
           </span>
         </label>
-        <div class="main col-md-8 padding-right-zero padding-left-zero">
+        <div id="chatMessagingCheckboxContainer" class="main col-md-8 padding-right-zero padding-left-zero">
           <button id="addChatInstance" class="btn btn-info pull-right">Select Feature</button>
           <div id="chatInstanceRowContainer"
-            class="flex-auto flex border-grey border-radius-four padding-bottom-five padding-top-five padding-left-ten padding-right-ten hidden">
+            class="flex-auto flex border-grey border-radius-four padding-bottom-five padding-top-five padding-left-ten padding-right-ten">
             <div class="flex flex-auto flex-align-center">
               <img id="chatInstanceIcon" class="border-radius-four chat-instance-icon" src="">
               <div class="blackTheme chat-instance-title margin-bottom-zero margin-top-zero">
@@ -270,7 +270,7 @@
         </span>
       </div>
     </div>
-    <div class="flex flex-align-start row margin-bottom-sixteen hidden" id="votesNumberContainer">
+    <div class="flex flex-align-start row margin-bottom-sixteen">
       <label class="tooltip-container col-md-4"><span class="required-field">Votes Per Purchase</span>
         <span class="btn-info-icon btn-primary">
           <span class="cp-tooltip">
@@ -278,7 +278,7 @@
           </span>
         </span>
       </label>
-      <div class="main col-md-8 pull-right padding-lr-6">
+      <div id="votesNumberContainer" class="main col-md-8 pull-right padding-lr-6">
         <input class="form-control" type="number" id="votesNumberInput" value="1">
         <span id="votesNumberErrorMessage" class="margin-left-ten small text-danger hidden">This field is
           required</span>

@@ -18,8 +18,8 @@ const settingsPage = {
 
   initSelectors() {
     this.selectors = {
-      directoryBadgesRow: document.getElementById('directoryBadgesRow'),
-      chatMessagingRow: document.getElementById('chatMessagingRow'),
+      directoryBadgesCheckboxContainer: document.getElementById('directoryBadgesCheckboxContainer'),
+      chatMessagingCheckboxContainer: document.getElementById('chatMessagingCheckboxContainer'),
 
       // toggles
       enableComments: document.getElementById('enableComments'),
@@ -84,6 +84,11 @@ const settingsPage = {
         scope: 'directoryOptions',
         directoryOptions: { enableUserProfile: event.target.checked },
       };
+
+      if (!state.settings.enableUserProfile) {
+        state.settings.messagingFeatureInstance = {};
+        state.settings.enableDirectoryBadges = false;
+      }
 
       this.saveWithDelay(syncMessageData);
     };
@@ -318,10 +323,11 @@ const settingsPage = {
       selectors.pushNotificationUserTags.classList.add('hidden');
     }
 
-    if (settings.inAppPurchase.enabled && settings.inAppPurchase.planId) {
-      selectors.votesNumberContainer.classList.remove('hidden');
+    const activePurchaseProduct = state.inAppPurchaseProduct.find(product => product.value === settings.inAppPurchase.planId);
+    if (settings.inAppPurchase.enabled && settings.inAppPurchase.planId && activePurchaseProduct) {
+      selectors.votesNumberContainer.classList.remove('disabled');
     } else {
-      selectors.votesNumberContainer.classList.add('hidden');
+      selectors.votesNumberContainer.classList.add('disabled');
     }
 
     if (settings.messagingFeatureInstance && settings.messagingFeatureInstance.instanceId) {
@@ -338,11 +344,11 @@ const settingsPage = {
     }
 
     if (settings.enableUserProfile) {
-      selectors.directoryBadgesRow.classList.remove('hidden');
-      selectors.chatMessagingRow.classList.remove('hidden');
+      selectors.directoryBadgesCheckboxContainer.classList.remove('disabled');
+      selectors.chatMessagingCheckboxContainer.classList.remove('disabled');
     } else {
-      selectors.directoryBadgesRow.classList.add('hidden');
-      selectors.chatMessagingRow.classList.add('hidden');
+      selectors.directoryBadgesCheckboxContainer.classList.add('disabled');
+      selectors.chatMessagingCheckboxContainer.classList.add('disabled');
     }
   },
 
@@ -374,11 +380,12 @@ const settingsPage = {
 
         this.initDropdown({ selector: '#hideCompletedDropdown', items: this.hideCompletedItemsList, settingKey: 'hideCompletedItems' });
         settingsController.getInAppPurchaseProducts().then((products) => {
-          const items = [
-            { value: '', text: 'Disabled' },
-            ...products.map((product) => ({ value: product.id, text: product.name })),
-          ];
+          const formattedProducts = products.map((product) => ({ value: product.id, text: product.name }));
+          const items = [{ value: '', text: 'Disabled' }, ...formattedProducts];
+          state.inAppPurchaseProduct = [...formattedProducts];
           this.initDropdown({ selector: '#inAppPurchaseDropdown', items, settingKey: 'inAppPurchase.planId' });
+
+          this.updateUI();
         }).catch((err) => {
           console.error('Error fetching in-app purchase products:');
           this.initDropdown({ selector: '#inAppPurchaseDropdown', items: [{ value: '', text: 'Disabled' }], settingKey: 'inAppPurchase.planId' });
