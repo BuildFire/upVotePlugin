@@ -6,7 +6,6 @@ describe('Suggestions', () => {
     createdOn: new Date(),
     modifiedOn: new Date(),
     pushNotificationTags: null,
-    upVoteCount: 5,
     upVotedBy: null,
     status: SUGGESTION_STATUS.BACKLOG,
   };
@@ -15,15 +14,14 @@ describe('Suggestions', () => {
       const suggestion = new Suggestion(result);
       testSuggestion = suggestion;
       expect(suggestion.id).toBeDefined();
-      expect(suggestion.upVoteCount).toEqual(5);
       done();
     }).catch((error) => fail(error));
   });
 
   it('Update Existing Suggestion', (done) => {
-    Suggestions.update(testSuggestion.id, { ...testSuggestion, upVoteCount: 2 })
+    Suggestions.update(testSuggestion.id, { ...testSuggestion, title: 'updated title' })
       .then((result) => {
-        expect(result.upVoteCount).toEqual(2);
+        expect(result.title).toEqual('updated title');
         done();
       })
       .catch((error) => fail(error));

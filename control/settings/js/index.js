@@ -18,13 +18,11 @@ const settingsPage = {
 
   initSelectors() {
     this.selectors = {
-      directoryBadgesCheckboxContainer: document.getElementById('directoryBadgesCheckboxContainer'),
       chatMessagingCheckboxContainer: document.getElementById('chatMessagingCheckboxContainer'),
 
       // toggles
       enableComments: document.getElementById('enableComments'),
       enableUserProfile: document.getElementById('enableUserProfile'),
-      enableDirectoryBadges: document.getElementById('enableDirectoryBadges'),
       addChatInstance: document.getElementById('addChatInstance'),
       chatInstanceRowContainer: document.getElementById('chatInstanceRowContainer'),
       editChatInstance: document.getElementById('editChatInstance'),
@@ -87,17 +85,7 @@ const settingsPage = {
 
       if (!state.settings.enableUserProfile) {
         state.settings.messagingFeatureInstance = {};
-        state.settings.enableDirectoryBadges = false;
       }
-
-      this.saveWithDelay(syncMessageData);
-    };
-    this.selectors.enableDirectoryBadges.onchange = (event) => {
-      state.settings.enableDirectoryBadges = event.target.checked;
-      const syncMessageData = {
-        scope: 'directoryOptions',
-        directoryOptions: { enableDirectoryBadges: event.target.checked },
-      };
 
       this.saveWithDelay(syncMessageData);
     };
@@ -287,7 +275,6 @@ const settingsPage = {
 
     // update toggles
     selectors.enableComments.checked = settings.enableComments;
-    selectors.enableDirectoryBadges.checked = settings.enableDirectoryBadges;
     selectors.enableUserProfile.checked = settings.enableUserProfile;
 
     // update radios
@@ -344,10 +331,8 @@ const settingsPage = {
     }
 
     if (settings.enableUserProfile) {
-      selectors.directoryBadgesCheckboxContainer.classList.remove('disabled');
       selectors.chatMessagingCheckboxContainer.classList.remove('disabled');
     } else {
-      selectors.directoryBadgesCheckboxContainer.classList.add('disabled');
       selectors.chatMessagingCheckboxContainer.classList.add('disabled');
     }
   },

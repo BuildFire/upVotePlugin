@@ -118,14 +118,6 @@
                     "toolTip": "This message will only be shown if the 'Show Upvoter's Profile Details' setting and the corresponding subsetting are enabled.",
                     "placeholder": "Message User"
                 },
-                "noBadgesYet": {
-                    "title": "No Badges Yet",
-                    "defaultValue": "No Badges Yet",
-                    "inputType": "text",
-                    "maxLength": 20,
-                    "toolTip": "This message will only be shown if the 'Show Upvoter's Profile Details' setting and the corresponding subsetting are enabled.",
-                    "placeholder": "No Badges Yet"
-                },
                 "day": {
                     "title": "Day",
                     "defaultValue": "day",

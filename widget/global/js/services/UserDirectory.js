@@ -13,7 +13,7 @@ class UserDirectory {
         '_buildfire.index.string1': userId,
       };
 
-      buildfire.appData.search({ filter }, '$$userDirectory', (err, res) => {
+      buildfire.appData.search({ filter }, UserDirectory.DirectoryTag, (err, res) => {
         if (err) reject(err);
         else {
           resolve(res[0] ? res[0].data : null);
@@ -28,7 +28,7 @@ class UserDirectory {
         '_buildfire.index.string1': { $in: badgesIds },
       };
 
-      buildfire.appData.search({ filter }, '$$badges', (err, res) => {
+      buildfire.appData.search({ filter }, UserDirectory.BadgesTag, (err, res) => {
         if (err) reject(err);
         else {
           resolve(res.map((badge) => badge.data));

@@ -218,14 +218,8 @@ label {
 }
 
 /* tooltip */
-.tooltip-container {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-}
-
 .tooltip-container .btn-info-icon {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   margin-left: 8px;
