@@ -294,6 +294,8 @@ const settingsPage = {
     selectors.oldestSorting.checked = settings.defaultItemSorting === ENUMS.SUGGESTIONS_SORTING.OLDEST;
     selectors.mostVotesSorting.checked = settings.defaultItemSorting === ENUMS.SUGGESTIONS_SORTING.MOST_VOTES;
 
+    this.selectors.votesNumberInput.value = state.settings.inAppPurchase.votesPerPurchase;
+
     if (settings.permissions.createPosts.value === ENUMS.USERS_PERMISSIONS.USERS_WITH) {
       selectors.postCreationTagsInput.classList.remove('hidden');
     } else {

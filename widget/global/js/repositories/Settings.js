@@ -37,7 +37,7 @@ class Settings {
             const introduction = res.text
             const navigateToCwByDefault = !Object.keys(res.data).length || res.navigateToCwByDefault;
 
-            let pushNotificationValue, statusUpdateValue;
+            let pushNotificationValue, statusUpdateValue, defaultItemSorting;
             if (result.statusUpdateUsersSegment === 1) {
               statusUpdateValue = ENUMS.USERS_PERMISSIONS.ALL_USERS
             } else if (result.statusUpdateUsersSegment === 2) {
@@ -54,8 +54,16 @@ class Settings {
               pushNotificationValue = ENUMS.USERS_PERMISSIONS.USERS_WITH
             }
 
+            if (result.defaultItemSorting === 1) {
+              defaultItemSorting = ENUMS.SUGGESTIONS_SORTING.NEWEST;
+            } else if (result.defaultItemSorting === 2) {
+              defaultItemSorting = ENUMS.SUGGESTIONS_SORTING.OLDEST;
+            } else {
+              defaultItemSorting = ENUMS.SUGGESTIONS_SORTING.MOST_VOTES;
+            }
+
             const updatedSettings = {
-              ...result, introduction, navigateToCwByDefault,
+              ...result, introduction, navigateToCwByDefault, defaultItemSorting,
               inAppPurchase: {
                 enabled: !!(result.selectedPurchaseProductId && result.votesCountPerPurchase),
                 planId: result.selectedPurchaseProductId,
