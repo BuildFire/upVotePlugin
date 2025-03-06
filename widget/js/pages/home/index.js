@@ -222,10 +222,24 @@ const homePage = {
       this.printSuggestionCard(suggestion);
     });
 
+    if (!state.pluginInitialized && suggestions.length) {
+      this.destroySkeleton();
+      this.initSuggestionsFab();
+      this.selectors.wysiwygContainer.innerHTML = state.settings.introduction;
+      state.pluginInitialized = true;
+    }
+
     if (suggestions.length < state.pageSize) {
       if (state.currentStatusSearch === SUGGESTION_STATUS.COMPLETED) {
         state.isAllSuggestionFetched = true;
-        if (!state.suggestionsList.length) this.printEmptyState();
+        if (!state.suggestionsList.length) {
+          this.destroySkeleton();
+          this.initSuggestionsFab();
+          this.selectors.wysiwygContainer.innerHTML = state.settings.introduction;
+          state.pluginInitialized = true;
+
+          this.printEmptyState();
+        }
       } else if (state.currentStatusSearch === SUGGESTION_STATUS.INPROGRESS) {
         state.currentStatusSearch = SUGGESTION_STATUS.COMPLETED;
         state.page = 0;
@@ -250,16 +264,13 @@ const homePage = {
 
   init() {
     this.initSelectors();
+    this.initListeners();
 
     widgetController.getSuggestions().then((suggestions) => {
       setTimeout(() => {
-        this.destroySkeleton();
 
         this.handleSuggestionPage(suggestions);
-        this.initListeners();
 
-        this.initSuggestionsFab();
-        this.selectors.wysiwygContainer.innerHTML = state.settings.introduction;
       }, 500);
     }).catch((err) => {
       console.error(err);

@@ -57,4 +57,5 @@ const state = {
   validUserImages: {},
   suggestionsList: [],
   updatedUsersData: [],
+  pluginInitialized: false,
 };
