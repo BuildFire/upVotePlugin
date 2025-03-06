@@ -70,6 +70,8 @@ const widgetController = {
             { status: SUGGESTION_STATUS.COMPLETED },
             { modifiedOn: { $gte: startDate } }
           ];
+        } else {
+          $match.status = { $eq: currentStatusSearch };
         }
       } else {
         $match.status = { $eq: currentStatusSearch };
