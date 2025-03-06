@@ -104,7 +104,7 @@ const suggestionDetailsPage = {
 
     this.selectors.detailsContainer.classList.remove('hidden');
 
-    Suggestions.getById(suggestion.id).then((updatedSuggestion) => {
+    widgetController.getSuggestionById(suggestion.id).then((updatedSuggestion) => {
       setTimeout(() => {
         this.destroySkeleton();
         this.selectors.detailsContainer.innerHTML = '';

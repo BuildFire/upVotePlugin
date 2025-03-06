@@ -43,7 +43,7 @@ const updateStatusDrawer = {
   },
 
   init(suggestion, callback) {
-    Suggestions.getById(suggestion.id).then((updatedSuggestion) => {
+    widgetController.getSuggestionById(suggestion.id).then((updatedSuggestion) => {
       this.activeSuggestion = updatedSuggestion;
       const listItems = this.prepareOptions();
 

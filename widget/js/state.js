@@ -16,7 +16,6 @@ const state = {
     'mainScreen.hours': '',
     'mainScreen.min': '',
     'mainScreen.unknownUser': '',
-    'mainScreen.noBadgesYet': '',
     'mainScreen.messageUser': '',
     'mainScreen.viewProfile': '',
 
@@ -52,8 +51,10 @@ const state = {
   settings: new Setting(),
   page: 0,
   pageSize: 50,
+  currentStatusSearch: SUGGESTION_STATUS.BACKLOG,
   fetching: false,
   isAllSuggestionFetched: false,
   validUserImages: {},
   suggestionsList: [],
+  updatedUsersData: [],
 };

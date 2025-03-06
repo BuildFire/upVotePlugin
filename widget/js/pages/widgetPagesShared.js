@@ -299,7 +299,7 @@ const widgetPagesShared = {
     votersDrawer.init(suggestion, (err, selectedUser) => {
       if (state.settings.enableUserProfile) {
         buildfire.components.drawer.closeDrawer();
-        if (state.settings.enableDirectoryBadges || (state.settings.messagingFeatureInstance && state.settings.messagingFeatureInstance.instanceId)) {
+        if (state.settings.messagingFeatureInstance && state.settings.messagingFeatureInstance.instanceId && authManager.currentUser && selectedUser.userId !== authManager.currentUser.userId) {
           // show new drawer
           UserDirectory.getUserDirectoryRecord(selectedUser.userId).then((userDirectoryData) => {
             UserModal.init(userDirectoryData || suggestion.upVotedBy[selectedUser.userId].user);

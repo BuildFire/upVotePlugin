@@ -17,10 +17,7 @@ const homePage = {
 
         state.fetching = true;
         widgetController.getSuggestions().then((suggestions) => {
-          if (suggestions.length < state.pageSize) state.isAllSuggestionFetched = true;
-
-          this.renderSuggestionsCards(suggestions);
-          state.fetching = false;
+          this.handleSuggestionPage(suggestions)
         }).catch((err) => {
           console.error(err);
         });
@@ -100,12 +97,6 @@ const homePage = {
     } else {
       this.selectors.homePageContainer.appendChild(cloneCard);
     }
-  },
-
-  renderSuggestionsCards(suggestionList) {
-    suggestionList.forEach((suggestion) => {
-      this.printSuggestionCard(suggestion);
-    });
   },
 
   handleCreateNewSuggestion() {
@@ -225,6 +216,38 @@ const homePage = {
     }
   },
 
+  handleSuggestionPage(suggestions) {
+    state.fetching = false;
+    suggestions.forEach((suggestion) => {
+      this.printSuggestionCard(suggestion);
+    });
+
+    if (suggestions.length < state.pageSize) {
+      if (state.currentStatusSearch === SUGGESTION_STATUS.COMPLETED) {
+        state.isAllSuggestionFetched = true;
+        if (!state.suggestionsList.length) this.printEmptyState();
+      } else if (state.currentStatusSearch === SUGGESTION_STATUS.INPROGRESS) {
+        state.currentStatusSearch = SUGGESTION_STATUS.COMPLETED;
+        state.page = 0;
+
+        widgetController.getSuggestions().then((suggestions) => {
+          this.handleSuggestionPage(suggestions)
+        }).catch((err) => {
+          console.error(err);
+        });
+      } else {
+        state.currentStatusSearch = SUGGESTION_STATUS.INPROGRESS;
+        state.page = 0;
+
+        widgetController.getSuggestions().then((suggestions) => {
+          this.handleSuggestionPage(suggestions)
+        }).catch((err) => {
+          console.error(err);
+        });
+      }
+    }
+  },
+
   init() {
     this.initSelectors();
 
@@ -232,11 +255,7 @@ const homePage = {
       setTimeout(() => {
         this.destroySkeleton();
 
-        if (suggestions.length === 0) {
-          this.printEmptyState();
-        } else {
-          this.renderSuggestionsCards(suggestions);
-        }
+        this.handleSuggestionPage(suggestions);
         this.initListeners();
 
         this.initSuggestionsFab();

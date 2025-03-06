@@ -16,6 +16,19 @@ class Suggestions {
     });
   }
 
+  static aggregate(options) {
+    return new Promise((resolve, reject) => {
+      buildfire.publicData.aggregate(options, Suggestions.TAG, (e, results) => {
+        if (e) {
+          reject(e);
+        } else {
+          const suggestions = results.map((result) => new Suggestion({ ...result.data, id: result._id })).filter(suggestion => (suggestion && suggestion.id && suggestion.createdBy));
+          resolve(suggestions);
+        }
+      });
+    })
+  }
+
   static getById(id) {
     return new Promise((resolve, reject) => {
       buildfire.publicData.getById(

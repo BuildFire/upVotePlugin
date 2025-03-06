@@ -1,4 +1,31 @@
 const widgetController = {
+  extractUpdatedUsersData(suggestions) {
+    return new Promise((resolve, reject) => {
+      const usersIds = [];
+      suggestions.forEach((suggestion) => {
+        if (usersIds.indexOf(suggestion.createdBy.userId) === -1 && !state.updatedUsersData.some(updatedUser => updatedUser.userId === suggestion.createdBy.userId)) {
+          usersIds.push(suggestion.createdBy.userId);
+        }
+        for (const voterId in suggestion.upVotedBy) {
+          if (usersIds.indexOf(voterId) === -1 && !state.updatedUsersData.some(updatedUser => updatedUser.userId === voterId)) {
+            usersIds.push(voterId);
+          }
+        }
+      });
+      if (usersIds.length) {
+        authManager.getUpdatedUsersBatches(usersIds).then((updatedUsers) => {
+          state.updatedUsersData = state.updatedUsersData.concat(updatedUsers);
+          resolve();
+        }).catch((err) => {
+          console.error(err);
+          resolve();
+        })
+      } else {
+        resolve();
+      }
+    })
+  },
+
   getSettings() {
     return new Promise((resolve) => {
       Settings.get().then((result) => {
@@ -26,50 +53,91 @@ const widgetController = {
 
   getSuggestions() {
     return new Promise((resolve) => {
-      const { page, pageSize, settings } = state;
+      const { page, pageSize, settings, currentStatusSearch } = state;
       const searchOptions = { page, pageSize };
+      let $match = {
+        "_buildfire.index.string1": { $exists: false }
+      }, $sort = {};
+
+      if (currentStatusSearch === SUGGESTION_STATUS.COMPLETED) {
+        if (settings.hideCompletedItems === 0) return resolve([]);
+
+        if (settings.hideCompletedItems > 0) {
+          const startDate = new Date();
+          startDate.setDate(startDate.getDate() - settings.hideCompletedItems);
+
+          $match['$and'] = [
+            { status: SUGGESTION_STATUS.COMPLETED },
+            { modifiedOn: { $gte: startDate } }
+          ];
+        }
+      } else {
+        $match.status = { $eq: currentStatusSearch };
+      }
 
       switch (settings.defaultItemSorting) {
         case ENUMS.SUGGESTIONS_SORTING.NEWEST:
-          searchOptions.sort = {
+          $sort = {
             createdOn: -1,
           };
           break;
         case ENUMS.SUGGESTIONS_SORTING.OLDEST:
-          searchOptions.sort = {
+          $sort = {
             createdOn: 1,
           };
           break;
         case ENUMS.SUGGESTIONS_SORTING.MOST_VOTES:
         default:
-          searchOptions.sort = {
-            upVoteCount: -1,
+          $sort = {
+            upVotedByCount: -1,
           };
           break;
       }
 
-      if (settings.hideCompletedItems === 0) {
-        searchOptions.filter = {
-          status: { $ne: SUGGESTION_STATUS.COMPLETED },
-        };
-      } else if (settings.hideCompletedItems > 0) {
-        const startDate = new Date();
-        startDate.setDate(startDate.getDate() - settings.hideCompletedItems);
-        searchOptions.filter = {
-          $or: [
-            { status: { $ne: SUGGESTION_STATUS.COMPLETED } },
-            { status: SUGGESTION_STATUS.COMPLETED, modifiedOn: { $gte: startDate } },
-          ],
-        };
-      }
+      searchOptions.pipelineStages = [
+        { $match },
+        { "$addFields": { "upVotedByCount": { "$size": { "$objectToArray": "$upVotedBy" } } } },
+        { $sort },
+      ]
 
-      Suggestions.search(searchOptions).then((result) => {
+      Suggestions.aggregate(searchOptions).then((result) => {
         state.page += 1;
-        state.suggestionsList = state.suggestionsList.concat(result);
+        this.extractUpdatedUsersData(result).then(() => {
+          const syncedSuggestions = result.map((suggestion) => {
+            const updatedCreator = state.updatedUsersData.find(updatedUser => updatedUser.userId === suggestion.createdBy.userId);
+            if (updatedCreator) suggestion.createdBy = updatedCreator;
 
-        resolve(result);
+            for (const voterId in suggestion.upVotedBy) {
+              const updatedVoter = state.updatedUsersData.find(updatedUser => updatedUser.userId === voterId);
+              if (updatedVoter) suggestion.upVotedBy[voterId].user = updatedVoter;
+            }
+
+            return suggestion;
+          }).filter((suggestion) => !state.suggestionsList.some(stateSuggestion => stateSuggestion.id === suggestion.id));
+          state.suggestionsList = state.suggestionsList.concat(syncedSuggestions);
+
+          resolve(syncedSuggestions);
+        })
       });
     });
+  },
+
+  getSuggestionById(suggestionId) {
+    return new Promise((resolve, reject) => {
+      Suggestions.getById(suggestionId).then((suggestion) => {
+        this.extractUpdatedUsersData([suggestion]).then(() => {
+          const updatedCreator = state.updatedUsersData.find(updatedUser => updatedUser.userId === suggestion.createdBy.userId);
+          if (updatedCreator) suggestion.createdBy = updatedCreator;
+
+          for (const voterId in suggestion.upVotedBy) {
+            const updatedVoter = state.updatedUsersData.find(updatedUser => updatedUser.userId === voterId);
+            if (updatedVoter) suggestion.upVotedBy[voterId].user = updatedVoter;
+          }
+
+          resolve(suggestion);
+        })
+      }).catch(reject);
+    })
   },
 
   isSuggestionVoted(suggestion) {
@@ -94,7 +162,6 @@ const widgetController = {
             user: widgetUtils.getUserNeededAuthData(authManager.currentUser),
             votedOn: new Date(),
           },
-          upVoteCount: suggestion.upVoteCount + 1,
         },
       }).then(resolve).catch(reject);
     });
@@ -106,7 +173,6 @@ const widgetController = {
 
       Suggestions.update(suggestion.id, {
         $unset: { [`upVotedBy.${authManager.currentUser.userId}`]: '' },
-        $set: { upVoteCount: suggestion.upVoteCount - 1 },
       }).then(resolve).catch(reject);
     });
   },

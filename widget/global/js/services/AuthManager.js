@@ -36,6 +36,26 @@ const authManager = {
       });
     });
   },
+
+  getUpdatedUsersProfilesBatch(userIds) {
+    return new Promise((resolve, reject) => {
+      buildfire.auth.getUserProfiles({ userIds }, (err, users) => {
+        if (err) return reject(err);
+
+        resolve(users);
+      });
+    })
+  },
+  getUpdatedUsersBatches(userIds, formattedUsers = []) {
+    return new Promise((resolve, reject) => {
+      const usersBatch = userIds.splice(0, 50);
+      if (!usersBatch || !usersBatch.length) return resolve(formattedUsers);
+      authManager.getUpdatedUsersProfilesBatch(usersBatch).then((users) => {
+        formattedUsers = formattedUsers.concat(users);
+        authManager.getUpdatedUsersBatches(userIds, formattedUsers).then(resolve).catch(reject);
+      }).catch(reject);
+    })
+  }
 };
 
 buildfire.auth.onLogin((user) => {
