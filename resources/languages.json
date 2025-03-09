@@ -102,37 +102,53 @@
                     "toolTip": "",
                     "placeholder": "Someone"
                 },
+                "viewProfile": {
+                    "title": "View Profile",
+                    "defaultValue": "View Profile",
+                    "inputType": "text",
+                    "maxLength": 20,
+                    "toolTip": "This message will only be shown if the 'Show Upvoter's Profile Details' setting is enabled.",
+                    "placeholder": "View Profile"
+                },
+                "messageUser": {
+                    "title": "Message User",
+                    "defaultValue": "Message User",
+                    "inputType": "text",
+                    "maxLength": 20,
+                    "toolTip": "This message will only be shown if the 'Show Upvoter's Profile Details' setting and the corresponding subsetting are enabled.",
+                    "placeholder": "Message User"
+                },
                 "day": {
                     "title": "Day",
-                    "defaultValue": "Day",
+                    "defaultValue": "day",
                     "inputType": "text",
                     "maxLength": 15,
                     "toolTip": "",
-                    "placeholder": "Day"
+                    "placeholder": "day"
                 },
                 "hour": {
                     "title": "Hour",
-                    "defaultValue": "Hour",
+                    "defaultValue": "hour",
                     "inputType": "text",
                     "maxLength": 15,
                     "toolTip": "",
-                    "placeholder": "Hour"
+                    "placeholder": "hour"
                 },
                 "hours": {
                     "title": "Hours",
-                    "defaultValue": "Hours",
+                    "defaultValue": "hours",
                     "inputType": "text",
                     "maxLength": 15,
                     "toolTip": "",
-                    "placeholder": "Hours"
+                    "placeholder": "hours"
                 },
                 "min": {
                     "title": "Min",
-                    "defaultValue": "Min",
+                    "defaultValue": "min",
                     "inputType": "text",
                     "maxLength": 15,
                     "toolTip": "",
-                    "placeholder": "Min"
+                    "placeholder": "min"
                 }
             }
         },

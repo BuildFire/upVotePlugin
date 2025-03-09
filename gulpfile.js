@@ -3,175 +3,122 @@ const del = require('del');
 const minHTML = require('gulp-htmlmin');
 const minifyCSS = require('gulp-csso');
 const concat = require('gulp-concat');
-const strip = require('gulp-strip-comments');
 const htmlReplace = require('gulp-html-replace');
-const terser = require('gulp-terser');
-const eslint = require('gulp-eslint');
+const minify = require('gulp-minify');
 const imagemin = require('gulp-imagemin');
-const gulpSequence = require('gulp-sequence');
 const babel = require('gulp-babel');
-const zip = require('gulp-zip');
 
-const destinationFolder= releaseFolder();
-var fldr; // moved outside to be able to use it in zip function (191002 - Marcela)
+const version = new Date().getTime();
+const destinationFolder = releaseFolder();
+
 function releaseFolder() {
-    var arr = __dirname.split("/");
-    fldr = arr.pop();
-    arr.push(fldr + "_release");
-    return arr.join("/");
+  const arr = __dirname.split('/');
+  const fldr = arr.pop();
+  arr.push(`${fldr}_release`);
+  return arr.join('/');
 }
 
-console.log(">> Building to " , destinationFolder);
-
-
-const cssTasks=[
-    {name:"widgetCSS",src:"widget/**/*.css",dest:"/widget"}
-    ,{name:"controlAssetsCSS",src:"control/assets/**/*.css",dest:"/control/assets"}
-    ,{name:"controlContentCSS",src:"control/content/**/*.css",dest:"/control/content"}
-    ,{name:"controlDesignCSS",src:"control/design/**/*.css",dest:"/control/design"}
-    ,{name:"controlSettingsCSS",src:"control/settings/**/*.css",dest:"/control/settings"}
+const cssTasks = [
+  { name: 'controlContentCSS', src: 'control/content/**/*.css', dest: '/control/content' },
+  { name: 'controlAssetsCSS', src: 'control/assets/**/*.css', dest: '/control/assets' },
+  { name: 'controlSettingsCSS', src: 'control/settings/**/*.css', dest: '/control/settings' },
+  { name: 'widgetCSS', src: ['widget/**/*.css', '!widget/layouts/*.css'], dest: '/widget' },
 ];
 
-cssTasks.forEach(function(task){
-    /*
+cssTasks.forEach((task) => {
+  /*
      Define a task called 'css' the recursively loops through
      the widget and control folders, processes each CSS file and puts
      a processes copy in the 'build' folder
      note if the order matters you can import each css separately in the array
 
      */
-    gulp.task(task.name, function(){
-        return gulp.src(task.src,{base: '.'})
+  gulp.task(task.name, () => gulp.src(task.src, { base: '.' })
 
-        /// minify the CSS contents
-            .pipe(minifyCSS())
+    /// minify the CSS contents
+    .pipe(minifyCSS())
 
-            ///merge
-            .pipe(concat('styles.min.css'))
+    /// merge
+    .pipe(concat('styles.min.css'))
 
-            /// write result to the 'build' folder
-            .pipe(gulp.dest(destinationFolder + task.dest))
-    });
+    /// write result to the 'build' folder
+    .pipe(gulp.dest(destinationFolder + task.dest)));
 });
 
-const jsTasks=[
-    {name:"widgetJS",src:["!widget/assets/**/*.js", "widget/*.js" ,"widget/controllers/*.js"],dest:"/widget"}
-    ,{name:"sharedJS",src:["widget/assets/**/*.js"],dest:"/widget/shared"}
-    ,{name:"controlContentJS",src:"control/content/**/*.js",dest:"/control/content"}
-    ,{name:"controlDesignJS",src:"control/design/**/*.js",dest:"/control/design"}
-    ,{name:"controlSettingsJS",src:"control/settings/**/*.js",dest:"/control/settings"}
+gulp.task('sharedJS', () => gulp.src(['widget/global/**/*.js'], { base: '.' })
+  .pipe(concat('scripts.shared.js'))
+  .pipe(babel({
+    presets: ['@babel/env'],
+    plugins: ['@babel/plugin-proposal-class-properties'],
+  }))
+  .pipe(minify())
+  .pipe(gulp.dest(`${destinationFolder}/widget/global`)));
+
+const jsTasks = [
+  { name: 'widgetJS', src: ['widget/js/*.js', 'widget/js/**/*.js', 'widget/pages/**/*.js'], dest: '/widget' },
+  { name: 'controlContentJS', src: ['control/content/**/*.js'], dest: '/control/content' },
+  { name: 'controlSettingsJS', src: ['control/settings/**/*.js', '!control/settings/js/duration-picker.js'], dest: '/control/settings' },
+  { name: 'controlTestsDataJS', src: ['control/tests/**/*.js'], dest: '/control/tests' },
 ];
 
-
-
-jsTasks.forEach(function(task){
-    gulp.task(task.name, function() {
-
-        return gulp.src(task.src,{base: '.'})
-            .pipe(babel({
-                presets: ['es2015']
-            }))
-             /// obfuscate and minify the JS files
-            .pipe(terser())
-
-            /// merge all the JS files together. If the
-            /// order matters you can pass each file to the function
-            /// in an array in the order you like
-            .pipe(concat('scripts.min.js'))
-
-            ///output here
-            .pipe(gulp.dest(destinationFolder + task.dest));
-
-    });
-
+jsTasks.forEach((task) => {
+  gulp.task(task.name, () => gulp.src(task.src, { base: '.' })
+    /// merge all the JS files together. If the
+    /// order matters you can pass each file to the function
+    /// in an array in the order you like
+    .pipe(concat('scripts.js'))
+    .pipe(babel({
+      presets: ['@babel/env'],
+      plugins: ['@babel/plugin-proposal-class-properties'],
+    }))
+    .pipe(minify())
+    /// output here
+    .pipe(gulp.dest(destinationFolder + task.dest)));
 });
 
-gulp.task('clean',function(){
-    return del([destinationFolder],{force: true});
-});
+gulp.task('clean', () => del([destinationFolder], { force: true }));
 
 /*
  Define a task called 'html' the recursively loops through
  the widget and control folders, processes each html file and puts
  a processes copy in the 'build' folder
  */
-gulp.task('html', function(){
-    return gulp.src(['widget/**/*.html','widget/**/*.htm', 'widget/layouts/*.css'],{base: '.'})
-    /// replace all the <!-- build:bundleJSFiles  --> comment bodies
-    /// with scripts.min.js with cache buster
-        .pipe(htmlReplace({
-            bundleJSFiles:"scripts.min.js?v=" + (new Date().getTime())
-            ,bundleCSSFiles:"styles.min.css?v=" + (new Date().getTime())
-            ,bundleSharedJSFiles:"./shared/scripts.min.js?v=" + (new Date().getTime())
-        }))
+gulp.task('controlHTML', () => gulp.src(['control/**/*.html'], { base: '.' })
+  .pipe(htmlReplace({
+    bundleSharedJSFiles: `../../widget/global/scripts.shared-min.js?v=${version}`,
+    bundleJSFiles: `scripts-min.js?v=${version}`,
+    bundleCSSFiles: `styles.min.css?v=${version}`,
+    bundleControlAssetsCSSFiles: `../assets/styles.min.css?v=${new Date().getTime()}`,
+  }))
+  .pipe(minHTML({ removeComments: true, collapseWhitespace: true }))
+  .pipe(gulp.dest(destinationFolder)));
 
-        /// then strip the html from any comments
-        .pipe(minHTML({removeComments:true,collapseWhitespace:true}))
+gulp.task('widgetHTML', () => gulp.src(['widget/*.html'], { base: '.' })
+  .pipe(htmlReplace({
+    bundleSharedJSFiles: `global/scripts.shared-min.js?v=${version}`,
+    bundleJSFiles: `scripts-min.js?v=${version}`,
+    bundleCSSFiles: `styles.min.css?v=${version}`,
+  }))
+  .pipe(minHTML({ removeComments: true, collapseWhitespace: true }))
+  .pipe(gulp.dest(destinationFolder)));
 
-        /// write results to the 'build' folder
-        .pipe(gulp.dest(destinationFolder));
-});
+gulp.task('resources', () => gulp.src(['resources/*', 'resources/**', 'plugin.json'], { base: '.' })
+  .pipe(gulp.dest(destinationFolder)));
 
-gulp.task('Controlhtml', function(){
-    return gulp.src(['control/**/*.html','control/**/*.htm'],{base: '.'})
-    /// replace all the <!-- build:bundleJSFiles  --> comment bodies
-    /// with scripts.min.js with cache buster
-        .pipe(htmlReplace({
-            bundleJSFiles:"./scripts.min.js?v=" + (new Date().getTime())
-            ,bundleSharedJSFiles:"../../widget/shared/scripts.min.js?v=" + (new Date().getTime())
-            ,bundleCSSFiles:"styles.min.css?v=" + (new Date().getTime())
-        }))
+gulp.task('images', () => gulp.src(['**/images/**'], { base: '.' })
+  .pipe(imagemin())
+  .pipe(gulp.dest(destinationFolder)));
 
-        /// then strip the html from any comments
-        .pipe(minHTML({removeComments:true,collapseWhitespace:true}))
+gulp.task('assets', () => gulp.src(['control/assets/**/*']).pipe(gulp.dest(`${destinationFolder}/control/assets`)));
 
-        /// write results to the 'build' folder
-        .pipe(gulp.dest(destinationFolder));
-});
+gulp.task('copyJS', () => gulp.src(['control/tests/spec/*', 'control/tests/Jasmine-Project/**/*'], { base: '.' })
+  .pipe(gulp.dest(destinationFolder)));
 
-gulp.task('resources', function(){
-    return gulp.src(['resources/*','plugin.json'],{base: '.'})
-        .pipe(gulp.dest(destinationFolder ));
-});
+gulp.task('copyCSS', () => gulp.src('widget/layouts/layout1.css', { base: '.' })
+  .pipe(gulp.dest(destinationFolder)));
 
+const buildTasksToRun = ['controlHTML', 'widgetHTML', 'resources', 'images', 'sharedJS', 'assets', 'copyCSS', 'copyJS'];
+cssTasks.forEach((task) => { buildTasksToRun.push(task.name); });
+jsTasks.forEach((task) => { buildTasksToRun.push(task.name); });
 
-gulp.task('images', function(){
-    return gulp.src(['**/*.png'],{base: '.'})
-        .pipe(imagemin())
-        .pipe(gulp.dest(destinationFolder ));
-});
-
-gulp.task('fonts', function(){
-    return gulp.src(['widget/css/fonts/**/*.{ttf,woff,eot,svg}'],{base: '.'})
-        .pipe(gulp.dest(destinationFolder));
-});
-
-gulp.task('assets', function(){
-    return gulp.src(['widget/assets/**/*.{css,png,svg}', 'control/assets/**'],{base: '.'})
-        .pipe(gulp.dest(destinationFolder));
-});
-
-gulp.task('tests', function(){
-    return gulp.src(['control/tests/**'],{base: '.'})
-        .pipe(gulp.dest(destinationFolder));
-});
-
-gulp.task('icons', function(){
-    return gulp.src(['widget/css/fonts/**/*.{ttf,woff,eot,svg}'])
-        .pipe(gulp.dest(destinationFolder + '/widget/fonts'));
-});
-
-// added task to be able to zip by running gulp zipit (191001 - Marcela)
-gulp.task('zip', function () {
-    return gulp.src(destinationFolder + '/**/*')
-        .pipe(zip(fldr + 'release.zip'))
-        .pipe(gulp.dest('..'));
-});
-
-var buildTasksToRun=['html', 'Controlhtml','resources','images','fonts','icons', 'assets', 'tests'];
-
-cssTasks.forEach(function(task){  buildTasksToRun.push(task.name)});
-jsTasks.forEach(function(task){  buildTasksToRun.push(task.name)});
-
-gulp.task('build', gulpSequence('clean',buildTasksToRun) );
-gulp.task('zipit', gulpSequence('zip'));// run by 'gulp zip' (191001 - Marcela)
+gulp.task('build', gulp.series('clean', ...buildTasksToRun));

@@ -15,20 +15,20 @@
     "settings": {
       "enabled": true
     },
-	  "cssInjection" : {
-		  "enabled": true,
-		  "layouts": [
-			  {
-				  "name": "Test Layout 1",
-				  "imageUrl": "resources/layouts_img/layout1.png",
-				  "cssPath": "widget/layouts/layout1.css"
-			  }
-		  ]
-	  },
-	  "language" : {
-		  "enabled": true,
-		  "languageJsonPath": "resources/languages.json"
-	  },
+    "cssInjection" : {
+      "enabled": true,
+      "layouts": [
+        {
+          "name": "Test Layout 1",
+          "imageUrl": "resources/layouts_img/layout1.png",
+          "cssPath": "widget/layouts/layout1.css"
+        }
+      ]
+    },
+    "language" : {
+      "enabled": true,
+      "languageJsonPath": "resources/languages.json"
+    },
     "customTabs": [
       {
         "title": "Tests",
