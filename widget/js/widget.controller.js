@@ -53,15 +53,17 @@ const widgetController = {
 
   getSuggestions() {
     return new Promise((resolve) => {
-      const { page, pageSize, settings, currentStatusSearch } = state;
+      const { page, pageSize, settings, isAllNotCompletedSuggestionFetched } = state;
       const searchOptions = { page, pageSize };
       let $match = {
         "_buildfire.index.string1": { $exists: false }
       }, $sort = {};
 
-      if (currentStatusSearch === SUGGESTION_STATUS.COMPLETED) {
+      if (isAllNotCompletedSuggestionFetched) {
+        // hide completed immediately
         if (settings.hideCompletedItems === 0) return resolve([]);
 
+        // hide completed after a certain period
         if (settings.hideCompletedItems > 0) {
           const startDate = new Date();
           startDate.setDate(startDate.getDate() - settings.hideCompletedItems);
@@ -71,10 +73,14 @@ const widgetController = {
             { modifiedOn: { $gte: startDate } }
           ];
         } else {
-          $match.status = { $eq: currentStatusSearch };
+          // never hide the completed items
+          $match.status = { $eq: SUGGESTION_STATUS.COMPLETED };
         }
       } else {
-        $match.status = { $eq: currentStatusSearch };
+        $match['$or'] = [
+          { status: SUGGESTION_STATUS.BACKLOG },
+          { status: SUGGESTION_STATUS.INPROGRESS },
+        ];
       }
 
       switch (settings.defaultItemSorting) {
@@ -122,6 +128,23 @@ const widgetController = {
         })
       });
     });
+  },
+
+  getFirstSuggestionsPage() {
+    return new Promise((resolve, reject) => {
+      this.getSuggestions().then((suggestions) => {
+        if (suggestions.length >= 10) {
+          resolve(suggestions);
+        } else {
+          state.isAllNotCompletedSuggestionFetched = true;
+          state.page = 0;
+
+          this.getSuggestions().then(() => {
+            resolve(state.suggestionsList);
+          });
+        }
+      })
+    })
   },
 
   getSuggestionById(suggestionId) {
