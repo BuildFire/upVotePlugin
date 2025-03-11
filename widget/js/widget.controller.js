@@ -244,6 +244,8 @@ const widgetController = {
         const payload = {
           $set: {
             credits: encryptedCredits,
+            lastUpdatedBy: authManager.currentUser._id,
+            lastUpdatedOn: new Date(),
           },
         };
         return UserCredits.update(authManager.currentUser._id, payload).then((updatedCredits) => {
@@ -265,14 +267,15 @@ const widgetController = {
       const encryptedCredits = widgetUtils.encryptCredit(state.settings.inAppPurchase.votesPerPurchase, ENUMS.SECRET_KEY);
       const payload = {
         $set: {
-          createdBy: authManager.currentUser._id,
+          lastUpdatedBy: authManager.currentUser._id,
+          lastUpdatedOn: new Date(),
           credits: encryptedCredits,
           firstTimePurchase: true,
         },
       };
       UserCredits.update(authManager.currentUser._id, payload).then((updatedCredits) => {
         state.userCredits = {
-          createdBy: authManager.currentUser._id,
+          lastUpdatedBy: authManager.currentUser._id,
           credits: encryptedCredits,
           firstTimePurchase: true,
         };
