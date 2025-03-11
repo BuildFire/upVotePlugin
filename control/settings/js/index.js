@@ -385,5 +385,7 @@ const settingsPage = {
 };
 
 window.onload = () => {
-  settingsPage.init();
+  authManager.enforceLogin().then(() => {
+    settingsPage.init();
+  });
 };
