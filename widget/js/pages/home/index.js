@@ -228,11 +228,11 @@ const homePage = {
     });
 
     if (suggestions.length < state.pageSize) {
-      if (state.isAllNotCompletedSuggestionFetched) {
+      if (state.startFetchingCompleted) {
         state.isAllSuggestionFetched = true;
         if (!state.suggestionsList.length) this.printEmptyState();
       } else {
-        state.isAllNotCompletedSuggestionFetched = true;
+        state.startFetchingCompleted = true;
         state.page = 0;
 
         widgetController.getSuggestions().then((suggestions) => {

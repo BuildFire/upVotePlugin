@@ -53,13 +53,13 @@ const widgetController = {
 
   getSuggestions() {
     return new Promise((resolve) => {
-      const { page, pageSize, settings, isAllNotCompletedSuggestionFetched } = state;
+      const { page, pageSize, settings, startFetchingCompleted } = state;
       const searchOptions = { page, pageSize };
       let $match = {
         "_buildfire.index.string1": { $exists: false }
       }, $sort = {};
 
-      if (isAllNotCompletedSuggestionFetched) {
+      if (startFetchingCompleted) {
         // hide completed immediately
         if (settings.hideCompletedItems === 0) return resolve([]);
 
@@ -136,7 +136,7 @@ const widgetController = {
         if (suggestions.length >= 10) {
           resolve(suggestions);
         } else {
-          state.isAllNotCompletedSuggestionFetched = true;
+          state.startFetchingCompleted = true;
           state.page = 0;
 
           this.getSuggestions().then(() => {

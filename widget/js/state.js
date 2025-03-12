@@ -53,7 +53,7 @@ const state = {
   pageSize: 50,
   fetching: false,
   isAllSuggestionFetched: false,
-  isAllNotCompletedSuggestionFetched: false,
+  startFetchingCompleted: false,
   validUserImages: {},
   suggestionsList: [],
   updatedUsersData: [],
