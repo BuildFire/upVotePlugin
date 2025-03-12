@@ -18,6 +18,7 @@ class UserCredits {
           if (!results || !results.length) {
             const data = new UserCredit({
               userId,
+              createdBy: userId,
             }).toJSON();
             this.insert(data).then((res) => {
               res.data.id = res.id;

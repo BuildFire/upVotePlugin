@@ -226,7 +226,8 @@ const settingsPage = {
       }));
       this.updateDeepSettingValue(`${settingKey}.tags`, updatedTags);
     };
-    tagsInput.set(settingValue.tags);
+    const tags = settingValue.tags.map(tag => ({...tag, tagName: tag.tagName ? tag.tagName : tag.value}));
+    tagsInput.set(tags);
   },
 
   initDropdown(options) {
@@ -385,5 +386,7 @@ const settingsPage = {
 };
 
 window.onload = () => {
-  settingsPage.init();
+  authManager.enforceLogin().then(() => {
+    settingsPage.init();
+  });
 };

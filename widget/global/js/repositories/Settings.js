@@ -17,6 +17,8 @@ class Settings {
 
   static save(settings) {
     return new Promise((resolve, reject) => {
+      settings.lastUpdatedOn = new Date();
+      settings.lastUpdatedBy = authManager.currentUser.userId;
       buildfire.datastore.save(new Setting(settings), this.TAG, (err, res) => {
         if (err) {
           reject(err);

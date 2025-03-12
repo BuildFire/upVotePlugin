@@ -10,7 +10,7 @@ const contentController = {
       Settings.get().then((result) => {
         if (!result || !Object.keys(result).length) {
           Analytics.init(); // init analytics only for the first time of installing the plugin
-          Settings.save(new Setting({ navigateToCwByDefault: true })).then((settings) => {
+          Settings.save(new Setting({ navigateToCwByDefault: true, createdBy: authManager.currentUser.userId })).then((settings) => {
             state.settings = new Setting();
             resolve();
           }).catch((err) => { // don't blok the ui, just print the error and resolve

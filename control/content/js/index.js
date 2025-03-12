@@ -38,5 +38,7 @@ const contentPage = {
 };
 
 window.onload = () => {
-  contentPage.init();
+  authManager.enforceLogin().then(() => {
+    contentPage.init();
+  });
 };
