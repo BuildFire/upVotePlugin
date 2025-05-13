@@ -149,10 +149,10 @@ const settingsPage = {
         const chatInstance = instances.find((instance) => instance.pluginTypeId === 'de21ff5c-93d3-42fe-a8b8-39609c293453');
         if (communityWallInstance || chatInstance) {
         if (communityWallInstance) {
-            state.settings.messagingFeatureInstance = communityWallInstance;
+          state.settings.messagingFeatureInstance = communityWallInstance;
         }
         else {
-            state.settings.messagingFeatureInstance = chatInstance;
+          state.settings.messagingFeatureInstance = chatInstance;
         }
           const syncMessageData = {
             scope: 'directoryOptions',
