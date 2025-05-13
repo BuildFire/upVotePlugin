@@ -85,7 +85,10 @@ const UserModal = {
 
         const wTitle = `${firstUserName} | ${secondUserName}`;
         const wid = userIds[0] + userIds[1];
-        const queryString = widgetUtils.prepareDeeplinkQueryStringData({ wid, wTitle, userIds });
+        const receiverId = this.userData.userId;
+        const queryString = widgetUtils.prepareDeeplinkQueryStringData({
+          wid, wTitle, userIds, receiverId,
+        });
 
         actionItem.queryString = queryString;
 
