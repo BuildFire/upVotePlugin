@@ -146,8 +146,14 @@ const settingsPage = {
     buildfire.pluginInstance.showDialog({}, (error, instances) => {
       if (!error && instances.length > 0) {
         const communityWallInstance = instances.find((instance) => instance.pluginTypeId === 'b15c62f2-7a99-48dc-a37a-e42d46bd3289');
+        const chatInstance = instances.find((instance) => instance.pluginTypeId === 'de21ff5c-93d3-42fe-a8b8-39609c293453');
+        if (communityWallInstance || chatInstance) {
         if (communityWallInstance) {
           state.settings.messagingFeatureInstance = communityWallInstance;
+        }
+        else {
+          state.settings.messagingFeatureInstance = chatInstance;
+        }
           const syncMessageData = {
             scope: 'directoryOptions',
             directoryOptions: { messagingFeatureInstance: state.settings.messagingFeatureInstance },
@@ -156,7 +162,7 @@ const settingsPage = {
           this.saveWithDelay(syncMessageData);
         } else {
           buildfire.dialog.toast({
-            message: 'Please select a Community Wall instance.',
+            message: 'Please select a Community Wall or Chat instance.',
             type: 'warning',
           });
         }
