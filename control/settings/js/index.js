@@ -162,7 +162,7 @@ const settingsPage = {
           this.saveWithDelay(syncMessageData);
         } else {
           buildfire.dialog.toast({
-            message: 'Please select a Community Wall Or Chat Instance .',
+            message: 'Please select a Community Wall or Chat instance.',
             type: 'warning',
           });
         }
