@@ -43,7 +43,7 @@
           <span class="btn-info-icon btn-primary">
             <span class="cp-tooltip top-cp-tooltip">
               Enabling this option allows users to leave comments on items that have been upvoted. To make
-              this work, you must have the Community Wall feature installed.
+              this work, you must have the Community Wall or Chat feature installed.
             </span>
           </span>
         </label>
@@ -73,7 +73,7 @@
         <label class="tooltip-container col-md-4">Allow Private Messaging
           <span class="btn-info-icon btn-primary">
             <span class="cp-tooltip">
-              To enable users to send direct messages, you need to connect the Community Wall plugin,
+              To enable users to send direct messages, you need to connect the Community Wall or Chat feature,
               which will handle message delivery.
             </span>
           </span>
@@ -90,10 +90,8 @@
               </div>
             </div>
             <div class="flex action-item-actions">
-              <button id="editChatInstance"
-                class="btn btn--icon icon primary icon-pencil margin-left-five"></button>
-              <button id="deleteChatInstance"
-                class="btn btn--icon icon danger icon-cross2 margin-left-five"></button>
+              <button id="editChatInstance" class="btn btn--icon icon primary icon-pencil margin-left-five"></button>
+              <button id="deleteChatInstance" class="btn btn--icon icon danger icon-cross2 margin-left-five"></button>
             </div>
           </div>
         </div>
@@ -123,8 +121,7 @@
           </div>
         </span>
 
-        <div class="padding-right-zero margin-top-fifteen tags-input-container hidden"
-          id="postCreationTagsInput">
+        <div class="padding-right-zero margin-top-fifteen tags-input-container hidden" id="postCreationTagsInput">
         </div>
       </div>
     </div>
@@ -152,13 +149,12 @@
           </div>
         </span>
 
-        <div class="padding-right-zero margin-top-fifteen tags-input-container hidden"
-          id="statusUpdateUserTags"></div>
+        <div class="padding-right-zero margin-top-fifteen tags-input-container hidden" id="statusUpdateUserTags"></div>
       </div>
     </div>
 
     <div class="flex flex-align-start row margin-bottom-sixteen">
-      <label class="tooltip-container col-md-4">Allow New Item Push <br/> Notification
+      <label class="tooltip-container col-md-4">Allow New Item Push <br /> Notification
         <span class="btn-info-icon btn-primary">
           <span class="cp-tooltip">
             Specify who should receive push notifications whenever a new item is created.
@@ -168,8 +164,7 @@
       <div class="main col-md-8 pull-right padding-lr-6">
         <span class="radios-row">
           <div class="radio radio-primary radio-inline">
-            <input id="pushNotificationAllUsers" type="radio" name="receiveNotifications"
-              value="ALL_USERS" />
+            <input id="pushNotificationAllUsers" type="radio" name="receiveNotifications" value="ALL_USERS" />
             <label class="subtitles-labels" for="pushNotificationAllUsers">All Users</label>
           </div>
           <div class="radio radio-primary radio-inline">
@@ -177,14 +172,12 @@
             <label class="subtitles-labels" for="pushNotificationNoUsers">No Users</label>
           </div>
           <div class="radio radio-primary radio-inline">
-            <input id="pushNotificationUsersWith" type="radio" name="receiveNotifications"
-              value="USERS_WITH" />
+            <input id="pushNotificationUsersWith" type="radio" name="receiveNotifications" value="USERS_WITH" />
             <label class="subtitles-labels" for="pushNotificationUsersWith">Users With</label>
           </div>
         </span>
 
-        <div class="padding-right-zero margin-top-fifteen tags-input-container hidden"
-          id="pushNotificationUserTags">
+        <div class="padding-right-zero margin-top-fifteen tags-input-container hidden" id="pushNotificationUserTags">
         </div>
       </div>
     </div>
@@ -218,8 +211,8 @@
       </label>
       <div class="main col-md-8 pull-right padding-lr-6">
         <div class="btn-group hide-completed-items-dropdown" id="hideCompletedDropdown">
-          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
-            aria-haspopup="true" aria-expanded="false">
+          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+            aria-expanded="false">
             <span class="button-label">Immediately</span>
             <span class="icon-chevron-down rotate icon"></span>
           </button>
@@ -238,8 +231,8 @@
       </label>
       <div class="main col-md-8 pull-right padding-lr-6">
         <div class="btn-group in-app-purchase-dropdown" id="inAppPurchaseDropdown">
-          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
-            aria-haspopup="true" aria-expanded="false">
+          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+            aria-expanded="false">
             <span class="button-label">Disabled</span>
             <span class="icon-chevron-down rotate icon"></span>
           </button>
@@ -248,8 +241,7 @@
           </ul>
         </div>
         <span>
-          <a class="margin-left-ten"
-            href="https://learn.appdocumentation.com/en/collections/571367-commerce-tab"
+          <a class="margin-left-ten" href="https://learn.appdocumentation.com/en/collections/571367-commerce-tab"
             target="_blank">Learn more about In-App Purchases</a>
         </span>
       </div>
