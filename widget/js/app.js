@@ -27,6 +27,7 @@ const hasPermission = (permissionType) => {
 };
 
 const init = () => {
+  buildfire.appearance.titlebar.show();
   homePage.initSkeleton();
   handleCPSync();
 
