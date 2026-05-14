@@ -256,11 +256,11 @@ const widgetPagesShared = {
     }).then((isConfirmed) => {
       if (isConfirmed) {
         widgetController.handleSuggestionUnVote(suggestion).then((updatedSuggestion) => {
-          if (upvote_icon) upvote_icon.className = 'padding-zero margin--zero iconsTheme material-icons-outlined';
-          if (suggestionVotesCount) suggestionVotesCount.innerHTML = `<span class="margin--0 iconsTheme">${Object.keys(updatedSuggestion.upVotedBy).length}</span>`;
+          if (upvote_icon) upvote_icon.className = 'padding-zero margin--zero bodyTextTheme material-icons';
+          if (suggestionVotesCount) suggestionVotesCount.innerHTML = `<span class="margin--0 bodyTextTheme">${Object.keys(updatedSuggestion.upVotedBy).length}</span>`;
 
-          if (detailsVoteIcon) detailsVoteIcon.className = 'padding-zero margin--zero iconsTheme material-icons-outlined';
-          if (detailsVotesCount) detailsVotesCount.innerHTML = `<span class="margin--0 iconsTheme">${Object.keys(updatedSuggestion.upVotedBy).length}</span>`;
+          if (detailsVoteIcon) detailsVoteIcon.className = 'padding-zero margin--zero bodyTextTheme material-icons';
+          if (detailsVotesCount) detailsVotesCount.innerHTML = `<span class="margin--0 bodyTextTheme">${Object.keys(updatedSuggestion.upVotedBy).length}</span>`;
         }).catch((err) => {
           console.error(err);
           if (upvote_icon) upvote_icon.classList.remove('disabled');

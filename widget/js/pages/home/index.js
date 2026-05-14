@@ -68,7 +68,7 @@ const homePage = {
     suggestionTitle.innerHTML = suggestion.title;
     suggestionBodyText.innerHTML = suggestion.suggestion;
     widgetPagesShared.validateSuggestionImage(suggestionBodyText);
-    suggestionVotesCount.innerHTML = `<span class="margin--0 iconsTheme">${Object.keys(suggestion.upVotedBy).length}</span>`;
+    let suggestionVotesCountClasses = 'margin--0';
 
     if (!state.settings.enableComments) {
       suggestionCommentContainer.classList.add('hidden');
@@ -76,10 +76,15 @@ const homePage = {
 
     if (authManager.currentUser && suggestion.upVotedBy && suggestion.upVotedBy[authManager.currentUser.userId]) {
       upvote_icon.className = 'padding-zero margin--zero iconsTheme material-icons';
+      suggestionVotesCountClasses += ' iconsTheme'
+    } else {
+      suggestionVotesCountClasses += ' bodyTextTheme'
     }
     if (suggestion.status === SUGGESTION_STATUS.COMPLETED) {
       upvote_icon.classList.add('disabled');
     }
+
+    suggestionVotesCount.innerHTML = `<span class="${suggestionVotesCountClasses}">${Object.keys(suggestion.upVotedBy).length}</span>`;
 
     suggestionCommentContainer.onclick = () => widgetPagesShared.navigateToSuggestionComments(suggestion);
     upvote_icon.onclick = () => widgetPagesShared.voteToSuggestion(suggestion);
@@ -223,20 +228,11 @@ const homePage = {
     });
 
     if (suggestions.length < state.pageSize) {
-      if (state.currentStatusSearch === SUGGESTION_STATUS.COMPLETED) {
+      if (state.startFetchingCompleted) {
         state.isAllSuggestionFetched = true;
         if (!state.suggestionsList.length) this.printEmptyState();
-      } else if (state.currentStatusSearch === SUGGESTION_STATUS.INPROGRESS) {
-        state.currentStatusSearch = SUGGESTION_STATUS.COMPLETED;
-        state.page = 0;
-
-        widgetController.getSuggestions().then((suggestions) => {
-          this.handleSuggestionPage(suggestions)
-        }).catch((err) => {
-          console.error(err);
-        });
       } else {
-        state.currentStatusSearch = SUGGESTION_STATUS.INPROGRESS;
+        state.startFetchingCompleted = true;
         state.page = 0;
 
         widgetController.getSuggestions().then((suggestions) => {
@@ -251,7 +247,7 @@ const homePage = {
   init() {
     this.initSelectors();
 
-    widgetController.getSuggestions().then((suggestions) => {
+    widgetController.getFirstSuggestionsPage().then((suggestions) => {
       setTimeout(() => {
         this.destroySkeleton();
 

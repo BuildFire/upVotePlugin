@@ -15,7 +15,7 @@ const hasPermission = (permissionType) => {
       const permissionTags = state.settings.permissions[permissionType].tags;
 
       for (let i = 0; i < permissionTags.length; i++) {
-        if (userTags.some((_tag) => _tag.tagName === permissionTags[i].tagName)) {
+        if (userTags.some((_tag) => (_tag.tagName === permissionTags[i].tagName || _tag.tagName === permissionTags[i].value))) {
           userPermitted = true;
           break;
         }

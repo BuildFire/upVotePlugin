@@ -50,7 +50,7 @@ const suggestionDetailsPage = {
     suggestionTitle.innerHTML = state.activeSuggestion.title;
     suggestionBodyText.innerHTML = state.activeSuggestion.suggestion;
     widgetPagesShared.validateSuggestionImage(suggestionBodyText);
-    suggestionVotesCount.innerHTML = `<span class="margin--0 iconsTheme">${Object.keys(state.activeSuggestion.upVotedBy).length}</span>`;
+    let suggestionVotesCountClasses = 'margin--0';
 
     if (!state.settings.enableComments) {
       suggestionCommentContainer.classList.add('hidden');
@@ -58,10 +58,15 @@ const suggestionDetailsPage = {
 
     if (authManager.currentUser && state.activeSuggestion.upVotedBy && state.activeSuggestion.upVotedBy[authManager.currentUser.userId]) {
       upvote_icon.className = 'padding-zero margin--zero iconsTheme material-icons';
+      suggestionVotesCountClasses += ' iconsTheme'
+    } else {
+      suggestionVotesCountClasses += ' bodyTextTheme'
     }
     if (state.activeSuggestion.status === SUGGESTION_STATUS.COMPLETED) {
       upvote_icon.classList.add('disabled');
     }
+
+    suggestionVotesCount.innerHTML = `<span class="${suggestionVotesCountClasses}">${Object.keys(state.activeSuggestion.upVotedBy).length}</span>`;
 
     suggestionCommentContainer.onclick = () => widgetPagesShared.navigateToSuggestionComments(state.activeSuggestion);
     upvote_icon.onclick = () => widgetPagesShared.voteToSuggestion(state.activeSuggestion);
